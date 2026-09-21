@@ -5,14 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Credit Process Rebuild — Engagement 02 — Jacob Eickhoff</title>
 <meta name="description" content="Rebuilding loan origination as local-only browser tools for a community bank in the Upper Midwest: a constraint argued on concentration of risk, a three-stage review, and extraction that refuses rather than guesses.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<!-- Not deferred, deliberately: this script turns the hiding rules on, and it has to
-     do that before first paint. See the header of motion.js. -->
-<script src="/assets/js/motion.js"></script>
 </head>
 <body>
 <!-- chrome:nav -->
@@ -113,13 +118,11 @@
               compromised workstation yields only what that analyst could already open from the
               share. A compromised server yields every customer, because its service account has to
               read all of them and bypasses the share&rsquo;s permissions by design.</p>
-            <p>It also turns a document on a share into a formal internal service &mdash; which at
-              a regulated institution means risk assessment, sign-off and examiner scrutiny, on top
-              of patching, certificates and a supply chain that today has no dependencies in it at
-              all.</p>
-            <p>The decision is recorded with the conditions that reverse it: someone outside the
-              network needs access, concurrent editing becomes routine, or access control is needed
-              finer than the share can express. None is true today.</p>
+            <p>It also turns a document on a share into a formal internal service, which at a
+              regulated institution means risk assessment, sign-off and examiner scrutiny. The
+              decision is recorded with the conditions that reverse it: someone outside the network
+              needs access, concurrent editing becomes routine, or access control is needed finer
+              than the share can express. None is true today.</p>
           </div>
         </details>
       </section>
@@ -143,8 +146,8 @@
               a call to the lender who wrote the deal, mid-analysis.</p>
             <p>The rebuild separates them: fill the figures, analyse the why, then review. A
               question only the originating lender can answer is marked where it arises and
-              re-listed in one place at the end, so a phone call is one phone call rather than
-              fourteen interruptions.</p>
+              re-listed in one place at the end, so a phone call is one phone call rather than a
+              running string of interruptions.</p>
             <p>The rationale is stakeholder cost: the scarce resource is somebody else&rsquo;s
               attention, and a redesign that saves the analyst an hour by spending two of the
               lender&rsquo;s has made things worse while looking better.</p>
@@ -159,9 +162,9 @@
               emitted as numbers that look like figures. Where an export has scrambled a
               line&rsquo;s description, the amount is flagged for review instead of attached to the
               nearest plausible label.</p>
-            <p>One rule underneath all three: in a credit file a wrong number costs more than a
-              missing one, because a missing number is visibly missing and a wrong one is what
-              everybody works from.</p>
+            <p>The rule underneath both: in a credit file a wrong number costs more than a missing
+              one, because a missing number is visibly missing and a wrong one is what everybody
+              works from.</p>
           </div>
         </details>
       </section>
@@ -169,7 +172,7 @@
       <section class="spine" id="what-changed">
         <p class="eyebrow">Section 03</p>
         <h2 class="spine__title">What Changed</h2>
-        <p>Measured, and mine to state: nine tools shipped and in use; 3,923 automated assertions
+        <p>Measured, and mine to state: nine tools shipped; 3,923 automated assertions
           over the approval-presentation tool alone, none failing, with a second harness that proves
           them capable of failing by injecting the faults they exist to catch; nine architecture
           decisions written down, each with the alternative it was chosen over.</p>
@@ -204,22 +207,23 @@
               fail, and the only gate on deleting the analyst&rsquo;s hand-entered grid.</p>
             <p>The other four: a refusal with nowhere on screen to be said; a rule that had quietly
               stopped being true for one sheet type; a predicate rewritten into a form that read the
-              same and changed behaviour for four existing cases under cover of fixing a fifth; and
-              three analyst-facing messages printing an internal key instead of a name.</p>
+              same and changed behaviour under cover of fixing a fifth case; and three
+              analyst-facing messages printing an internal key instead of a name.</p>
             <p>All six sit in code that generalised an existing rule, which is the pattern worth
               naming: the rule goes on reading correctly while the predicate underneath it has
               changed meaning.</p>
           </div>
         </details>
         <p>The useful part is not the six. It is that the suite, the mutation harness and I were
-          all satisfied, and reading the change as prose was what was left.</p>
+          all satisfied, and reading the change as prose was what was left. I write the tests and I
+          still need the review.</p>
       </section>
 
       <section class="spine" id="where-else-this-applies">
         <p class="eyebrow">Section 05</p>
         <h2 class="spine__title">Where Else This Applies</h2>
         <p><strong>Arguing a constraint&rsquo;s threat model</strong> rather than accepting its
-          conclusion. Healthcare, legal and defence clients set conditions that look like
+          conclusion. Healthcare, legal and defence work runs under conditions that look like
           obstruction from outside and are load-bearing from inside, and knowing which is the
           difference between negotiating a constraint and building within it.</p>
         <p><strong>Separating a process by whose attention it spends.</strong> Any workflow where

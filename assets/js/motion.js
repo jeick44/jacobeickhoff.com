@@ -44,22 +44,40 @@
     var buttons = document.querySelectorAll("[data-expand-all]");
     for (var i = 0; i < buttons.length; i++) {
       (function (btn) {
-        var items = document.querySelectorAll("details.disclosure");
+        var items = document.querySelectorAll("details");
         if (!items.length) return;
         btn.removeAttribute("hidden");
-        btn.addEventListener("click", function () {
-          /* Open unless everything is already open. The label is the state: a screen reader
-             announces the button's new name when focus stays on it, which is what tells someone
-             not watching the page what just happened. */
-          var allOpen = true;
+
+        /* The label IS the state, derived from the sections rather than toggled. A label that
+           flips on click goes stale the moment somebody closes one section by hand, and then it is
+           a button that says Collapse and expands.
+
+           The button deliberately carries no aria-expanded: it does not expand ITSELF, it operates
+           other elements, and each of those announces its own state because it is a <details>.
+           run.py fails the run on an aria-expanded outside a <summary> for that reason. */
+        function everyOneOpen() {
           for (var j = 0; j < items.length; j++) {
-            if (!items[j].open) { allOpen = false; break; }
+            if (!items[j].open) return false;
           }
+          return true;
+        }
+
+        function relabel() {
+          btn.textContent = everyOneOpen() ? "Collapse all sections" : "Expand all sections";
+        }
+
+        btn.addEventListener("click", function () {
+          var open = !everyOneOpen();
           for (var k = 0; k < items.length; k++) {
-            items[k].open = !allOpen;
+            items[k].open = open;
           }
-          btn.textContent = allOpen ? "Expand all sections" : "Collapse all sections";
+          relabel();
         });
+
+        for (var m = 0; m < items.length; m++) {
+          items[m].addEventListener("toggle", relabel);
+        }
+        relabel();
       })(buttons[i]);
     }
   }

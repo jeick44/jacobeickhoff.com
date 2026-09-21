@@ -25,6 +25,10 @@
   --accent: #1fa0b8;
   --ink: #1b2436;
   --ink-soft: #4a5468;
+  /* Body text and captions ON a navy band. Neither is --steel-light, which is a chrome colour and
+     too cold for running prose; both were hard-coded in three places each before they were named. */
+  --on-navy: #d7dde8;
+  --on-navy-soft: #c4ccd8;
   --paper: #ffffff;
   --shade: #f4f5f7;
   --line: #dfe2e6;
@@ -58,6 +62,10 @@
   --space-xl: 3.5rem;
   --space-2xl: 5rem;
   --space-3xl: 7rem;
+
+  /* A hairline on a navy band. The chrome already drew one at 0.12 and another at 0.14; this is
+     the one value for it. */
+  --rule-on-navy: rgba(255, 255, 255, 0.14);
 
   --wrap: 68rem;
   --gutter: clamp(1.25rem, 4vw, 3rem);
@@ -149,12 +157,27 @@ ul {
   background: var(--shade);
 }
 
-.eyebrow {
+/* THE LABEL TREATMENT - one rule, every uppercase label on the site.
+   Eight components were carrying these same five declarations, copied. Each still owns its own
+   colour, spacing and box, because those are what distinguish an eyebrow from a breadcrumb from a
+   Pending Results flag; the typography is what makes them all recognisably the same site. */
+.eyebrow,
+.about__facts dt,
+.crumb,
+.case-head__flag,
+.pending-result__flag,
+.engagement-card__cta,
+.engagement-card__cta--pending,
+.expand-all,
+.timeline__when {
   font-family: var(--font-display);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
+}
+
+.eyebrow {
   color: var(--steel);
   margin: 0 0 var(--space-sm);
 }
@@ -196,7 +219,7 @@ ul {
 .site-header {
   background: var(--navy-deep);
   color: var(--paper);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid var(--rule-on-navy);
 }
 
 .site-header__inner {
@@ -302,7 +325,7 @@ ul {
 }
 
 .site-footer__note {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid var(--rule-on-navy);
   padding-top: var(--space-md);
   max-width: 68ch;
   color: var(--steel);
@@ -367,7 +390,7 @@ ul {
 
 .hero__lede {
   font-size: var(--text-md);
-  color: #d7dde8;
+  color: var(--on-navy);
   max-width: 54ch;
   margin-top: var(--space-md);
 }
@@ -474,7 +497,7 @@ ul {
 .stat__label {
   display: block;
   margin-top: var(--space-2xs);
-  color: #c4ccd8;
+  color: var(--on-navy-soft);
   font-size: var(--text-sm);
   max-width: 34ch;
 }
@@ -515,11 +538,6 @@ ul {
 }
 
 .about__facts dt {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--steel);
 }
 
@@ -638,7 +656,7 @@ ul {
 }
 
 .contact__lede {
-  color: #d7dde8;
+  color: var(--on-navy);
   max-width: 54ch;
   margin-top: var(--space-md);
   font-size: var(--text-md);
@@ -711,17 +729,12 @@ ul {
 .page-head__lede,
 .case-head__lede {
   font-size: var(--text-md);
-  color: #d7dde8;
+  color: var(--on-navy);
   max-width: 58ch;
   margin-top: var(--space-md);
 }
 
 .crumb {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--steel-light);
   margin-bottom: var(--space-md);
   display: flex;
@@ -740,20 +753,10 @@ ul {
 .case-head__status {
   margin-top: var(--space-md);
   padding-top: var(--space-md);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid var(--rule-on-navy);
   font-size: var(--text-sm);
-  color: #c4ccd8;
+  color: var(--on-navy-soft);
   max-width: 58ch;
-}
-
-.case-head__flag,
-.pending-result__flag,
-.engagement-card__cta--pending {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
 }
 
 .case-head__flag {
@@ -784,11 +787,6 @@ ul {
 }
 
 .expand-all {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--navy);
   background: none;
   border: 0;
@@ -941,11 +939,6 @@ ul {
 }
 
 .engagement-card__cta {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--accent);
   margin: var(--space-xs) 0 0;
 }
@@ -1123,11 +1116,6 @@ ul {
 }
 
 .timeline__when {
-  font-family: var(--font-display);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
   color: var(--steel);
   font-variant-numeric: tabular-nums;
   margin: 0;

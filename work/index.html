@@ -5,14 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The work — Six Engagements — Jacob Eickhoff</title>
 <meta name="description" content="Six Engagements, each written as a Case Study following the same five sections: The Situation, What I Did, What Changed, What I Learned, Where Else This Applies.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
 <link rel="stylesheet" href="/assets/css/site.css">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<!-- Not deferred, deliberately: this script turns the hiding rules on, and it has to
-     do that before first paint. See the header of motion.js. -->
-<script src="/assets/js/motion.js"></script>
 </head>
 <body>
 <!-- chrome:nav -->
