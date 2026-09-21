@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="JE">
+  <rect width="64" height="64" fill="#1F3864"/>
+  <rect x="0" y="0" width="64" height="4" fill="#1FA0B8"/>
+  <text x="32" y="45" text-anchor="middle" font-family="Helvetica, Arial, sans-serif"
+        font-weight="700" font-size="30" fill="#FFFFFF">JE</text>
+</svg>

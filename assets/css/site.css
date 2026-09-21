@@ -1,0 +1,714 @@
+/* =================================================================================================
+   site.css - the whole visual system. Every page loads this file and no other.
+
+   THE TOKENS ARE THE CONTRACT. Palette, type scale and spacing rhythm are custom properties on
+   :root, and nothing below hard-codes a colour or a size that a token already names. That is what
+   makes a Case Study written six issues from now look like it belongs to the same site as the
+   homepage without anyone comparing them side by side.
+
+   NOTHING IS HIDDEN EXCEPT UNDER .js-motion. The scroll reveals need their elements to start
+   invisible, and an element that starts invisible in a plain stylesheet stays invisible forever
+   when the script is blocked, fails, or simply has not arrived yet. So the hiding rule is scoped
+   to a class that motion.js adds to <html> as its first act. No script, no class, no hiding, and
+   the page is just a page. suites/run.py fails the run on any opacity:0 outside that scope.
+   ============================================================================================== */
+
+:root {
+  /* ---- palette -------------------------------------------------------------------------------
+     Navy and steel, per the spec. The accent is decoration only - rules, underlines, the focus
+     ring - and never carries text, because at 4.0:1 on white it would not be readable if it did. */
+  --navy: #1f3864;
+  --navy-deep: #152744;
+  --navy-lift: #2b4a7e;
+  --steel: #8d9296;
+  --steel-light: #b7bbbf;
+  --accent: #1fa0b8;
+  --ink: #1b2436;
+  --ink-soft: #4a5468;
+  --paper: #ffffff;
+  --shade: #f4f5f7;
+  --line: #dfe2e6;
+
+  /* ---- type ----------------------------------------------------------------------------------
+     Archivo for anything that carries weight, Source Sans for anything that carries words. The
+     display steps are fluid so the hero is large on a monitor without overflowing a 320px phone,
+     which is a thing a fixed 5rem heading does on the first long word. */
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+
+  --text-xs: 0.78rem;
+  --text-sm: 0.9rem;
+  --text-base: 1.0625rem;
+  --text-md: 1.1875rem;
+  --text-lg: clamp(1.25rem, 1.15rem + 0.45vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.3rem + 1vw, 2.125rem);
+  --text-2xl: clamp(1.875rem, 1.5rem + 1.9vw, 3rem);
+  --text-3xl: clamp(2.5rem, 1.7rem + 4vw, 5rem);
+
+  --tracking-label: 0.14em;
+  --tracking-display: -0.022em;
+
+  /* ---- spacing rhythm ------------------------------------------------------------------------ */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.25rem;
+  --space-xl: 3.5rem;
+  --space-2xl: 5rem;
+  --space-3xl: 7rem;
+
+  --wrap: 68rem;
+  --gutter: clamp(1.25rem, 4vw, 3rem);
+  --rule: 3px;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --speed: 520ms;
+}
+
+/* =================================================================================================
+   RESET - the small, deliberate part of one
+   ============================================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.65;
+  /* A long unbroken token - a URL in body copy - is the usual cause of overflow at 320px. */
+  overflow-wrap: break-word;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0 0 var(--space-sm);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  color: inherit;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* =================================================================================================
+   LAYOUT
+   ============================================================================================== */
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  padding-block: clamp(var(--space-xl), 8vw, var(--space-3xl));
+}
+
+.section--shade {
+  background: var(--shade);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--steel);
+  margin: 0 0 var(--space-sm);
+}
+
+.section__title {
+  font-size: var(--text-2xl);
+  max-width: 22ch;
+}
+
+.section__lede {
+  font-size: var(--text-md);
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin-top: var(--space-md);
+}
+
+.rule {
+  width: 3.5rem;
+  height: var(--rule);
+  background: var(--accent);
+  border: 0;
+  margin: 0 0 var(--space-md);
+}
+
+/* =================================================================================================
+   CHROME - duplicated into every page, kept identical by suites/run.py (ADR-0002)
+   ============================================================================================== */
+.skip-link {
+  position: absolute;
+  left: var(--space-sm);
+  top: var(--space-sm);
+  z-index: 100;
+  transform: translateY(-350%);
+  background: var(--paper);
+  color: var(--navy);
+  font-weight: 600;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: 2px;
+  text-decoration: none;
+  transition: transform 180ms var(--ease);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.site-header {
+  background: var(--navy-deep);
+  color: var(--paper);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+  padding-block: var(--space-sm);
+}
+
+.brand {
+  text-decoration: none;
+  display: grid;
+  gap: 1px;
+}
+
+.brand__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-md);
+  letter-spacing: -0.01em;
+}
+
+.brand__tag {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--steel-light);
+}
+
+.nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.nav__link {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--steel-light);
+  padding-block: var(--space-3xs);
+  border-bottom: 2px solid transparent;
+  transition: color 180ms var(--ease), border-color 180ms var(--ease);
+}
+
+.nav__link:hover {
+  color: var(--paper);
+  border-bottom-color: var(--accent);
+}
+
+/* The active page. One class and one aria-current, and they are the ONLY thing suites/run.py
+   permits a page's chrome to differ by. */
+.nav__link.is-current,
+.brand.is-current .brand__name {
+  color: var(--paper);
+}
+
+.nav__link.is-current {
+  border-bottom-color: var(--accent);
+}
+
+.site-footer {
+  background: var(--navy-deep);
+  color: var(--steel-light);
+  font-size: var(--text-sm);
+}
+
+.site-footer__inner {
+  display: grid;
+  gap: var(--space-md);
+  padding-block: var(--space-xl);
+}
+
+.site-footer__name {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--paper);
+  margin: 0;
+}
+
+.site-footer__where {
+  margin: var(--space-3xs) 0 0;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+}
+
+.site-footer__links a {
+  color: var(--paper);
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
+}
+
+.site-footer__note {
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: var(--space-md);
+  max-width: 68ch;
+  color: var(--steel);
+  margin: 0;
+}
+
+@media (min-width: 56rem) {
+  .site-footer__inner {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+
+  .site-footer__note {
+    grid-column: 1 / -1;
+  }
+}
+
+/* =================================================================================================
+   HERO
+   ============================================================================================== */
+.hero {
+  background: var(--navy);
+  color: var(--paper);
+  padding-block: clamp(var(--space-xl), 10vw, var(--space-3xl));
+  position: relative;
+  overflow: hidden;
+}
+
+/* A single diagonal shaft of lighter navy. It is decoration, it carries no meaning, and it is
+   clipped by the hero rather than allowed to widen the page. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: -20% -10% -20% 55%;
+  background: linear-gradient(105deg, transparent 0 42%, var(--navy-lift) 42% 100%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.hero .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__eyebrow {
+  color: var(--steel-light);
+}
+
+.hero__name {
+  font-size: var(--text-3xl);
+  max-width: 14ch;
+}
+
+.hero__tagline {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  margin: var(--space-sm) 0 0;
+}
+
+.hero__lede {
+  font-size: var(--text-md);
+  color: #d7dde8;
+  max-width: 54ch;
+  margin-top: var(--space-md);
+}
+
+.hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.btn {
+  display: inline-block;
+  /* A button label is a label. `anywhere` also lowers the min-content width, which is what stops
+     a long one from widening the whole page at 320px rather than just spilling out of its box. */
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-md);
+  border: 2px solid transparent;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease),
+    border-color 200ms var(--ease);
+}
+
+.btn--primary {
+  background: var(--paper);
+  color: var(--navy-deep);
+  border-color: var(--paper);
+}
+
+.btn--primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--navy-deep);
+}
+
+.btn--ghost {
+  border-color: rgba(255, 255, 255, 0.45);
+  color: var(--paper);
+}
+
+.btn--ghost:hover {
+  border-color: var(--paper);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =================================================================================================
+   STAT CALLOUTS - the only figures on this page (ADR-0001)
+   ============================================================================================== */
+.stats {
+  background: var(--navy-deep);
+  color: var(--paper);
+  padding-block: var(--space-xl);
+}
+
+.stats__list {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 46rem) {
+  .stats__list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+.stat {
+  border-top: var(--rule) solid var(--accent);
+  padding-top: var(--space-md);
+}
+
+.stat__figure {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+  flex-wrap: wrap;
+}
+
+.stat__value {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  /* Tabular figures so a counting animation does not make the row jitter as digits change. */
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stat__unit {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.stat__label {
+  display: block;
+  margin-top: var(--space-2xs);
+  color: #c4ccd8;
+  font-size: var(--text-sm);
+  max-width: 34ch;
+}
+
+/* =================================================================================================
+   ABOUT BAND
+   ============================================================================================== */
+.about__grid {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (min-width: 52rem) {
+  .about__grid {
+    grid-template-columns: 17rem 1fr;
+    gap: var(--space-xl);
+  }
+}
+
+.about__portrait {
+  width: 100%;
+  max-width: 17rem;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-bottom: var(--rule) solid var(--accent);
+  background: var(--shade);
+}
+
+.about__facts {
+  display: grid;
+  gap: var(--space-2xs);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.about__facts dt {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.about__facts dd {
+  margin: 0 0 var(--space-2xs);
+}
+
+/* =================================================================================================
+   ENGAGEMENT PREVIEW CARDS
+   ============================================================================================== */
+.engagements__list {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+@media (min-width: 42rem) {
+  .engagements__list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 66rem) {
+  .engagements__list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.engagement-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-top: var(--rule) solid var(--navy);
+  padding: var(--space-md);
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  transition: border-top-color 200ms var(--ease), box-shadow 200ms var(--ease),
+    transform 200ms var(--ease);
+}
+
+.engagement-card:hover {
+  border-top-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(31, 56, 100, 0.12);
+  transform: translateY(-2px);
+}
+
+.engagement-card__index {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  color: var(--steel);
+}
+
+.engagement-card__name {
+  font-size: var(--text-lg);
+}
+
+.engagement-card__sponsor {
+  font-size: var(--text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.engagement-card__line {
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  margin: var(--space-2xs) 0 0;
+}
+
+.engagements__note {
+  margin-top: var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--steel);
+  max-width: 62ch;
+}
+
+/* =================================================================================================
+   CONTACT BAND
+   ============================================================================================== */
+.contact {
+  background: var(--navy);
+  color: var(--paper);
+}
+
+.contact__title {
+  font-size: var(--text-2xl);
+  max-width: 20ch;
+}
+
+.contact__lede {
+  color: #d7dde8;
+  max-width: 54ch;
+  margin-top: var(--space-md);
+  font-size: var(--text-md);
+}
+
+.contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+/* The address itself, in its own case and its own size. It is the thing a reader copies. */
+.contact__address {
+  margin-top: var(--space-md);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.contact__address a {
+  color: var(--paper);
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
+}
+
+/* =================================================================================================
+   MOTION - every hiding rule below is inside .js-motion, and that is load-bearing
+   ============================================================================================== */
+.js-motion .reveal {
+  opacity: 0;
+  transform: translateY(1.25rem);
+  transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease);
+}
+
+.js-motion .reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* =================================================================================================
+   REDUCED MOTION - a blanket, deliberately
+   The alternative is a per-component opt-in, which the next component forgets. suites/run.py
+   fails the run if this block stops collapsing both durations on *.
+   ============================================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* =================================================================================================
+   PRINT - a recruiter saving this as a PDF gets the whole page
+   ============================================================================================== */
+@media print {
+  .site-header,
+  .skip-link,
+  .hero__ctas,
+  .contact__actions {
+    display: none;
+  }
+
+  .hero,
+  .stats,
+  .contact,
+  .site-footer {
+    background: var(--paper) !important;
+    color: #000 !important;
+  }
+
+  .hero::after {
+    display: none;
+  }
+
+  .stat__label,
+  .hero__lede,
+  .contact__lede,
+  .site-footer__note {
+    color: #333 !important;
+  }
+}
