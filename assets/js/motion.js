@@ -1,5 +1,6 @@
 /* =================================================================================================
-   motion.js - scroll reveals and the Stat Callout counters. The site is complete without it.
+   motion.js - scroll reveals, the Stat Callout counters, and the expand-all control. The site is
+   complete without it.
 
    IT RUNS IN THE HEAD, ON PURPOSE, AND IT IS NOT DEFERRED.
      Its first act is to put `js-motion` on <html>, and that class is what turns the hiding rules
@@ -29,6 +30,45 @@
 
   var root = document.documentElement;
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- expand all ----------------------------------------------------------------------------
+     THIS RUNS BEFORE THE REDUCED-MOTION RETURN, AND THAT IS THE POINT. Expanding a section is not
+     motion, it is a control; a visitor who asked for less motion still wants the button to work.
+     Putting it below the early return would have taken the control away from exactly the people
+     most likely to be using a keyboard.
+
+     The button ships with `hidden` and is unhidden here, so a visitor with no script never sees a
+     control that cannot do anything. The <details> elements underneath work perfectly well one at
+     a time without it. suites/run.py fails the run on an expand-all that ships visible. */
+  function wireExpandAll() {
+    var buttons = document.querySelectorAll("[data-expand-all]");
+    for (var i = 0; i < buttons.length; i++) {
+      (function (btn) {
+        var items = document.querySelectorAll("details.disclosure");
+        if (!items.length) return;
+        btn.removeAttribute("hidden");
+        btn.addEventListener("click", function () {
+          /* Open unless everything is already open. The label is the state: a screen reader
+             announces the button's new name when focus stays on it, which is what tells someone
+             not watching the page what just happened. */
+          var allOpen = true;
+          for (var j = 0; j < items.length; j++) {
+            if (!items[j].open) { allOpen = false; break; }
+          }
+          for (var k = 0; k < items.length; k++) {
+            items[k].open = !allOpen;
+          }
+          btn.textContent = allOpen ? "Expand all sections" : "Collapse all sections";
+        });
+      })(buttons[i]);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wireExpandAll);
+  } else {
+    wireExpandAll();
+  }
 
   if (reduced || !("IntersectionObserver" in window)) {
     return;
