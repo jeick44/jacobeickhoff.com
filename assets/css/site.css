@@ -171,14 +171,6 @@ ul {
   margin-top: var(--space-md);
 }
 
-.rule {
-  width: 3.5rem;
-  height: var(--rule);
-  background: var(--accent);
-  border: 0;
-  margin: 0 0 var(--space-md);
-}
-
 /* =================================================================================================
    CHROME - duplicated into every page, kept identical by suites/run.py (ADR-0002)
    ============================================================================================== */
