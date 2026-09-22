@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research &mdash; Jacob Eickhoff</title>
+<meta name="description" content="Two research tracks — a faculty-advised study of whether AI-generated language in filings predicts abnormal returns, and a self-directed allocation framework — with the self-withdrawal that set the standard for both, and what would show either of them to be wrong.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!-- chrome:nav -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="/">
+        <span class="brand__name">Jacob Eickhoff</span>
+        <span class="brand__tag">Finance. AI. Consulting.</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="/work/">Work</a></li>
+          <li><a class="nav__link is-current" href="/research/" aria-current="page">Research</a></li>
+          <li><a class="nav__link" href="/about/">About</a></li>
+          <li><a class="nav__link" href="/#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<!-- /chrome:nav -->
+
+<main id="main">
+
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow hero__eyebrow">Research</p>
+      <h1 class="page-head__title">Two tracks, and the withdrawal that set the standard for
+        both.</h1>
+      <p class="page-head__lede">One track is academic and faculty-advised: whether a model&rsquo;s
+        hand in a company&rsquo;s own prose can be seen at all, and if it can, whether the market
+        prices it. The other is an allocation framework I designed, built and operate myself. This
+        page says what each one is, where it actually stands, and what would show it to be wrong.
+        The work is written up in two Case Studies, and this page is not a summary of them.</p>
+    </div>
+  </section>
+
+  <!-- THE WITHDRAWAL GOES FIRST, AND ONCE.
+       It is the reason a reader should extend any credit to the two tracks below, so it is above
+       them rather than tucked into the first one - and it is told at overview level here and in
+       full on one Case Study, never in three places at once. -->
+  <section class="section section--shade" id="the-withdrawal">
+    <div class="wrap">
+      <p class="eyebrow">Start here</p>
+      <h2 class="section__title">I withdrew my own published result.</h2>
+      <p class="stance">In June 2026 I compiled a report carrying three headline findings and sent
+        it out. I then checked it against its own source data and against filings I pulled fresh,
+        found three defects, and superseded it: a dated correction, saying the report was
+        superseded and not to be cited, to go to every recipient I could identify. I cannot be
+        certain where the original travelled, and that is a large part of why a correction exists
+        at all rather than a quiet replacement. The findings themselves are not repeated anywhere
+        on this site, including on this page.</p>
+      <p>All three are named and dated in the Case Study. One of them governs everything I have
+        done since: the headline effect turned up at dates I had invented, where nothing whatever
+        had happened. None of that was carelessness, which is the uncomfortable part. Every call
+        underneath it had been made while the result was already on screen, and not one had been
+        logged as a call, because none of them felt like one at the time.</p>
+      <p>Which is why more care is not the remedy: care pointed at an expected answer is what built
+        the defect. The remedy has to be a commitment entered into while the numbers do not yet
+        exist, in a form able to disqualify the answer I would rather have.</p>
+      <h3 class="section__subtitle" id="the-gate">The Gate is what that commitment looks
+        like.</h3>
+      <p>Before any detector was run against the labelled data, the pass bar for the rebuilt study
+        was written into a file with a date on it. It is a real bar and it is worth stating as a
+        number: an AUC of at least 0.70 at the moderate rung of edit intensity, with false positives
+        held at or under 5% against genuine pre-2020 footnotes. Four candidate detectors were named
+        in the same file. One that does not reach the bar is disqualified, and published as
+        disqualified.</p>
+      <p>What the bar buys is that the bar cannot move. The rungs are not re-cut afterwards, a
+        fifth detector is not added because the first four disappointed, and the panel of filings is
+        not scored at all until something clears it. That is what turns a negative answer into a
+        reportable finding instead of an embarrassment &mdash; and the same commitment, one track
+        over, is why the allocation framework&rsquo;s measured results are absent from this site
+        rather than printed with a caveat beside them.</p>
+      <details class="disclosure">
+        <summary class="disclosure__summary">Why the withdrawn findings are not restated on this
+          page</summary>
+        <div class="disclosure__body">
+          <p>The superseded report is the one piece of work here whose conclusions are deliberately
+            unavailable, and that is a decision rather than an oversight. Restating them would put
+            three figures back in front of a reader who has no way to re-derive them, attached to a
+            sentence explaining that they are wrong &mdash; and a figure travels a great deal
+            further than the sentence qualifying it.</p>
+          <p>What is published instead is the defect behind each one, which is the part somebody
+            else can use: it says what to look for in work of the same shape, and it can be checked
+            against the pipeline that replaced it.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" id="the-tracks">
+    <div class="wrap">
+      <p class="eyebrow">The tracks</p>
+      <h2 class="section__title">What each one is, and where it stands.</h2>
+      <p class="section__lede">Neither track is finished, and they are unfinished in different
+        ways: one has its instrument built and a result it is not yet permitted to compute, the
+        other has a system that runs on a schedule and a history far too short to judge it by. Both
+        are set out below in the same three slots, and the third slot is the one that says what
+        would show the work to be wrong.</p>
+
+      <p class="section__tools">
+        <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+      </p>
+
+      <section class="track reveal" id="filings-and-returns">
+        <p class="eyebrow">Track 01</p>
+        <h3 class="track__name">Can a model&rsquo;s hand in a filing be seen &mdash; and does it get
+          priced?</h3>
+        <p class="track__sponsor">Independent &middot; faculty-advised &middot; Engagement 04</p>
+        <p>A great deal of finance research reads corporate disclosure as text: how hedged it is,
+          how readable, how far it has moved since last year. All of it assumes a person chose the
+          words. Where an issuer put the paragraph through an assistant first, those measures are
+          partly measuring the assistant, and a company that reads as newly careful may just have
+          changed its drafting habits.</p>
+        <p>How often that happens is unknown, for a narrow reason: the detectors that exist were
+          built to separate web prose from model output, and the notes to a set of financial
+          statements resemble neither. None of them has been shown to work on this kind of writing
+          at all. So the study runs in two halves and the second waits on the first. Half one asks
+          whether the edit is visible, against text whose authorship is beyond doubt. Only if
+          something passes does half two ask whether the market prices it. Scoring real filings
+          with an instrument that has not passed produces a number either way, which is the trap
+          the withdrawn version walked into.</p>
+        <dl class="track__standing">
+          <dt>Settled</dt>
+          <dd>The corpus is extracted, and each passage carries the filing it came from, the note it
+            sits in and its character range, so any figure traces back to text a reader can open for
+            themselves. Human authorship is certain by construction: all of it predates the models.
+            The instrument reports accuracy at three levels of edit intensity rather than as one
+            score, and a passage&rsquo;s level is measured against its own unedited original instead
+            of being read off the prompt that asked for the edit.</dd>
+          <dt>In progress</dt>
+          <dd>The four detectors named in advance are being measured against the labelled validation
+            set. The panel of real filings is not scored, and is not authorised to be scored, until
+            one of them clears the Gate. Around that work sit three things that are not results: an
+            application for research funding, submitted and not yet decided; a conference as the
+            intended venue whichever way the Gate falls; and a faculty relationship that is a
+            working one rather than a name on a cover page.</dd>
+          <dt>What would falsify it</dt>
+          <dd>If no detector clears the Gate, the study stops at the validation stage, and the
+            reportable finding is that editing of this kind cannot be detected with the public
+            methods available &mdash; published with the accuracy curve attached, so that filers not
+            doing it stays distinguishable from an instrument that cannot see it. And if a detector
+            does clear the bar but the return effect vanishes once a time trend sits in the
+            specification, that answer goes the same way the first one did.</dd>
+        </dl>
+        <p class="track__more"><a href="/work/the-research/">The Research &mdash; the full Case
+          Study, with the three defects named and dated</a></p>
+      </section>
+
+      <section class="track reveal" id="allocation-framework">
+        <p class="eyebrow">Track 02</p>
+        <h3 class="track__name">Can one person run the process a committee is supposed to
+          run?</h3>
+        <p class="track__sponsor">Self-directed &middot; Engagement 06</p>
+        <p>An allocation decision taken in a meeting leaves nothing behind that anybody can run
+          again. Six months later there is no process to interrogate, only a sequence of views and
+          whatever the market did next. MacroSense is that decision built as a machine instead: on a
+          schedule it reads public macro and market series, calls the environment as one of four
+          regimes with a probability across all four, allocates across sector and credit funds under
+          constraints that change with the regime, scores company commentary out of public filings
+          and earnings calls, and writes its own note in plain English explaining the change it has
+          just made.</p>
+        <p>Every input is free and public, which was a design constraint rather than a budget. A
+          process whose entire claim is that it repeats should be reproducible by the reader least
+          inclined to believe it.</p>
+        <dl class="track__standing">
+          <dt>Settled</dt>
+          <dd>The loop runs end to end on a timer with nobody watching it &mdash; fetch, classify,
+            allocate, explain, log &mdash; and it has been doing that rather than having been
+            demonstrated once. The components are separable, each runs on its own behind a
+            signature that was fixed early and left alone, and the replay harness calls the same
+            classifier and the same optimiser the live system does rather than a second copy of the
+            strategy.</dd>
+          <dt>In progress</dt>
+          <dd>Backfilling the stored history so the system can be replayed across several years and
+            several market environments instead of one short stretch of one. Until that is done the
+            harness&rsquo;s output describes its window rather than the thing it is pointed at, so
+            no performance figure for this framework appears here or anywhere else on the site.</dd>
+          <dt>What would falsify it</dt>
+          <dd>A history long enough to contain all four regimes, exercised against real returns and
+            charged for the cost of trading, in which the framework does not beat simply holding the
+            broad market. Or the regimes themselves proving unstable &mdash; labels that move when
+            the model is re-fit are not a classification you can hang a constraint set on. Either
+            result is publishable. The absence of a figure today is not a space reserved for a
+            flattering one.</dd>
+        </dl>
+        <details class="disclosure">
+          <summary class="disclosure__summary">Why the company layer has never been in a
+            replay</summary>
+          <div class="disclosure__body">
+            <p>Two layers, one history, and it only reaches one of them. Every replay run so far
+              has therefore exercised the macro half of the system while looking from the outside
+              like a test of all of it. The Case Study says what the stored rows do and do not
+              hold.</p>
+            <p>It belongs beside the short window rather than inside it, because a reader told the
+              history is short would reasonably take it to be short on the whole thing. Reconstructing
+              what had been filed and said as at each past date is the larger half of the backfill,
+              and the reason it is not finished.</p>
+          </div>
+        </details>
+        <p class="track__more"><a href="/work/macrosense/">MacroSense &mdash; the full Case Study,
+          component by component</a></p>
+      </section>
+
+    </div>
+  </section>
+
+  <section class="section section--shade" id="what-is-missing">
+    <div class="wrap">
+      <p class="eyebrow">Publication discipline</p>
+      <h2 class="section__title">What is deliberately missing here.</h2>
+      <p class="section__lede">Three things a reader might expect on a research page are absent
+        from it, and each absence is the same decision: the withdrawn findings, which are
+        superseded and so are not restated as results; the research funding, which is an
+        application submitted and not a decision received; and any measured result for the
+        allocation framework, which has only one short market environment to be measured over.</p>
+      <p class="section__lede">None of the three is left to my judgement at the moment of writing.
+        Each has an entry in a registry of refused patterns that fails the build if one reaches a
+        shipped file &mdash; and that registry is itself checked, by injecting every pattern into a
+        scratch copy of the site and requiring the check to go red. What a pattern can refuse is the
+        form a claim travels in: a figure pasted, an award verb beside the word grant. None of them
+        refuses the same claim restated from memory in a sentence of my own. The registry is not the
+        decision. It is what stops the decision quietly coming undone at one in the morning.</p>
+      <p class="case-foot">
+        <a class="btn btn--solid" href="/work/">All six Engagements</a>
+        <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about the
+          research</a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<!-- chrome:footer -->
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__identity">
+        <p class="site-footer__name">Jacob Eickhoff</p>
+        <p class="site-footer__where">St. Cloud, Minnesota &middot; University of Wisconsin&ndash;Eau Claire, May 2027</p>
+      </div>
+      <ul class="site-footer__links">
+        <li><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
+      </ul>
+      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalised or left out.</p>
+    </div>
+  </footer>
+<!-- /chrome:footer -->
+
+</body>
+</html>

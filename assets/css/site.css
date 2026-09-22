@@ -174,6 +174,8 @@ ul {
 .engagement-card__cta,
 .engagement-card__cta--pending,
 .expand-all,
+.track__standing dt,
+.omissions dt,
 .timeline__when {
   font-family: var(--font-display);
   font-size: var(--text-xs);
@@ -190,6 +192,16 @@ ul {
 .section__title {
   font-size: var(--text-2xl);
   max-width: 22ch;
+}
+
+/* A heading INSIDE a section, under its title. The two are a pair - the section says what it is
+   about and the subtitle names the turn the argument takes - so the step down in size is the whole
+   of the difference between them. */
+.section__subtitle {
+  font-size: var(--text-xl);
+  max-width: 26ch;
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .section__lede {
@@ -624,7 +636,8 @@ ul {
 
 .engagement-card__sponsor,
 .timeline__where,
-.credential__where {
+.credential__where,
+.track__sponsor {
   font-size: var(--text-xs);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -780,12 +793,16 @@ ul {
    inside the full wrap would indent the body away from the hero's left edge, and the eye reads
    that as two different pages stitched together. */
 .case-body__tools,
+.section__tools,
 .spine,
 .case-foot {
   max-width: 52rem;
 }
 
-.case-body__tools {
+/* The same control in the same place, on a page that is not a Case Study. Sharing the rule rather
+   than restating it is what stops the two drifting the first time the alignment changes. */
+.case-body__tools,
+.section__tools {
   display: flex;
   justify-content: flex-end;
   margin: 0 0 var(--space-lg);
@@ -1124,8 +1141,11 @@ ul {
    colour or a size that a token already names.
    ============================================================================================== */
 
-/* The one paragraph that explains the site to itself. It is set apart from ordinary body copy
-   because a reader who skims this page and reads nothing else should still read this. */
+/* The one paragraph a skimming reader has to meet whatever else they skip. It is set apart from
+   ordinary body copy for that reason and for no other, which is why it is now on two pages: the
+   editorial stance on /about/, and the withdrawal on /research/. Both are the paragraph the page
+   would be dishonest without. It lives under the About heading because that is where it was born;
+   if a third page needs it, move it out to its own block rather than widening this one. */
 .stance {
   margin-top: var(--space-md);
   border-left: var(--rule) solid var(--accent);
@@ -1265,4 +1285,89 @@ ul {
   color: var(--ink-soft);
   padding-block: var(--space-2xs);
   border-bottom: 1px solid var(--line);
+}
+
+/* =================================================================================================
+   THE RESEARCH OVERVIEW - two Research Tracks, framed and handed on (CONTEXT.md)
+
+   A Track is a reading column and not a card, because the page's job is to frame two bodies of work
+   well enough that each stands on its own and THEN send the reader into the Case Study. A card's
+   worth of room does the sending and not the framing, and an overview that only sends is a second
+   index.
+
+   The standing list is the part that keeps the framing from reading as an advertisement: three
+   labelled rows, one of which says what would show the work to be wrong. So it is a <dl> - the
+   labels are terms and the rest is their definition - and it is given the accent rail rather than
+   being folded into the prose above it, because a reader who skims the page should still meet it.
+   ============================================================================================== */
+.track {
+  max-width: 52rem;
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-xl);
+  margin-top: var(--space-xl);
+}
+
+.track:first-of-type {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.track__name {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2xs);
+}
+
+.track p {
+  max-width: 62ch;
+  color: var(--ink-soft);
+  margin-bottom: var(--space-sm);
+}
+
+.track .eyebrow {
+  margin-bottom: var(--space-2xs);
+}
+
+/* The same shape, twice on one page, deliberately: a Track's standing and the closing list of what
+   the page withholds are both a short column of labelled rows that a reader is meant to be able to
+   take in without reading the prose around them. Two names rather than one because only the first
+   is a Research Track - collect.js harvests `.track__standing` as a fact about a Track, and folding
+   the closing list under that name would report it as a third track. */
+.track__standing,
+.omissions {
+  margin: var(--space-md) 0 0;
+  border-left: var(--rule) solid var(--accent);
+  padding-left: var(--space-md);
+}
+
+.track__standing dt,
+.omissions dt {
+  color: var(--navy);
+  margin-top: var(--space-md);
+}
+
+.track__standing dt:first-of-type,
+.omissions dt:first-of-type {
+  margin-top: 0;
+}
+
+.track__standing dd,
+.omissions dd {
+  margin: var(--space-3xs) 0 0;
+  max-width: 60ch;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+/* The route into the depth. It is the last thing in a Track and the only link in one, so it is
+   weighted like a decision rather than set in the grey of the supporting copy. */
+.track__more {
+  margin-top: var(--space-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.track__more a {
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
 }
