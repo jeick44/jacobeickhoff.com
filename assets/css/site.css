@@ -39,6 +39,10 @@
      which is a thing a fixed 5rem heading does on the first long word. */
   --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-body: "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  /* For a specimen of a tool's own output, and nothing else. It is a system stack rather than a
+     third webfont: one more family from Google Fonts would be a third-party request bought for a
+     handful of lines, and the point of those lines is that they are figures in a column. */
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   --text-xs: 0.78rem;
   --text-sm: 0.9rem;
@@ -902,6 +906,53 @@ ul {
 
 .disclosure__body p {
   font-size: var(--text-sm);
+}
+
+/* A specimen of a tool's own output, quoted into the page the way a passage of prose would be.
+   The figures in one are always synthetic - ADR-0001 withholds a Sponsor's numbers in a picture
+   exactly as it does in a sentence - and the caption carries that where the reader meets the
+   figures rather than in a note further down. */
+.specimen {
+  margin: var(--space-md) 0;
+  padding: var(--space-sm);
+  border-left: var(--rule) solid var(--accent);
+  background: var(--shade);
+}
+
+.specimen__title {
+  margin: 0 0 var(--space-2xs);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+/* Label left, figure right, and the figures share a right edge so that the subtraction reads as a
+   subtraction. `auto` on the second column means the longest figure sets it and the labels wrap
+   instead of the row overflowing a 320px screen. */
+.specimen__rows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-3xs) var(--space-sm);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.specimen__rows dt {
+  color: var(--ink-soft);
+}
+
+.specimen__rows dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.specimen figcaption {
+  margin-top: var(--space-2xs);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
 }
 
 .case-foot {
