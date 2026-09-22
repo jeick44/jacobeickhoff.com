@@ -170,6 +170,7 @@ ul {
 .crumb,
 .case-head__flag,
 .pending-result__flag,
+.withheld-result__flag,
 .engagement-card__cta,
 .engagement-card__cta--pending,
 .expand-all,
@@ -832,14 +833,21 @@ ul {
 }
 
 /* An outcome that is real and not yet measured, said out loud rather than estimated (CONTEXT.md). */
-.pending-result {
+/* Two flags, one treatment, and the difference between them is load-bearing. A Pending Result is an
+   outcome nobody has measured yet (CONTEXT.md); a withheld one was measured and is not being
+   restated until it has been re-derived. They read the same on the page and must not be written the
+   same in the markup, because borrowing the reserved term for the second case is what makes it stop
+   meaning anything in the first. */
+.pending-result,
+.withheld-result {
   background: var(--shade);
   border-left: var(--rule) solid var(--steel);
   padding: var(--space-md);
   margin-top: var(--space-md);
 }
 
-.pending-result__flag {
+.pending-result__flag,
+.withheld-result__flag {
   color: var(--navy);
   display: block;
   margin-bottom: var(--space-3xs);
@@ -908,10 +916,14 @@ ul {
   font-size: var(--text-sm);
 }
 
-/* A specimen of a tool's own output, quoted into the page the way a passage of prose would be.
-   The figures in one are always synthetic - ADR-0001 withholds a Sponsor's numbers in a picture
-   exactly as it does in a sentence - and the caption carries that where the reader meets the
-   figures rather than in a note further down. */
+/* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
+   a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
+   exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
+   synthetic, as in the location readout on Engagement 01, or the readout carries no magnitude at all
+   - Engagement 03's three periods are quoted by direction, because the direction is the finding and
+   the magnitude is the part that is withheld. What is never allowed is a real magnitude here on the
+   grounds that a table reads as evidence rather than as a claim. Either way the caption says which
+   it is, where the reader meets the rows rather than in a note further down. */
 .specimen {
   margin: var(--space-md) 0;
   padding: var(--space-sm);

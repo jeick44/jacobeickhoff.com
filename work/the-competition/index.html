@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Competition — Engagement 03 — Jacob Eickhoff</title>
+<meta name="description" content="A four-person hedge fund case competition entry scoring operational AI adoption across the S&amp;P 500 from filings and earnings transcripts, reported with all three measured periods — the one the signal worked in and the two it inverted in.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!-- chrome:nav -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="/">
+        <span class="brand__name">Jacob Eickhoff</span>
+        <span class="brand__tag">Finance. AI. Consulting.</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link is-current" href="/work/" aria-current="true">Work</a></li>
+          <li><a class="nav__link" href="/about/">About</a></li>
+          <li><a class="nav__link" href="/#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<!-- /chrome:nav -->
+
+<main id="main">
+
+  <section class="case-head">
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a class="crumb__link" href="/work/">The work</a>
+        <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
+        <span class="crumb__here">Engagement 03</span>
+      </nav>
+      <p class="eyebrow hero__eyebrow">Engagement 03 &middot; Four-person team &middot; hedge fund case competition</p>
+      <h1 class="case-head__title">The Competition</h1>
+      <p class="case-head__lede">Four of us built a pipeline that read public filings and earnings
+        transcripts to score how far each company in the S&amp;P 500 had actually put AI into its
+        operations, sorted the index on that score, and submitted a paper.
+        &ldquo;Operational AI Adoption in a Winner-Take-Most Economy.&rdquo; On our own numbers, the
+        top quartile beat the bottom against an equal-weight benchmark over the eight weeks to late
+        February 2026. Run over the same stretch of each of the two years before that, the same
+        signal pointed the wrong way.</p>
+      <p class="case-head__status"><span class="case-head__flag">Self-Computed</span> Every
+        performance figure from this Engagement was computed by the team from terminal data. Nobody
+        outside the team checked it, and no independent party reviewed it. That is why What Changed
+        reports the direction of all three periods and withholds their magnitudes until they are
+        re-derived, rather than restating them from the paper.</p>
+    </div>
+  </section>
+
+  <section class="stats" aria-labelledby="stats-heading">
+    <div class="wrap">
+      <h2 class="eyebrow" id="stats-heading">What this Engagement produced</h2>
+      <ul class="stats__list">
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="1">1</span>
+            <span class="stat__unit">paper submitted</span>
+          </p>
+          <span class="stat__label">One formal submission, co-written by a team of four, on
+            operational AI adoption across the index.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="3">3</span>
+            <span class="stat__unit">measured periods</span>
+          </p>
+          <span class="stat__label">Windows the signal was tested over. It pointed the right way in
+            one of them.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="2">2</span>
+            <span class="stat__unit">corpora read</span>
+          </p>
+          <span class="stat__label">Public filings and earnings transcripts, machine-read into one
+            adoption score per company.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="case-body">
+    <div class="wrap">
+
+      <p class="case-body__tools">
+        <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+      </p>
+
+      <section class="spine" id="the-situation">
+        <p class="eyebrow">Section 01</p>
+        <h2 class="spine__title">The Situation</h2>
+        <p>A hedge fund case competition wants one thing: a formal paper carrying an investable idea
+          and enough evidence that somebody can argue with it. Early in 2026 nearly every such idea
+          priced who <em>sells</em> AI &mdash; chips, models, the clouds they run on. Far fewer were
+          about who had actually put it to work.</p>
+        <p>That gap stays open because the evidence is awkward: companies say a great deal about AI
+          in their filings and on their earnings calls, and most of it is positioning. So the question
+          we took was whether the documents alone separate a company running AI in its operations
+          from a company with an AI paragraph &mdash; and whether the market pays for the
+          difference.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">Why the paper was about operators rather than
+            sellers</summary>
+          <div class="disclosure__body">
+            <p>In a winner-take-most market the returns to a technology concentrate in a handful of
+              firms, and the vendors are where that concentration shows first &mdash; their revenue
+              is the adoption. For an operator the same adoption arrives as cost that has stopped
+              being incurred, which surfaces later and through a noisier channel.</p>
+            <p>The paper&rsquo;s argument is that the lag is where a public-market reader can still
+              act: by the time an operator&rsquo;s advantage is legible in its margin it is legible
+              to everybody, and the disclosure documents move first. Whether that argument survives
+              is a separate question from whether it was worth testing, and What Changed is about
+              which of the two this turned out to be.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="spine" id="what-i-did">
+        <p class="eyebrow">Section 02</p>
+        <h2 class="spine__title">What I Did</h2>
+        <p>The team built a document-processing pipeline: pull the filings and the earnings-call
+          transcripts for the index, split them into passages, score each company on the language of
+          deployment rather than on the frequency of the word, roll the passages up to one score per
+          company, cut the index into quartiles on it, and measure the top-quartile-minus-bottom
+          spread forward against an equal-weight benchmark.</p>
+        <p>My own part, stated plainly: I contributed to the pipeline, read every prior year&rsquo;s
+          winning entry to work out what the judges actually rewarded, and co-wrote the final
+          submission.</p>
+        <p>The other three owned the financial modelling, the index construction, and the
+          presentation the paper was defended with. They are credited by what they owned rather than
+          by name, for the same reason the Sponsor of Engagements 01 and 02 is not named: none of
+          them has approved a public write-up of their work, and putting a co-author&rsquo;s name on
+          my portfolio is their decision to make, not mine.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">Reading the prior winners before writing a
+            word</summary>
+          <div class="disclosure__body">
+            <p>The entries that had won in previous years were not the ones with the strongest
+              backtest. They were the ones whose thesis could be stated in a sentence, and whose
+              evidence a judge could check inside the time a judge actually has.</p>
+            <p>That changed what we produced: fewer exhibits, each defensible on its own, and every
+              figure in the abstract carrying the window it was measured over. It is the most
+              transferable thing I did here, and it was not analysis &mdash; it was finding out what
+              the audience rewards before spending six weeks producing for it.</p>
+          </div>
+        </details>
+        <details class="disclosure">
+          <summary class="disclosure__summary">Counting mentions is not measuring adoption, and
+            this is the part I would attack first</summary>
+          <div class="disclosure__body">
+            <p>A filing that says &ldquo;AI&rdquo; forty times is a filing with a communications
+              strategy. The score keys instead on the language of something actually running
+              &mdash; named internal systems, capital expenditure attached to them, described
+              changes to a process, headcount discussed in relation to them &mdash; and treats bare
+              frequency as noise.</p>
+            <p>The weakness sits in the same place as the idea. The label is inferred from what a
+              company chose to write down and is never checked against what it runs: a firm with a
+              disciplined investor-relations team and no deployment scores like an operator, and a
+              firm that deploys quietly does not score at all. We said so in the paper, and it is
+              still the first thing I would go after.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="spine" id="what-changed">
+        <p class="eyebrow">Section 03</p>
+        <h2 class="spine__title">What Changed</h2>
+        <p>Measured, and mine to state: one paper submitted, and the signal tested over three
+          periods instead of the one that flattered it.</p>
+        <p>The result, by direction. Out of sample, over roughly eight weeks ending in late February
+          2026, the top quartile beat the bottom quartile against an equal-weight benchmark &mdash;
+          a spread the team computed itself from terminal data. Run over the equivalent stretch of
+          each of the two preceding years, the same signal produced a negative spread both
+          times.</p>
+        <figure class="specimen">
+          <p class="specimen__title">Top-minus-bottom quartile spread &middot; all three periods</p>
+          <dl class="specimen__rows">
+            <dt>Eight weeks to late Feb 2026 &mdash; out of sample</dt>
+            <dd>positive</dd>
+            <dt>Same stretch, one year earlier</dt>
+            <dd>negative</dd>
+            <dt>Same stretch, two years earlier</dt>
+            <dd>negative</dd>
+          </dl>
+          <figcaption>Direction only, against an equal-weight benchmark, Self-Computed by the team
+            from terminal data. The magnitudes are withheld below; no price series and no terminal
+            capture is published.</figcaption>
+        </figure>
+        <p class="withheld-result">
+          <span class="withheld-result__flag">Withheld</span>
+          The magnitudes of the three spreads, and their standard errors, were measured &mdash; they
+          are in the submitted paper &mdash; and they are not reproduced here. I will not restate a
+          performance figure from memory on a page with my name on it, and I have not yet re-derived
+          these from the source. That is a different thing from a Pending Result, which is an outcome
+          nobody has measured yet; this one is measured and withheld until I have checked it. The
+          paragraph gets replaced by the three figures at that point.
+        </p>
+        <p>Two of the three periods went against us, and that is the finding rather than a footnote
+          on it. An eight-week window that works, sitting on top of two years that do not, is far
+          more likely to be an eight-week window than a signal &mdash; and a reader shown only the
+          window that worked has been handed the one period out of three in which the thesis is
+          true. All three went into the paper and all three are here.</p>
+        <p>For anyone reading Engagement 04 next: this scoring work and the pipeline I later withdrew
+          in The Research are independent pieces of work, on the evidence of the two things I can
+          actually check. They measure different constructs &mdash; operational adoption here, machine
+          authorship there &mdash; over different corpora, and this paper was written months before
+          that pipeline existed. I have not sat down and diffed the two, so that is the basis for the
+          claim rather than more than it is; what it supports is that the withdrawal there does not
+          reach back into the result here.</p>
+      </section>
+
+      <section class="spine" id="what-i-learned">
+        <p class="eyebrow">Section 04</p>
+        <h2 class="spine__title">What I Learned</h2>
+        <p>That one good window is a window, and that the argument I had to make on my own team was
+          for publishing the two that were not.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">The case against reporting the inversion, and why it
+            lost</summary>
+          <div class="disclosure__body">
+            <p>The case against was real and not lazy: a competition rewards a clean result, the
+              prior periods were out of sample in a direction nobody had asked about, and volunteering
+              them invites a judge to spend his limited attention on our weakest exhibit.</p>
+            <p>What beat it: a judge who finds the inverted periods himself has found something,
+              and a judge who is handed them is reading a paper that already knows where it is weak.
+              The second is the better paper even when it scores worse. The inversion is also
+              information &mdash; a signal that works only in the most recent window is a signal
+              fitted to that window, whether or not anybody fitted it on purpose, and three
+              eight-week stretches cannot tell those two apart.</p>
+          </div>
+        </details>
+        <p>The second thing is smaller and I keep relearning it: attribution on a team has to be
+          written down while the work is happening. Six months later, working out who owned which
+          part of a pipeline is reconstruction, and reconstruction flatters whoever is doing it. The
+          single sentence about my own contribution in What I Did is narrower than what I could have
+          claimed, because narrow and checkable is the only version worth anything in an
+          interview.</p>
+      </section>
+
+      <section class="spine" id="where-else-this-applies">
+        <p class="eyebrow">Section 05</p>
+        <h2 class="spine__title">Where Else This Applies</h2>
+        <p><strong>Reporting the periods that went against you.</strong> Any performance claim
+          &mdash; a strategy, a pricing change, a marketing channel, a process redesign &mdash; is
+          measured over some window, and the window is usually chosen after the result is known.
+          Stating the periods that failed alongside the one that worked is the only version a reader
+          can price.</p>
+        <p><strong>Measuring the behaviour rather than the disclosure.</strong> Reading an
+          organisation from its own documents is the same problem in sustainability reporting, in
+          risk, and in any diligence read of a target: the document says what somebody chose to
+          write, and the gap between that and what it does is where the wrong conclusions come
+          from.</p>
+        <p><strong>Finding out what the audience rewards before producing for it.</strong> Prior
+          winning entries, prior approved deals, prior board memos that got a decision &mdash; the
+          record of what an audience has actually rewarded exists in most organisations and is
+          almost never read before the work starts.</p>
+      </section>
+
+      <p class="case-foot">
+        <a class="btn btn--solid" href="/work/">All six Engagements</a>
+        <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
+      </p>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- chrome:footer -->
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__identity">
+        <p class="site-footer__name">Jacob Eickhoff</p>
+        <p class="site-footer__where">St. Cloud, Minnesota &middot; University of Wisconsin&ndash;Eau Claire, May 2027</p>
+      </div>
+      <ul class="site-footer__links">
+        <li><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
+      </ul>
+      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalised or left out.</p>
+    </div>
+  </footer>
+<!-- /chrome:footer -->
+
+</body>
+</html>
