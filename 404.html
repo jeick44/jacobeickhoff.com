@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — Jacob Eickhoff</title>
+<meta name="description" content="That page does not exist on jacobeickhoff.com. The work, the research, the about page and the contact details are all one link away from here.">
+<!-- This page is reachable at every URL on the domain that is not a real one, so it is the one
+     page that must never be an indexed search result of its own. -->
+<meta name="robots" content="noindex">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!-- chrome:nav -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="/">
+        <span class="brand__name">Jacob Eickhoff</span>
+        <span class="brand__tag">Finance. AI. Consulting.</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link" href="/work/">Work</a></li>
+          <li><a class="nav__link" href="/research/">Research</a></li>
+          <li><a class="nav__link" href="/about/">About</a></li>
+          <li><a class="nav__link" href="/contact/">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<!-- /chrome:nav -->
+
+<!-- NOTHING IN THE NAV IS MARKED CURRENT ON THIS PAGE, and that is the one place on the site where
+     that is true. A reader who mistyped a URL is not inside Work or Research or About; saying they
+     are is the same lie as a Case Study claiming to BE the Work index. run.py holds this page to
+     the opposite of the rule it holds every other page to. -->
+
+<main id="main">
+
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow hero__eyebrow">404</p>
+      <h1 class="page-head__title">That page does not exist.</h1>
+      <p class="page-head__lede">The address you followed does not match anything on this site.
+        Either the link was typed slightly wrong, or it pointed at something that has since moved
+        &mdash; the site is a small set of real pages, and this is not one of them. Nothing is
+        broken on your end.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Where to go instead</p>
+      <h2 class="section__title">Four routes, and one of them is almost certainly it.</h2>
+      <ul class="routes">
+        <li class="route reveal">
+          <h3 class="route__name"><a class="route__link" href="/work/">The work</a></h3>
+          <p class="route__line">Six Engagements, each written as a Case Study with the same five
+            sections in the same order.</p>
+        </li>
+        <li class="route reveal">
+          <h3 class="route__name"><a class="route__link" href="/research/">The research</a></h3>
+          <p class="route__line">The faculty-advised filings study and the allocation framework,
+            with what is settled and what would falsify each.</p>
+        </li>
+        <li class="route reveal">
+          <h3 class="route__name"><a class="route__link" href="/about/">About</a></h3>
+          <p class="route__line">The timeline, the education, what I can actually operate, and why
+            every Case Study here reports a problem.</p>
+        </li>
+        <li class="route reveal">
+          <h3 class="route__name"><a class="route__link" href="/contact/">Contact</a></h3>
+          <p class="route__line">One email address, one LinkedIn profile, and a person on the
+            other end of both.</p>
+        </li>
+      </ul>
+      <p class="routes__note">If you arrived from a link somebody sent you and none of these is
+        what you were promised, <a href="mailto:jacobeickhoff01@gmail.com">tell me what the link
+        said</a> and I will point you at the right page.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- chrome:footer -->
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__identity">
+        <p class="site-footer__name">Jacob Eickhoff</p>
+        <p class="site-footer__where">St. Cloud, Minnesota &middot; University of Wisconsin&ndash;Eau Claire, May 2027</p>
+      </div>
+      <ul class="site-footer__links">
+        <li><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
+      </ul>
+      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalised or left out.</p>
+    </div>
+  </footer>
+<!-- /chrome:footer -->
+
+</body>
+</html>

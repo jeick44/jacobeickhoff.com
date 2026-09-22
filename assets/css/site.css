@@ -578,14 +578,16 @@ ul {
 /* =================================================================================================
    ENGAGEMENT PREVIEW CARDS
    ============================================================================================== */
-.engagements__list {
+.engagements__list,
+.routes {
   display: grid;
   gap: var(--space-md);
   margin-top: var(--space-xl);
 }
 
 @media (min-width: 42rem) {
-  .engagements__list {
+  .engagements__list,
+  .routes {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -596,11 +598,13 @@ ul {
   }
 }
 
-/* An education credential is the same card. Sharing the rule rather than restating it is what
-   stops the two drifting apart the first time the border or the padding changes. Only the
-   Engagement card is interactive, so only it carries the hover. */
+/* An education credential is the same card, and so is a route off the 404 page. Sharing the rule
+   rather than restating it is what stops the three drifting apart the first time the border or the
+   padding changes. The credential is the one that is not interactive, so it is the one without the
+   hover. */
 .engagement-card,
-.credential {
+.credential,
+.route {
   background: var(--paper);
   border: 1px solid var(--line);
   border-top: var(--rule) solid var(--navy);
@@ -612,7 +616,8 @@ ul {
     transform 200ms var(--ease);
 }
 
-.engagement-card:hover {
+.engagement-card:hover,
+.route:hover {
   border-top-color: var(--accent);
   box-shadow: 0 10px 30px rgba(31, 56, 100, 0.12);
   transform: translateY(-2px);
@@ -626,11 +631,13 @@ ul {
   color: var(--steel);
 }
 
-/* Three places carry a card-sized title, a small uppercase accent label and a grey supporting
-   line: the Engagement preview, the About page's timeline, and its education cards. One rule each. */
+/* Four places carry a card-sized title, a small uppercase accent label and a grey supporting
+   line: the Engagement preview, the About page's timeline, its education cards, and the routes
+   off the 404 page. One rule each. */
 .engagement-card__name,
 .timeline__what,
-.credential__what {
+.credential__what,
+.route__name {
   font-size: var(--text-lg);
 }
 
@@ -647,13 +654,17 @@ ul {
 
 .engagement-card__line,
 .timeline__note,
-.credential__meta {
+.credential__meta,
+.route__line {
   font-size: var(--text-sm);
   color: var(--ink-soft);
   margin: var(--space-2xs) 0 0;
 }
 
-.engagements__note {
+/* The line under the Engagement list, and the line under the four routes on the 404. Same rule
+   because they do the same job: the sentence for the reader none of the cards above fitted. */
+.engagements__note,
+.routes__note {
   margin-top: var(--space-lg);
   font-size: var(--text-sm);
   color: var(--steel);
@@ -1368,6 +1379,44 @@ ul {
 }
 
 .track__more a {
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
+}
+
+
+/* =================================================================================================
+   CONTACT CHANNELS, AND THE ROUTES OFF THE 404
+   ============================================================================================== */
+/* The three ways in, on /contact/. Not folded under `.track__standing` above, for the same reason
+   `.omissions` is not: collect.js harvests `.channels` as the contact page's own fact, and one
+   class name over two lists would report one of them as the other. */
+.channels {
+  margin: var(--space-lg) 0 0;
+  max-width: 58ch;
+  border-top: 1px solid var(--line);
+}
+
+.channels dt {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+  padding-top: var(--space-md);
+}
+
+.channels dd {
+  margin: var(--space-3xs) 0 0;
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-md);
+  /* An email address and a profile URL are the two strings on this site a reader copies by hand,
+     and neither carries a space to break at. Without this, one of them sets the width of the
+     column on a 320px screen and the page scrolls sideways. */
+  overflow-wrap: anywhere;
+}
+
+.channels a {
   text-decoration-color: var(--accent);
   text-underline-offset: 4px;
 }
