@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MacroSense &mdash; Engagement 06 &mdash; Jacob Eickhoff</title>
+<meta name="description" content="A macro-regime allocation system built and run end to end by one person - regime detection, sentiment scoring, optimisation, scheduling and a generated briefing - published as architecture, with the backtest window named as the reason no performance figure appears.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&amp;family=Source+Sans+3:wght@400;600&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!-- chrome:nav -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="/">
+        <span class="brand__name">Jacob Eickhoff</span>
+        <span class="brand__tag">Finance. AI. Consulting.</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link is-current" href="/work/" aria-current="true">Work</a></li>
+          <li><a class="nav__link" href="/about/">About</a></li>
+          <li><a class="nav__link" href="/#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<!-- /chrome:nav -->
+<main id="main">
+
+  <section class="case-head">
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a class="crumb__link" href="/work/">The work</a>
+        <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
+        <span class="crumb__here">Engagement 06</span>
+      </nav>
+      <p class="eyebrow hero__eyebrow">Engagement 06 &middot; Self-directed</p>
+      <h1 class="case-head__title">MacroSense</h1>
+      <p class="case-head__lede">The question behind MacroSense is whether the kind of disciplined,
+        repeatable allocation process an investment committee is supposed to run can be built and
+        operated end to end by one person, on data anybody can look up. It reads public macro and
+        market series, classifies the environment into one of four regimes, scores company
+        commentary out of public filings and earnings calls, allocates under regime-specific
+        constraints, and writes itself a plain-English briefing explaining what it just did &mdash;
+        on a timer. This page is the architecture. It is deliberately not a performance claim, and
+        the third section says why.</p>
+      <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
+        end to end and has not been validated, and those are two different sentences. The backtest
+        harness is built and runs; the history it has to run over is fifty-six trading days, which
+        cannot support a return, a ratio or a probability of beating a benchmark. Extending that
+        history is the current work, and until it is done no performance figure appears on this
+        page.</p>
+    </div>
+  </section>
+
+  <section class="stats" aria-labelledby="stats-heading">
+    <div class="wrap">
+      <h2 class="eyebrow" id="stats-heading">What this Engagement produced</h2>
+      <ul class="stats__list">
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="13">13</span>
+            <span class="stat__unit">modules</span>
+          </p>
+          <span class="stat__label">Each separable and runnable alone; the six carrying the loop are
+            named below with their inputs and outputs.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="4">4</span>
+            <span class="stat__unit">macro regimes</span>
+          </p>
+          <span class="stat__label">Calm Growth, Turbulent Growth, Rate Stress and Risk Off, each
+            with its own allocation constraints.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="56">56</span>
+            <span class="stat__unit">trading days of history</span>
+          </p>
+          <span class="stat__label">The whole window a backtest has to work with, and the reason no
+            performance figure appears below.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="case-body">
+    <div class="wrap">
+
+      <p class="case-body__tools">
+        <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+      </p>
+
+      <section class="spine" id="the-situation">
+        <p class="eyebrow">Section 01</p>
+        <h2 class="spine__title">The Situation</h2>
+        <p>Allocation decisions made by hand share a defect that has nothing to do with whether they
+          are any good: they are made once, defended in a meeting, and never recorded in a form
+          anybody can re-run. Six months later there is no process to interrogate &mdash; there was a
+          sequence of opinions.</p>
+        <p>A system that executes on a schedule, from stated inputs, and writes down what it did and
+          why is a different object. It can be replayed, argued with on its merits, and &mdash; the
+          part that matters &mdash; shown to be wrong. So the question was not whether I could pick
+          sectors, but whether the whole loop could be built and run by one person, with no step
+          that works only because somebody is watching.</p>
+        <p>One constraint was fixed at the start and never relaxed. Every input is free and public:
+          Treasury yields and credit spreads from the Federal Reserve&rsquo;s published series,
+          volatility and fund prices from public market data, and company commentary from 10-K and
+          10-Q filings and earnings-call transcripts.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">Why free and public was a design constraint rather
+            than a budget</summary>
+          <div class="disclosure__body">
+            <p>The cheap reading is that a student cannot afford a terminal. The real one is that a
+              system built on a subscription cannot be reproduced by a reader or checked by somebody
+              who doubts it, and a process whose whole claim is that it repeats should not have a
+              paywall in the middle of it. The cost is that free sources go missing: identifiers get
+              retired, endpoints change shape, requests come back empty. So every signal resolves
+              through a fallback chain rather than a single call.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="spine" id="what-i-did">
+        <p class="eyebrow">Section 02</p>
+        <h2 class="spine__title">What I Did</h2>
+        <p>I built it as separable components, each taking a stated input, returning a stated
+          output, and runnable on its own.</p>
+        <p><strong>The data fetcher.</strong> In: public macro series and public market prices
+          &mdash; Treasury yields at two and ten years and the spread between them, high-yield and
+          investment-grade credit spreads, the volatility index and its term structure, and one- and
+          three-month momentum for each of fifteen sector and credit exchange-traded funds. Out: one
+          dated row, fifty-eight columns wide.</p>
+        <p><strong>The regime classifier.</strong> In: a rolling window of at least twenty of those
+          rows. Out: one of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk
+          Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov
+          model. The vector matters more than the label it resolves to &mdash; a regime called at
+          0.41 against a runner-up at 0.39 is a different statement from one called at 0.90 &mdash;
+          so the briefing is handed all four rather than the winner alone.</p>
+        <p><strong>The portfolio optimiser.</strong> In: the regime and the current signal row. Out:
+          weights across the same fifteen funds, summing to one. Each regime carries its own
+          constraint set rather than its own model &mdash; long only under a per-position cap in the
+          two growth regimes; shorts permitted inside tighter bounds in the two stress regimes,
+          defensive holdings favoured and rate-sensitive ones penalised. When the convex solver
+          fails it returns an equal-weight book and logs the reason at error level.</p>
+        <p><strong>The sentiment scorer.</strong> In: earnings-call transcripts and 10-K and 10-Q
+          filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps
+          between requests to stay inside the published rate limit. Out: a score per issuer on four
+          dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged
+          language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up
+          that returns to the classifier as one of its features.</p>
+        <p><strong>The scheduler.</strong> In: the clock and the exchange calendar. Out: a completed
+          cycle, logged. Three jobs &mdash; a rebalance after the close on each trading day, a model
+          retrain on the first of the month, a filings pull on Sunday. Every step inside a cycle is
+          independently fault-tolerant, because the point of a scheduler is that it is still running
+          in March.</p>
+        <p><strong>The briefing.</strong> In: the regime name, the probability vector, the previous
+          weights, the new weights, the sentiment signals. Out: a few sentences of plain English
+          saying what changed and why. A language model writes them; with no key available it falls
+          back to a deterministic template, because the record of what the system did should not have
+          holes in it on the days an interface was unreachable. A logger writes every rebalance to a
+          local database; a dashboard reads it back.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">The rule that kept the components separable</summary>
+          <div class="disclosure__body">
+            <p>A short list of interfaces was written down and then treated as fixed: what the
+              classifier is called with and what it hands back, that the optimiser returns weights
+              keyed by ticker summing to one, the five arguments the briefing takes. Everything
+              behind those signatures was rewritten repeatedly &mdash; the fetcher most of all
+              &mdash; and none of those rewrites reached another module. Where the shapes are not
+              fixed, every change is a whole-system change, and the symptom is that you stop making
+              improvements because you cannot price them.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="spine" id="what-changed">
+        <p class="eyebrow">Section 03</p>
+        <h2 class="spine__title">What Changed</h2>
+        <p>The system works end to end. It fires on schedule, fetches, classifies, allocates,
+          explains itself and logs the result, and it has been doing that rather than being
+          demonstrated once. That is what I set out to build, and it is done.</p>
+        <p>The backtest harness is built too. It reuses the live classifier and the live optimiser
+          verbatim rather than reimplementing the strategy, because a backtest that reimplements the
+          thing it is testing is testing the reimplementation. It walks the history forward one
+          rebalance at a time, classifying on data up to that date and no further, applies real daily
+          fund returns afterwards, charges a cost against turnover, and compares the result with
+          buying and holding the broad market. It computes what a reader would ask for: total return,
+          a compound growth rate, a Sharpe ratio, volatility, maximum drawdown, attribution by
+          regime, and a distribution of outcomes.</p>
+        <p>None of those numbers appears on this page.</p>
+        <p class="pending-result">
+          <span class="pending-result__flag">Pending Result</span>
+          Whether MacroSense allocates well is not answered here. The continuous history it has
+          accumulated is fifty-six trading days, from 7 January to 27 March 2026. Replayed at the
+          backtest&rsquo;s default weekly rebalance that is roughly eleven decisions; monthly, two. Every ratio in the list
+          above would be annualised out of that, a single market environment three months long, and
+          a figure produced that way describes the window rather than the system. Backfilling the snapshot
+          series so the model can be run across several years and several regimes is the current
+          work. The numbers go on this page when the window can carry them, and not before.
+        </p>
+        <p>One thing belongs alongside that, because it is the same error one level down: the
+          history carries no scored sentiment at all &mdash; those columns are absent from it, and
+          the classifier imputes them to zero &mdash; so the company layer has never been in a
+          backtest. The macro layer has.</p>
+      </section>
+
+      <section class="spine" id="what-i-learned">
+        <p class="eyebrow">Section 04</p>
+        <h2 class="spine__title">What I Learned</h2>
+        <p>The first time the backtest rendered an equity curve next to its benchmark, the shape of
+          it felt like a result. It was not one, and the distance between those two things is what
+          building this actually taught me.</p>
+        <p>Sample size is not a caveat you attach at the end; it decides whether a number is a
+          number at all. Fifty-six daily observations look like a sample and are closer to one
+          &mdash; a single market environment, read fifty-six times. The ratios a backtest prints
+          are annualised, which makes that window wear the clothes of a year, and nothing in the
+          output says so.</p>
+        <p>The harder half is that a system which runs is enormously satisfying, and the
+          satisfaction is misleading. Every day the scheduler fires, a cycle completes, a briefing is
+          written and a row lands in the database &mdash; and none of it is evidence about whether
+          the allocations are any good. Running and being right are unrelated properties, and only
+          one of them gives feedback.</p>
+        <details class="disclosure">
+          <summary class="disclosure__summary">What it would take for a number to go on this
+            page</summary>
+          <div class="disclosure__body">
+            <p>A history long enough to contain all four regimes, with enough time in each that the
+              per-regime constraint sets have been exercised against real returns. Scored sentiment
+              across it instead of placeholders. And the result reported with its window, its costs
+              and the periods where it went the other way &mdash; the standard Engagement 03 is held
+              to on this site.</p>
+          </div>
+        </details>
+      </section>
+
+      <section class="spine" id="where-else-this-applies">
+        <p class="eyebrow">Section 05</p>
+        <h2 class="spine__title">Where Else This Applies</h2>
+        <p><strong>A pipeline that runs is not a pipeline that is right.</strong> Any automated
+          process handed to a client &mdash; a nightly reporting refresh, a scoring model, a
+          forecast that regenerates itself &mdash; produces its most convincing evidence, a clean
+          run, on the one axis nobody was asking about. The question to put to a working system is
+          not whether it ran. It is what would have to be true for the output to be wrong, and
+          whether anybody has gone and looked.</p>
+        <p><strong>State the window in the same breath as the figure.</strong> A pilot over six
+          weeks, a test over two, a model checked against one quarter: each produces a point estimate
+          whose uncertainty is wide enough to contain the opposite conclusion, and each is routinely
+          escalated as a finding. The discipline costs nothing &mdash; the window travels with the
+          number, and nothing is annualised out of a window that cannot support it.</p>
+        <p><strong>Make the degraded path announce itself.</strong> Two defects here were the same
+          defect: an optimiser that fell back to equal weight when its import failed, and an alert
+          channel built but never configured, which returned quietly every time. Both kept producing
+          output after a component had stopped working, which is worse than stopping, because nothing
+          downstream can tell. Any monitoring or integration work meets this in some form, and the
+          fallback that never announces itself costs the most.</p>
+      </section>
+
+      <p class="case-foot">
+        <a class="btn btn--solid" href="/work/">All six Engagements</a>
+        <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
+      </p>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- chrome:footer -->
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__identity">
+        <p class="site-footer__name">Jacob Eickhoff</p>
+        <p class="site-footer__where">St. Cloud, Minnesota &middot; University of Wisconsin&ndash;Eau Claire, May 2027</p>
+      </div>
+      <ul class="site-footer__links">
+        <li><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></li>
+        <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
+      </ul>
+      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalised or left out.</p>
+    </div>
+  </footer>
+<!-- /chrome:footer -->
+
+</body>
+</html>
