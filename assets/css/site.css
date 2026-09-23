@@ -2526,12 +2526,109 @@ button.prep__cell:focus-visible {
   color: var(--ink-soft);
 }
 
+/* SPREAD DIRECTION - a result reported by direction only. One column per period, each arrow one
+   length above or below a zero line, so the drawing cannot say more than the words beside it. The
+   status colours are the right place for it: pointed the right way or the wrong way is a pass or a
+   fail, and each arrow is paired with its direction in words. */
+.spread {
+  padding: var(--space-sm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.exhibit .spread__heading {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.spread__plot {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spread__period {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-3xs);
+  text-align: center;
+}
+
+.spread__period[hidden] {
+  display: none;
+}
+
+/* The zero line is drawn per column and runs edge to edge, so the columns share one unbroken axis;
+   the words beneath carry the gutter instead. */
+.spread__mark {
+  display: block;
+  width: 100%;
+  height: 6rem;
+  background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat;
+}
+
+.spread__mark svg {
+  display: block;
+  width: 1.5rem;
+  height: 100%;
+  margin: 0 auto;
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.is-up .spread__mark svg {
+  stroke: var(--good);
+}
+
+.is-down .spread__mark svg {
+  stroke: var(--bad);
+}
+
+.spread__direction {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.is-up .spread__direction {
+  color: var(--good);
+}
+
+.is-down .spread__direction {
+  color: var(--bad);
+}
+
+.spread__direction,
+.spread__label {
+  padding-inline: var(--space-3xs);
+}
+
+.spread__label {
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--ink-soft);
+  overflow-wrap: break-word;
+}
+
+.exhibit .spread__scale {
+  margin: var(--space-xs) 0 0;
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}
+
 /* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
    a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
    exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
-   synthetic, as in the location readout on Engagement 01, or the readout carries no magnitude at all
-   - Engagement 03's three periods are quoted by direction, because the direction is the finding and
-   the magnitude is the part that is withheld. What is never allowed is a real magnitude here on the
+   synthetic, as in the location readout on Engagement 01, or the readout carries no magnitude at all,
+   as in Engagement 03's spread-direction Exhibit above, because the direction is the finding and the
+   magnitude is the part that is withheld. What is never allowed is a real magnitude here on the
    grounds that a table reads as evidence rather than as a claim. Either way the caption says which
    it is, where the reader meets the rows rather than in a note further down. */
 .specimen {

@@ -1271,6 +1271,98 @@
     }
   });
 
+  /* ---- KIND: spread-direction ------------------------------------------------------------------
+     A result reported by direction only. The table lists each period the signal was tested over,
+     oldest first, and the direction the spread took in it, in words: Positive or Negative. Every
+     arrow is drawn one length, because on this site a direction may be published where its
+     magnitude is withheld (Self-Computed in CONTEXT.md).
+
+     Two charts from the one table: every period, and the one a less careful paper would have
+     published - only the periods that pointed the right way, with nothing on it saying the others
+     were left out. The count of periods shown that pointed the right way is the result, so leaving
+     the others out changes it from one of three to one of one.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
+     a direction that is not one of the two words - a figure above all, since a figure there is the
+     magnitude this Exhibit exists to withhold - or no period that pointed the right way, which
+     leaves the flattering chart nothing to flatter with. */
+  register("spread-direction", function (fig, stage, data) {
+    var UP = "positive", DOWN = "negative";
+    if (data.columns.length < 2 || !data.rows.length) throw new Error("spread-direction: the table has no periods");
+    var periods = data.rows.map(function (r) {
+      var d = (r.cells[0] || "").toLowerCase();
+      if (d !== UP && d !== DOWN) {
+        throw new Error("spread-direction: " + r.label + " reads " + JSON.stringify(r.cells[0]) +
+                        "; a direction is Positive or Negative, and never a figure");
+      }
+      return { label: r.label, words: r.cells[0], up: d === UP };
+    });
+    var worked = periods.filter(function (p) { return p.up; });
+    if (!worked.length) throw new Error("spread-direction: no period pointed the right way");
+    var one = worked.length === 1;
+    var views = ["Every period tested", one ? "Only the period that worked" : "Only the periods that worked"];
+    var flattering = false;
+
+    var bar = make("div", "exhibit__controls", stage);
+    var group = make("div", "seg", bar);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Periods shown");
+    var viewButtons = views.map(function (name, i) {
+      var b = button(group, "seg__option", name, i === 0);
+      b.addEventListener("click", function () { flattering = i === 1; update(); });
+      return b;
+    });
+
+    /* The chart itself: a heading, a zero line, and one column per period with an arrow of one
+       length above or below it, its direction in words and the period it was measured over. The
+       heading is the table's own name for the measure. */
+    var frame = make("div", "exhibit__frame", stage);
+    var chart = make("div", "spread", frame);
+    var heading = make("p", "spread__heading", chart);
+    var plot = make("ol", "spread__plot", chart);
+    var columns = periods.map(function (p) {
+      var li = make("li", "spread__period" + (p.up ? " is-up" : " is-down"), plot);
+      var mark = make("span", "spread__mark", li);
+      mark.setAttribute("aria-hidden", "true");
+      mark.innerHTML = '<svg viewBox="0 0 24 96" focusable="false">' +
+        (p.up ? '<path d="M12 48 V10 M4 20 L12 8 L20 20"/>' : '<path d="M12 48 V86 M4 76 L12 88 L20 76"/>') +
+        "</svg>";
+      make("span", "spread__direction", li, p.words);
+      make("span", "spread__label", li, p.label);
+      return li;
+    });
+    make("p", "spread__scale", chart, "No scale: every arrow is one length. Direction only.");
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var line = make("p", "exhibit__count", readout);
+    var tally = make("b", "", line);
+    tally.setAttribute("data-result", "");
+    var phrase = line.appendChild(document.createTextNode(""));
+    var note = make("p", "exhibit__note", readout);
+
+    function periodsWord(n) { return n === 1 ? "period" : "periods"; }
+
+    /* The two charts differ in which periods they show; everything else follows from that. */
+    function update() {
+      var shown = flattering ? worked : periods, wrong = periods.length - worked.length;
+      viewButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === (flattering ? 1 : 0))); });
+      columns.forEach(function (li, i) { li.hidden = shown.indexOf(periods[i]) < 0; });
+      heading.textContent = data.columns[1] + ": " +
+        (flattering ? worked.map(function (p) { return p.label; }).join("; ") : "every period tested");
+      tally.textContent = worked.length + " of " + shown.length;
+      phrase.nodeValue = " " + periodsWord(shown.length) + " shown pointed the right way";
+      note.textContent = flattering
+        ? (wrong === 1 ? "The period it pointed the wrong way in is left out"
+                       : "The " + wrong + " periods it pointed the wrong way in are left out") +
+          ", and nothing on this chart says so."
+        : wrong + " of " + periods.length + " pointed the wrong way, so the " + periodsWord(worked.length) +
+          " that worked " + (one ? "reads" : "read") + " as a window rather than a signal.";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
   window.Exhibit = { register: register, slider: slider };
