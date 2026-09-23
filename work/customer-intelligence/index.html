@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -56,7 +59,7 @@
         <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
         <div><dt>Status</dt><dd>In use</dd></div>
         <div><dt>Governing constraint</dt><dd>No backend, nothing to install</dd></div>
-        <div><dt>Reading time</dt><dd>6 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">In use</span> The build is
         finished, and is written here in the past tense. The tools are not finished with: they are
@@ -203,6 +206,41 @@
                   input is indistinguishable from one that quietly damages it.</p>
               </div>
             </details>
+            <figure class="exhibit" id="exhibit-detect-correct-flag" data-exhibit="detect-correct-flag"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Four corrections,
+                  each flagged where it was made; two cells left empty rather than guessed</h3>
+                <p class="exhibit__instruction">Choose Prepared, then hover or focus a flagged cell to
+                  read why.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>One synthetic export, line by line: each cell as it arrived, what the
+                      preparation tool made of the cells it checks, and why. Line 2 is the export&rsquo;s
+                      header row.</caption>
+                    <thead>
+                      <tr><th scope="col">Line</th><th scope="col">Account</th><th scope="col">Address</th><th scope="col">Coordinates</th><th scope="col">Age</th><th scope="col">Coordinates, prepared</th><th scope="col">Age, prepared</th><th scope="col">Why</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">1</th><td>Customer extract, run 2026-09-01</td><td>Blank</td><td>Blank</td><td>Blank</td><td>Line removed</td><td>Line removed</td><td>A title row above the headers, which is not a record.</td></tr>
+                      <tr><th scope="row">3</th><td>A-1001</td><td>Address A</td><td>45.12, &minus;93.40</td><td>47</td><td>Unchanged</td><td>Unchanged</td><td>None</td></tr>
+                      <tr><th scope="row">4</th><td>A-1002</td><td>Address B</td><td>Blank</td><td>62</td><td>45.10, &minus;93.44</td><td>Unchanged</td><td>No coordinates; filled from the same address in a previously cleaned file.</td></tr>
+                      <tr><th scope="row">5</th><td>A-1003</td><td>Address C</td><td>45.15, &minus;93.37</td><td>1958-03-14</td><td>Unchanged</td><td>68</td><td>A date of birth in the age column; converted to the age on the day the export was run.</td></tr>
+                      <tr><th scope="row">6</th><td>A-1004</td><td>Address D</td><td>Blank</td><td>39</td><td>Left empty</td><td>Unchanged</td><td>No coordinates, and no matching address in a previously cleaned file; left empty rather than placed at a guess.</td></tr>
+                      <tr><th scope="row">7</th><td>A-1005</td><td>Address E</td><td>45.11, &minus;93.42</td><td>3/4/24</td><td>Unchanged</td><td>Left empty</td><td>A date with a two-digit year: born in 1924 or in 2024, and nothing in the row says which.</td></tr>
+                      <tr><th scope="row">8</th><td>A-1006</td><td>Address F</td><td>45.13, &minus;93.39</td><td>1947-11-02</td><td>Unchanged</td><td>78</td><td>A date of birth in the age column; converted to the age on the day the export was run.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; an invented export of six
+                accounts, whose addresses are placeholders and whose coordinates describe no one. No real
+                export is shown, because every row of one is a customer of the Sponsor.</figcaption>
+            </figure>
           </section>
 
           <section class="spine" id="what-changed">

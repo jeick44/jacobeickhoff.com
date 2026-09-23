@@ -572,6 +572,209 @@
     }
   });
 
+  /* ---- KIND: detect-correct-flag ---------------------------------------------------------------
+     One raw export run through the preparation tool. The table lists each line of the export as it
+     arrived, cell by cell ("Blank" where the cell was empty), then, for each column the tool checks,
+     what it made of that cell in a column named "<column>, prepared", and why. A prepared cell says
+     "Unchanged", "Left empty", "Line removed" (a line that is not a record, such as a title row
+     above the headers) or the corrected value. The export's header row is the table's own header,
+     and the one line number the table has no row for.
+
+     The tool's standing rule is read back from the table rather than trusted to it, so a table that
+     breaks the rule is refused (the stage stays empty and the table stands alone):
+       - a cell holding nothing is missing: filled from elsewhere, or left empty - never guessed;
+       - a full date of birth (year first) in a column of ages is converted to the age on the date
+         the export was run, which the removed title line states;
+       - a date whose year has two digits could be either century, so it is left empty;
+       - a cell that is none of these is left unchanged, and every changed line says why.
+     Only those corrections are applied, and every one is counted and flagged on screen, with its
+     reason on hover and on focus. */
+  register("detect-correct-flag", function (fig, stage, data) {
+    var BLANK = "Blank", SAME = "Unchanged", EMPTY = "Left empty", GONE = "Line removed";
+    var why = data.columns.indexOf("Why") - 1;
+    var fields = [];
+    data.columns.slice(1).forEach(function (name, k) {
+      if (k === why || / prepared$/.test(name)) return;
+      fields.push({ name: name, at: k, prepared: data.columns.indexOf(name + ", prepared") - 1 });
+    });
+    if (why < 0 || !data.rows.length || !fields.some(function (f) { return f.prepared >= 0; })) {
+      throw new Error("detect-correct-flag: the table has no prepared columns or no reasons");
+    }
+
+    function isoDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s); }
+    function shortYear(s) { return /^\d{1,2}\/\d{1,2}\/\d{2}$/.test(s); }
+    function ageOn(born, on) {
+      var b = born.split("-").map(Number), o = on.split("-").map(Number);
+      return o[0] - b[0] - (o[1] < b[1] || (o[1] === b[1] && o[2] < b[2]) ? 1 : 0);
+    }
+
+    /* The export's own date, from the line the tool removes. */
+    var ranOn = null;
+    data.rows.forEach(function (r) {
+      if (ranOn === null && r.cells.indexOf(GONE) >= 0) {
+        r.cells.forEach(function (c) { var m = /\d{4}-\d{2}-\d{2}/.exec(c); if (m && ranOn === null) ranOn = m[0]; });
+      }
+    });
+
+    /* Each line: its cells, and for each checked cell what was detected and what the tool did. */
+    var lines = data.rows.map(function (r) {
+      var reason = r.cells[why], removed = r.cells.indexOf(GONE) >= 0, changed = removed;
+      var cells = fields.map(function (f) {
+        var raw = r.cells[f.at], done = f.prepared >= 0 ? r.cells[f.prepared] : SAME;
+        var cell = { field: f.name, raw: raw === BLANK ? "" : raw, done: done, detected: null };
+        if (removed) {
+          if (f.prepared >= 0 && done !== GONE) throw new Error("detect-correct-flag: line " + r.label + " is removed in one column only");
+          return cell;
+        }
+        if (f.prepared < 0) return cell;
+        if (done === GONE) throw new Error("detect-correct-flag: line " + r.label + " is removed in one column only");
+        if (raw === BLANK) {
+          cell.detected = "missing";
+          if (done === SAME) throw new Error("detect-correct-flag: line " + r.label + " leaves a missing " + f.name + " unmarked");
+        } else if (isoDate(raw)) {
+          cell.detected = "a date of birth";
+          if (!ranOn || done !== String(ageOn(raw, ranOn))) {
+            throw new Error("detect-correct-flag: line " + r.label + " converts " + raw + " to " + done);
+          }
+        } else if (shortYear(raw)) {
+          cell.detected = "a date with a two-digit year";
+          if (done !== EMPTY) throw new Error("detect-correct-flag: line " + r.label + " guesses a century for " + raw);
+        } else if (done !== SAME) {
+          throw new Error("detect-correct-flag: line " + r.label + " changes a " + f.name + " nothing was wrong with");
+        }
+        if (done !== SAME) changed = true;
+        return cell;
+      });
+      if (changed !== (reason !== "" && reason !== "None")) {
+        throw new Error("detect-correct-flag: line " + r.label + (changed ? " changes a cell and says nothing" : " gives a reason for no change"));
+      }
+      return { label: r.label, removed: removed, reason: reason, cells: cells };
+    });
+
+    var prepared = false;
+    var bar = make("div", "exhibit__controls", stage);
+    var viewGroup = make("div", "seg", bar);
+    viewGroup.setAttribute("role", "group");
+    viewGroup.setAttribute("aria-label", "Export");
+    var viewButtons = ["Raw export", "Prepared"].map(function (name, i) {
+      var b = button(viewGroup, "seg__option", name, i === 0);
+      b.addEventListener("click", function () { prepared = i === 1; update(); });
+      return b;
+    });
+
+    /* Above the preview: what was detected, what was corrected, what was left empty. */
+    var readout = make("div", "exhibit__readout prep__tally", stage);
+    readout.setAttribute("aria-live", "polite");
+    var tally = [["anomaly detected", "anomalies detected"],
+                 ["correction, flagged", "corrections, each flagged"],
+                 ["cell left empty", "cells left empty"]].map(function (words) {
+      var line = make("p", "exhibit__count", readout);
+      var b = make("b", "", line);
+      b.setAttribute("data-result", "");
+      return { count: b, words: line.appendChild(document.createTextNode("")), forms: words };
+    });
+
+    /* The preview: one row per line of the export, the header row in its place. A flagged cell is a
+       button, so the keyboard reaches its reason; hovering it shows the same reason. */
+    var frame = make("div", "exhibit__frame", stage);
+    var grid = make("div", "prep", frame);
+    grid.setAttribute("role", "group");
+    grid.setAttribute("aria-label", "Preview of the export");
+    grid.style.setProperty("--prep-columns", String(fields.length));
+    /* The header row is the one line of the export the table has no row for. */
+    var headAt = 1, headLine = null;
+    while (lines.some(function (ln) { return Number(ln.label) === headAt; })) headAt++;
+    function header() {
+      headLine = make("div", "prep__row prep__row--head", grid);
+      make("span", "prep__line", headLine, String(headAt));
+      fields.forEach(function (f) { make("span", "prep__cell", headLine, f.name); });
+    }
+
+    var note = make("p", "exhibit__note prep__why", stage);
+    var flags = [], reasons = [], busy = null;
+    function hint() {
+      note.textContent = prepared ? "Hover or focus a flagged cell to read why it changed."
+                                  : "Hover or focus a flagged cell to see what the tool detected.";
+    }
+    function flag(el, say) {
+      var show = function () { note.textContent = say(); };
+      ["mouseover", "focus"].forEach(function (t) { el.addEventListener(t, show); });
+      el.addEventListener("blur", hint);
+      /* The pointer leaving a cell hands the line back to whichever cell has focus. */
+      el.addEventListener("mouseout", function () {
+        var at = flags.indexOf(document.activeElement);
+        if (at < 0) hint(); else reasons[at]();
+      });
+      el.addEventListener("click", show);
+      flags.push(el);
+      reasons.push(show);
+      return el;
+    }
+
+    lines.forEach(function (ln) {
+      if (!headLine && Number(ln.label) > headAt) header();
+      var row = make("div", "prep__row", grid);
+      make("span", "prep__line", row, ln.label);
+      if (ln.removed) {
+        var title = ln.cells.map(function (c) { return c.raw; }).filter(Boolean).join(" ");
+        var t = flag(button(row, "prep__cell prep__cell--title"), function () {
+          return prepared ? "Line " + ln.label + ", removed: " + ln.reason
+                          : "Line " + ln.label + ": a line above the headers that is not a record.";
+        });
+        make("span", "visually-hidden", t, "Line " + ln.label + ": ");
+        make("span", "prep__value", t, title);
+        make("span", "prep__tag", t, "Removed");
+        ln.els = [{ el: t, cell: { detected: "title", done: GONE } }];
+        return;
+      }
+      ln.els = ln.cells.map(function (c) {
+        if (!c.detected) return { el: make("span", "prep__cell", row, c.raw), cell: c };
+        var b = flag(button(row, "prep__cell prep__cell--flag"), function () {
+          return prepared ? "Line " + ln.label + ", " + c.field + ": " + ln.reason
+                          : "Line " + ln.label + ", " + c.field + ": " + c.detected + ". Not yet corrected.";
+        });
+        make("span", "visually-hidden", b, "Line " + ln.label + ", " + c.field + ": ");
+        return { el: b, cell: c, value: make("span", "prep__value", b, "") };
+      });
+    });
+    if (!headLine) header();
+
+    function update() {
+      var detected = 0, corrected = 0, empty = 0, order = 0;
+      viewButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String((i === 1) === prepared)); });
+      lines.forEach(function (ln) {
+        ln.els.forEach(function (e) {
+          var c = e.cell;
+          if (!c.detected) return;
+          detected++;
+          var state = !prepared ? "is-detected" : c.done === EMPTY ? "is-empty" : "is-corrected";
+          if (prepared && state === "is-corrected") corrected++;
+          if (prepared && state === "is-empty") empty++;
+          ["is-detected", "is-empty", "is-corrected"].forEach(function (s) { e.el.classList.toggle(s, s === state); });
+          e.el.style.transitionDelay = prepared && !reduced ? order++ * 90 + "ms" : "0ms";
+          if (e.value) {
+            e.value.textContent = !prepared ? (c.raw || "blank") : c.done === EMPTY ? "empty" : c.done;
+            e.value.classList.toggle("is-none", !prepared ? !c.raw : c.done === EMPTY);
+          }
+        });
+      });
+      [detected, corrected, empty].forEach(function (v, k) {
+        tally[k].count.textContent = String(v);
+        tally[k].words.nodeValue = " " + tally[k].forms[v === 1 ? 0 : 1];
+      });
+      hint();
+      /* The flags light one after another; the readout is busy until the last has. */
+      window.clearTimeout(busy);
+      readout.removeAttribute("aria-busy");
+      if (order) {
+        readout.setAttribute("aria-busy", "true");
+        busy = window.setTimeout(function () { readout.removeAttribute("aria-busy"); }, order * 90 + 200);
+      }
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
   window.Exhibit = { register: register, slider: slider };
