@@ -29,6 +29,15 @@
      created here rather than shipped, so a reader with no script is never shown one that does
      nothing.
 
+   EVERY KIND DECLARES ITS RESULT. The element (or elements) stating what the reader's action
+     produced - a count, a total, a date - carries data-result. The harness operates each control the
+     way a keyboard does (a button - an action, a toggle with aria-pressed, a segment - is pressed; a
+     slider or a draggable mark, role="slider", takes an arrow key; a new kind of control is one
+     entry in OPERATORS in suites/collect.js) and requires some control to change a result's text.
+     A hint that changes while the result stands still is a control wired to nothing, and fails.
+     A control a state hides (the server, in the local-only view) is shown by operating the others,
+     and is then held to the same keyboard checks as the rest.
+
    TOUCH. Only a draggable mark (the slider) claims the gesture, with touch-action: none. A stage
      leaves panning alone, so a thumb landing on a diagram still scrolls the page.
 
@@ -189,7 +198,11 @@
      compromising it exposes. A machine with a figure in every column is a workstation, and its
      first figure is the group of files it can open. A machine with words where a figure would be
      does not exist in that architecture: that is the central server, drawn between the
-     workstations and the files only where it exists. */
+     workstations and the files only where it exists.
+
+     The drawing can only show a table that agrees with it, so a table that does not is refused
+     (the stage stays empty and the table stands alone): a workstation exposes its own group in
+     every architecture, and a server, where it exists, exposes every file on the shelf. */
   register("blast-radius", function (fig, stage, data) {
     var modes = data.columns.slice(1);
     var stations = [], hubs = [];
@@ -198,33 +211,49 @@
     });
     if (!modes.length || !stations.length) throw new Error("blast-radius: the table has no machines");
     var total = stations.reduce(function (s, r) { return s + r.values[0]; }, 0);
-    var mode = 0, hit = null;
+    stations.forEach(function (r) {
+      r.values.forEach(function (v, m) {
+        if (v !== r.values[0]) {
+          throw new Error("blast-radius: " + r.label + " exposes " + v + " under " + modes[m] +
+                          " but its group on the shelf is " + r.values[0]);
+        }
+      });
+    });
+    hubs.forEach(function (r) {
+      r.values.forEach(function (v, m) {
+        if (v !== null && v !== total) {
+          throw new Error("blast-radius: " + r.label + " exposes " + v + " under " + modes[m] +
+                          " but the workstations' groups add up to " + total);
+        }
+      });
+    });
+    var mode = 0, compromised = null;
 
     var bar = make("div", "exhibit__controls", stage);
-    var seg = make("div", "seg", bar);
-    seg.setAttribute("role", "group");
-    seg.setAttribute("aria-label", "Architecture");
+    var modeGroup = make("div", "seg", bar);
+    modeGroup.setAttribute("role", "group");
+    modeGroup.setAttribute("aria-label", "Architecture");
     var modeButtons = modes.map(function (name, i) {
-      return on(button(seg, "seg__option", name, i === 0), function () {
+      return operates(button(modeGroup, "seg__option", name, i === 0), function () {
         mode = i;
-        if (hit && hit.values[mode] === null) hit = null;
+        if (compromised && compromised.values[mode] === null) compromised = null;
       });
     });
 
     var frame = make("div", "exhibit__frame", stage);
     var diagram = make("div", "blast", frame);
     diagram.style.setProperty("--blast-columns", String(stations.length));
-    var top = make("div", "blast__machines", diagram);
-    var stationButtons = stations.map(function (r) { return machine(top, r, ""); });
-    var mid = make("div", "blast__links", diagram);
+    var stationRow = make("div", "blast__machines", diagram);
+    var stationButtons = stations.map(function (r) { return machine(stationRow, r, ""); });
+    var links = make("div", "blast__links", diagram);
     /* Parsed as markup so the browser supplies the SVG namespace. The lines are drawn in a box one
        hundred units per workstation wide and stretched to the row, so each column's centre is at a
        round number and the lines meet the buttons above and the files below. */
     var width = 100 * stations.length;
-    mid.innerHTML = '<svg viewBox="0 0 ' + width + ' 100" preserveAspectRatio="none" ' +
+    links.innerHTML = '<svg viewBox="0 0 ' + width + ' 100" preserveAspectRatio="none" ' +
       'aria-hidden="true" focusable="false"></svg>';
-    var svg = mid.firstChild;
-    var hubButtons = hubs.map(function (r) { return machine(mid, r, " blast__machine--hub"); });
+    var svg = links.firstChild;
+    var hubButtons = hubs.map(function (r) { return machine(links, r, " blast__machine--hub"); });
     var shelf = make("div", "blast__files", diagram);
     shelf.setAttribute("aria-hidden", "true");
     var files = [];
@@ -241,10 +270,12 @@
     readout.setAttribute("aria-live", "polite");
     var line = make("p", "exhibit__count", readout);
     var count = make("b", "", line);
+    count.setAttribute("data-result", "");
     line.appendChild(document.createTextNode(" of " + total + " customer files exposed"));
     var note = make("p", "exhibit__note", readout);
 
-    function on(b, act) {
+    /* Wires a button: pressing it acts on the state, then redraws everything from the state. */
+    function operates(b, act) {
       b.addEventListener("click", function () { act(); update(); });
       return b;
     }
@@ -254,7 +285,7 @@
       make("span", "visually-hidden", b, "Compromise ");
       make("span", "blast__name", b, row.label);
       make("span", "blast__tag", b, "Compromised").setAttribute("aria-hidden", "true");
-      return on(b, function () { hit = hit === row ? null : row; });
+      return operates(b, function () { compromised = compromised === row ? null : row; });
     }
 
     function path(d, hot, dashed) {
@@ -264,39 +295,46 @@
 
     function update() {
       var hub = hubs.filter(function (r) { return r.values[mode] !== null; })[0] || null;
-      var owner = stations.indexOf(hit), cx = width / 2, d = "";
+      /* Which workstation is compromised, or -1 for none or the server. */
+      var station = stations.indexOf(compromised);
+      var cx = width / 2, d = "";
       modeButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === mode)); });
-      stationButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(hit === stations[i])); });
+      stationButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(compromised === stations[i])); });
       hubButtons.forEach(function (b, i) {
         b.hidden = hubs[i].values[mode] === null;
-        b.setAttribute("aria-pressed", String(hit === hubs[i]));
+        b.setAttribute("aria-pressed", String(compromised === hubs[i]));
       });
 
       stations.forEach(function (r, i) {
         var x = 100 * i + 50;
         if (!hub) {
-          d += path("M" + x + " 0 V100", hit === r);
+          d += path("M" + x + " 0 V100", compromised === r);
         } else {
-          d += path("M" + x + " 0 C " + x + " 22, " + cx + " 14, " + cx + " 30", hit === r);
-          d += path("M" + cx + " 70 C " + cx + " 86, " + x + " 78, " + x + " 100", hit === hub, true);
+          d += path("M" + x + " 0 C " + x + " 22, " + cx + " 14, " + cx + " 30", compromised === r);
+          d += path("M" + cx + " 70 C " + cx + " 86, " + x + " 78, " + x + " 100", compromised === hub, true);
         }
       });
       svg.innerHTML = d;
 
-      var exposed = hit ? hit.values[mode] : 0;
+      /* A workstation lights its own group, one file after another; the server lights the whole
+         shelf, faster, because there is more of it. */
+      var exposed = compromised ? compromised.values[mode] : 0;
       files.forEach(function (f, k) {
-        var lit = hit !== null && (owner >= 0 ? f.owner === owner : k < exposed);
+        var lit = station >= 0 ? f.owner === station : k < exposed;
+        var delay = station >= 0 ? f.pos * 30 : k * 12;
         f.el.classList.toggle("is-exposed", lit);
-        f.el.style.transitionDelay = lit && !reduced ? (owner >= 0 ? f.pos * 30 : k * 12) + "ms" : "0ms";
+        f.el.style.transitionDelay = lit && !reduced ? delay + "ms" : "0ms";
       });
       count.textContent = String(exposed);
       readout.classList.toggle("is-hot", exposed > 0);
-      note.textContent = hit === null
-        ? (hub ? "Select a workstation, or the " + hub.label.toLowerCase() + "."
-               : "Select a workstation to compromise it.")
-        : owner < 0
-          ? "Its service account has to read every file, and bypasses the share’s permissions by design."
-          : "It yields only what that analyst could already open from the share.";
+      if (compromised === null) {
+        note.textContent = hub ? "Select a workstation, or the " + hub.label.toLowerCase() + "."
+                               : "Select a workstation to compromise it.";
+      } else if (station < 0) {
+        note.textContent = "Its service account has to read every file, and bypasses the share’s permissions by design.";
+      } else {
+        note.textContent = "It yields only what that analyst could already open from the share.";
+      }
     }
 
     update();
