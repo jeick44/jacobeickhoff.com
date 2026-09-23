@@ -58,7 +58,7 @@
         <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
         <div><dt>Status</dt><dd>Ongoing &middot; AI Integration Phase</dd></div>
         <div><dt>Governing constraint</dt><dd>The Local-Only Constraint</dd></div>
-        <div><dt>Reading time</dt><dd>7 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Ongoing</span> In its AI
         Integration Phase, so written in the present tense, with unmeasured outcomes labelled
@@ -313,25 +313,52 @@
               share machinery the existing ones used. It worked, and the suite was green. A code review
               of that same change found six defects, two of which would have corrupted figures on their
               way into a credit decision.</p>
+            <figure class="exhibit exhibit--wide" id="exhibit-green-suite" data-exhibit="green-suite"
+                    data-provenance="published">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> 3,923 checks
+                  passing, and six defects none of them could see</h3>
+                <p class="exhibit__instruction">Each square is one assertion over the
+                  approval-presentation tool.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The six defects a review found in one change to the spreads import, whether
+                      each would have reached figures, and how many of the approval-presentation
+                      tool&rsquo;s automated assertions failed on it</caption>
+                    <thead>
+                      <tr><th scope="col">Defect</th><th scope="col">Would reach figures</th><th scope="col">Assertions failing on it</th><th scope="col">What review found</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Sheet-type test read the whole sheet, not the header band</th><td>Yes</td><td>0 of 3,923</td><td>A block of round four-figure expense amounts reads to it as a row of years; two properties would land on one key, one silently overwriting the other.</td></tr>
+                      <tr><th scope="row">Migration verified the carry by comparing an object with itself</th><td>Yes</td><td>0 of 3,923</td><td>A comparison that could not fail &mdash; and the only gate on deleting the analyst&rsquo;s hand-entered grid.</td></tr>
+                      <tr><th scope="row">A refusal with nowhere on screen to be said</th><td>No</td><td>0 of 3,923</td><td>The tool declined, and the analyst would never have seen why.</td></tr>
+                      <tr><th scope="row">A rule that had quietly stopped being true for one sheet type</th><td>No</td><td>0 of 3,923</td><td>It went on reading correctly while the predicate underneath had changed meaning.</td></tr>
+                      <tr><th scope="row">A predicate rewritten into a form that read the same</th><td>No</td><td>0 of 3,923</td><td>It changed behaviour under cover of fixing a fifth case.</td></tr>
+                      <tr><th scope="row">Three analyst-facing messages printing an internal key</th><td>No</td><td>0 of 3,923</td><td>A name was expected; an identifier was shown.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> published; assertion count and defect
+                descriptions as published in the Case Study. All six sit in code that generalised an
+                existing rule: the rule goes on reading correctly while the predicate underneath it has
+                changed meaning.</figcaption>
+            </figure>
             <details class="disclosure">
-              <summary class="disclosure__summary">The six, and the pattern underneath them</summary>
+              <summary class="disclosure__summary">The two that would have reached real figures</summary>
               <div class="disclosure__body">
-                <p>The two that would have reached real figures. The test deciding what kind of sheet
-                  the tool is looking at asked its question of the whole sheet rather than the header
-                  band, and a block of round four-figure expense amounts reads to it as a row of years.
+                <p>The test deciding what kind of sheet the tool is looking at asked its question of
+                  the whole sheet rather than the header band, and a block of round four-figure expense amounts reads to it as a row of years.
                   A real sheet would have been typed wrongly and handed to a parser that keys columns by
                   year, so two properties would land on one key, one silently overwriting the other, and
                   the survivor would merge into that company&rsquo;s genuine multi-year trend. And the
                   migration that carries old data into the new shape verified the carry before deleting
                   the original by comparing an object with itself &mdash; a comparison that could not
                   fail, and the only gate on deleting the analyst&rsquo;s hand-entered grid.</p>
-                <p>The other four: a refusal with nowhere on screen to be said; a rule that had quietly
-                  stopped being true for one sheet type; a predicate rewritten into a form that read the
-                  same and changed behaviour under cover of fixing a fifth case; and three
-                  analyst-facing messages printing an internal key instead of a name.</p>
-                <p>All six sit in code that generalised an existing rule, which is the pattern worth
-                  naming: the rule goes on reading correctly while the predicate underneath it has
-                  changed meaning.</p>
               </div>
             </details>
             <p>The useful part is not the six. It is that the suite, the mutation harness and I were

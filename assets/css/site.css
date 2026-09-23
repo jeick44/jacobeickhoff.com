@@ -2130,6 +2130,136 @@ button.prep__cell:focus-visible {
   font-weight: 700;
 }
 
+/* ---- kind: green-suite -----------------------------------------------------------------------------
+   One square per assertion, filling in good green, over a legend that keys it: passing carries a
+   tick as well as the colour, so green is never the only signal. The grid scales with the column
+   rather than scrolling, since a field of squares reads the same at any size. Below it, the defects,
+   two to a row on wider screens, each with a pill saying whether it would reach figures. Neither pill
+   is pass or fail, so they take the fourth and third data colours rather than the status ones. */
+.exhibit .suite__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+.suite__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.suite__legend b {
+  font-variant-numeric: tabular-nums;
+}
+
+.suite__key {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+}
+
+.suite__key--pass {
+  color: var(--good);
+}
+
+.suite__key--pass rect {
+  fill: currentColor;
+}
+
+.suite__key--pass path {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.suite__key--idle {
+  background: var(--line);
+}
+
+.suite__grid {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.exhibit .suite__status {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.suite__defects {
+  display: grid;
+  gap: 0.4rem;
+}
+
+@media (min-width: 40rem) {
+  .suite__defects {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.suite__defects[hidden] {
+  display: none;
+}
+
+.suite__defect {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 160ms var(--ease), background-color 160ms var(--ease);
+}
+
+.suite__defect:hover,
+.suite__defect[aria-pressed="true"] {
+  border-color: var(--ink);
+}
+
+.suite__defect[aria-pressed="true"] {
+  background: var(--mist);
+}
+
+.suite__sev {
+  margin-top: 0.1rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--data-3) 16%, var(--paper));
+  color: color-mix(in srgb, var(--data-3) 45%, var(--ink));
+}
+
+.suite__sev--high {
+  background: color-mix(in srgb, var(--data-4) 13%, var(--paper));
+  color: color-mix(in srgb, var(--data-4) 70%, var(--ink));
+}
+
+.exhibit .suite__detail {
+  min-height: 1.6em;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
 /* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
    a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
    exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
@@ -2240,6 +2370,20 @@ button.prep__cell:focus-visible {
   opacity: 1;
   transform: none;
   filter: none;
+}
+
+/* The green suite's defects arrive one after another when the change is read as prose. */
+.js-motion .suite__defects.is-arriving .suite__defect {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.js-motion .suite__defects.is-arriving.is-here .suite__defect {
+  opacity: 1;
+  transform: none;
+  transition: opacity 500ms var(--ease), transform 500ms var(--ease),
+    border-color 160ms var(--ease), background-color 160ms var(--ease);
+  transition-delay: calc(var(--defect-at, 0) * 90ms), calc(var(--defect-at, 0) * 90ms), 0ms, 0ms;
 }
 
 /* =================================================================================================

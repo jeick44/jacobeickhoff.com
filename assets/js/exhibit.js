@@ -910,6 +910,161 @@
     show(0);
   });
 
+  /* ---- KIND: green-suite ---------------------------------------------------------------------------
+     One change, checked twice. The table lists each defect a review of the change found: whether it
+     would have reached figures ("Yes" or "No"), how many of the automated assertions failed on it
+     ("0 of 3,923"), and what review found. The suite is drawn as one square per assertion, filling in
+     green the first time it comes into view; reading the change as prose then shows the defects,
+     each a button that opens its description.
+
+     The Exhibit's claim is that the suite saw none of them, and the kind reads that back from the
+     table rather than trusting it, refusing a table that breaks it (the stage stays empty and the
+     table stands alone):
+       - every defect is counted against the same suite: one number of assertions in every row;
+       - a defect some assertion failed on is one the suite saw, so every row fails none;
+       - whether it would reach figures is "Yes" or "No".
+     Under reduced motion the suite stands filled at once and the defects appear without easing in. */
+  register("green-suite", function (fig, stage, data) {
+    var reach = data.columns.indexOf("Would reach figures") - 1;
+    var failing = data.columns.indexOf("Assertions failing on it") - 1;
+    var found = data.columns.indexOf("What review found") - 1;
+    if (reach < 0 || failing < 0 || found < 0 || !data.rows.length) {
+      throw new Error("green-suite: the table has no defects, or lacks a column the kind reads");
+    }
+    var total = null, failed = 0;
+    var defects = data.rows.map(function (r) {
+      var m = /^(\d[\d,]*) of (\d[\d,]*)$/.exec(r.cells[failing]);
+      if (!m) throw new Error("green-suite: " + r.label + " gives its failing assertions as " + JSON.stringify(r.cells[failing]));
+      if (total === null) total = m[2];
+      if (m[2] !== total) throw new Error("green-suite: " + r.label + " is counted against " + m[2] + " assertions, not " + total);
+      if (number(m[1]) !== 0) throw new Error("green-suite: " + m[1] + " assertions failed on " + r.label + ", so the suite saw it");
+      if (!/^(Yes|No)$/.test(r.cells[reach])) throw new Error("green-suite: " + r.label + " would reach figures: " + r.cells[reach]);
+      failed += number(m[1]);
+      return { name: r.label, high: r.cells[reach] === "Yes", says: r.cells[found] };
+    });
+    var n = number(total);
+    var WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+    var many = (WORDS[defects.length] || String(defects.length)) + (defects.length === 1 ? " defect" : " defects");
+
+    /* The legend: the passing count, which fills in with the grid, and the failing count. */
+    var legend = make("p", "suite__legend", stage);
+    var pass = make("span", "", legend);
+    pass.innerHTML = '<svg class="suite__key suite__key--pass" viewBox="0 0 12 12" aria-hidden="true" focusable="false">' +
+      '<rect width="12" height="12" rx="2"/><path d="M3 6.2l2 2 4-4.4"/></svg>';
+    var onKey = pass.firstChild;
+    var passing = make("b", "", pass, "0");
+    passing.setAttribute("data-result", "");
+    pass.appendChild(document.createTextNode(" passing"));
+    var idle = make("span", "", legend);
+    var offKey = make("i", "suite__key suite__key--idle", idle);
+    offKey.setAttribute("aria-hidden", "true");
+    idle.appendChild(document.createTextNode("not yet run"));
+    var fail = make("span", "", legend);
+    make("b", "", fail, String(failed));
+    fail.appendChild(document.createTextNode(" failing"));
+
+    /* The grid, one square per assertion. Its colours are the stylesheet's, read off the legend's
+       keys, so the grid and its key cannot disagree. */
+    var COLS = 106, CELL = 6, GAP = 1.5, rows = Math.ceil(n / COLS);
+    var w = COLS * (CELL + GAP), h = rows * (CELL + GAP);
+    var canvas = make("canvas", "suite__grid", stage);
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "A grid of " + total + " squares, every one passing.");
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.aspectRatio = w + " / " + h;
+    var ctx = canvas.getContext("2d");
+    var on = window.getComputedStyle(onKey).color;
+    var off = window.getComputedStyle(offKey).backgroundColor;
+    function paint(k) {
+      if (!ctx) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < n; i++) {
+        ctx.fillStyle = i < k ? on : off;
+        ctx.fillRect((i % COLS) * (CELL + GAP), Math.floor(i / COLS) * (CELL + GAP), CELL, CELL);
+      }
+    }
+    function at(k) {
+      paint(k);
+      passing.textContent = k === n ? total : k.toLocaleString("en-US");
+    }
+
+    /* Reading the change as prose: the button gives way to what it found, and focus moves to the
+       first defect so the keyboard is where the reading continues. */
+    var read = make("div", "suite__read", stage);
+    var go = button(read, "btn btn--solid", "Now read the change as prose");
+    var status = make("p", "suite__status", read, many + ", every check still green");
+    status.hidden = true;
+    var list = make("div", "suite__defects", stage);
+    list.setAttribute("role", "group");
+    list.setAttribute("aria-label", "Defects found by review");
+    list.hidden = true;
+    var detail = make("p", "suite__detail", stage);
+    detail.setAttribute("aria-live", "polite");
+    detail.setAttribute("data-result", "");
+
+    var buttons = defects.map(function (d, i) {
+      var b = button(list, "suite__defect", null, false);
+      make("span", "suite__sev" + (d.high ? " suite__sev--high" : ""), b, d.high ? "Would reach figures" : "Defect");
+      make("span", "", b, d.name);
+      b.style.setProperty("--defect-at", String(i));
+      b.addEventListener("click", function () {
+        buttons.forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+        detail.textContent = d.says;
+      });
+      return b;
+    });
+
+    /* The defects ease in one after another (the stylesheet's transition, 90ms apart), and the list
+       is busy until the last has arrived. */
+    var ARRIVE_MS = 500;
+    go.addEventListener("click", function () {
+      read.removeChild(go);
+      status.hidden = false;
+      list.hidden = false;
+      if (!reduced) {
+        list.classList.add("is-arriving");
+        void list.offsetWidth;
+        list.classList.add("is-here");
+        list.setAttribute("aria-busy", "true");
+        window.setTimeout(function () { list.removeAttribute("aria-busy"); }, ARRIVE_MS + buttons.length * 90);
+      }
+      detail.textContent = "Select a defect. None of the " + total + " checks covered any of them.";
+      buttons[0].focus({ preventScroll: true });
+    });
+
+    /* The suite fills in once, the first time the grid comes into view; the legend is busy until it
+       has. Under reduced motion it stands filled. */
+    var FILL_MS = 2200;
+    function fill() {
+      var t0 = null;
+      window.requestAnimationFrame(function tick(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / FILL_MS);
+        at(Math.round(n * (1 - Math.pow(1 - k, 2))));
+        if (k < 1) window.requestAnimationFrame(tick);
+        else legend.removeAttribute("aria-busy");
+      });
+    }
+    at(reduced ? n : 0);
+    if (!reduced) {
+      /* Busy from the start: until the grid has been seen and filled, 0 passing is not a result. */
+      legend.setAttribute("aria-busy", "true");
+      if (!("IntersectionObserver" in window)) {
+        fill();
+      } else {
+        var seen = new window.IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting) { seen.disconnect(); fill(); }
+          });
+        }, { threshold: 0.3 });
+        seen.observe(canvas);
+      }
+    }
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
   window.Exhibit = { register: register, slider: slider };
