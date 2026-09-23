@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -48,6 +51,46 @@
         the same order &mdash; The Situation, What I Did, What Changed, What I Learned, Where Else
         This Applies &mdash; so that two of them can be read against each other, and so that What I
         Learned reads as a method rather than an excuse.</p>
+    </div>
+  </section>
+
+  <section class="section section--overview">
+    <div class="wrap">
+      <!-- The homepage's Exhibit 1 at full size, with its own title and caption. Its table is a
+           hand copy of the homepage's; the suite holds the two to the same rows (work.overview-agrees). -->
+      <figure class="exhibit exhibit--index" id="exhibit-engagement-overview"
+              data-exhibit="engagement-overview" data-provenance="published">
+        <div class="exhibit__head">
+          <h2 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Every quadrant
+            holds an Engagement: work scoped by a Sponsor and work I scoped, analysis and shipped
+            tooling</h2>
+          <p class="exhibit__instruction">Hover or tab to an Engagement to read its line; select one
+            to open its Case Study.</p>
+        </div>
+        <div class="exhibit__stage" data-stage></div>
+        <details class="exhibit__data">
+          <summary class="exhibit__data-toggle">View the data</summary>
+          <div class="exhibit__table">
+            <table>
+              <caption>The six Engagements by who set the scope and what the work produced</caption>
+              <thead>
+                <tr><th scope="col">No.</th><th scope="col">Engagement</th><th scope="col">Scope</th><th scope="col">Output</th><th scope="col">Quadrant</th><th scope="col">Described as</th><th scope="col">In one line</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>01</td><th scope="row"><a href="/work/customer-intelligence/">Customer Intelligence</a></th><td>Scope set by a Sponsor</td><td>Shipped tooling</td><td>Tools under someone else&rsquo;s rules</td><td>Sponsor-set &middot; shipped tooling</td><td>Mapping and profitability tools giving leadership a spatial view of a customer base it had only seen as rows.</td></tr>
+                <tr data-lead><td>02</td><th scope="row"><a href="/work/credit-process-rebuild/">Credit Process Rebuild</a></th><td>Scope set by a Sponsor</td><td>Shipped tooling</td><td>Tools under someone else&rsquo;s rules</td><td>Sponsor-set &middot; shipped tooling &middot; ongoing</td><td>Loan origination rebuilt as local-only browser tools, and the approval presentation split into three stages.</td></tr>
+                <tr><td>03</td><th scope="row"><a href="/work/the-competition/">The Competition</a></th><td>Scope set by a Sponsor</td><td>Analysis</td><td>Analysis to a brief</td><td>Sponsor-set &middot; analysis</td><td>&ldquo;Operational AI Adoption in a Winner-Take-Most Economy&rdquo; &mdash; reported with the periods the signal pointed the wrong way.</td></tr>
+                <tr><td>04</td><th scope="row"><a href="/work/the-research/">The Research</a></th><td>Self-directed</td><td>Analysis</td><td>Research I can be wrong in</td><td>Self-directed, faculty-advised &middot; analysis</td><td>Whether AI-edited language in SEC filings predicts returns &mdash; rebuilt after I withdrew my own first result.</td></tr>
+                <tr><td>05</td><th scope="row"><a href="/work/tradelog-and-indy/">TradeLog and Indy</a></th><td>Self-directed</td><td>Shipped tooling</td><td>Systems I own end to end</td><td>Self-directed &middot; product design and architecture</td><td>A decision-discipline system for active investors. Adherence to a plan committed in advance is measured from the broker&rsquo;s execution record, so the distance between intended and actual decisions can be seen and reviewed; Indy, a companion charting toolkit, records what a chart displayed.</td></tr>
+                <tr><td>06</td><th scope="row"><a href="/work/macrosense/">MacroSense</a></th><td>Self-directed</td><td>Shipped tooling</td><td>Systems I own end to end</td><td>Self-directed &middot; system</td><td>A two-layer allocation system built and run end to end by one person &mdash; published as architecture, not performance.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <figcaption class="exhibit__source"><b>Source:</b> published; the same six Engagements as
+          the cards below, each placed by the scope and output its Case Study states. A quadrant is a
+          category, not a score: nearness to a corner, or to another mark, means nothing.</figcaption>
+      </figure>
     </div>
   </section>
 

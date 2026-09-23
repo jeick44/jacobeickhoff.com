@@ -2686,6 +2686,17 @@ button.prep__cell:focus-visible {
   margin-top: 0;
 }
 
+/* The Engagement overview at full size: wider than the hero's copy, and stopped where the 2x2 would
+   run taller than a laptop screen. The cards follow straight on, so the section gives up its foot. */
+.section--overview {
+  padding-bottom: 0;
+}
+
+.exhibit--index {
+  margin: 0;
+  max-width: 48rem;
+}
+
 .engagement-card__link {
   text-decoration: none;
 }
