@@ -27,13 +27,19 @@
    CONTROLS ARE BUTTONS, OR THE ONE SHARED SLIDER. No form inputs of any kind: the suite counts
      every input as evidence of a backend and keeps that check without exceptions. Controls are
      created here rather than shipped, so a reader with no script is never shown one that does
-     nothing.
+     nothing. A mark that leads to another page (the Engagement overview's) is a link, because it
+     navigates; what it shows on focus is its readout.
+
+   COMPACT MODE. data-compact on the figure hands the kind { compact: true }: a featured copy of an
+     Exhibit (the homepage's) with fewer controls, which still carries the whole contract above and
+     its own source line.
 
    EVERY KIND DECLARES ITS RESULT. The element (or elements) stating what the reader's action
      produced - a count, a total, a date - carries data-result. The harness operates each control the
      way a keyboard does (a button - an action, a toggle with aria-pressed, a segment - is pressed; a
-     slider or a draggable mark, role="slider", takes an arrow key; a new kind of control is one
-     entry in OPERATORS in suites/collect.js) and requires some control to change a result's text.
+     slider or a draggable mark, role="slider", takes an arrow key; a link, which leads to another
+     page, is focused and not followed; a new kind of control is one entry in OPERATORS in
+     suites/collect.js) and requires some control to change a result's text.
      A hint that changes while the result stands still is a control wired to nothing, and fails.
      A kind that plays its result through over time marks an element in the figure aria-busy="true"
      while it plays; the harness waits for that to clear before it reads the result a control ends on.
@@ -193,7 +199,7 @@
     var stage = fig.querySelector("[data-stage]");
     if (!draw || !stage || stage.children.length) return;
     try {
-      draw(fig, stage, readTable(fig));
+      draw(fig, stage, readTable(fig), { compact: fig.hasAttribute("data-compact") });
     } catch (e) {
       stage.textContent = "";
       if (window.console) window.console.error(e);
@@ -1061,6 +1067,206 @@
           });
         }, { threshold: 0.3 });
         seen.observe(canvas);
+      }
+    }
+  });
+
+  /* ---- KIND: engagement-overview ----------------------------------------------------------------
+     Every Engagement on one 2x2: who set its scope, and what the work produced. The table lists each
+     Engagement: its number, its name (a link to its Case Study), its scope, its output, the name of
+     the quadrant those two put it in, how it is described, and its line. Placement is categorical: a
+     mark's position inside its quadrant is layout, spread evenly in reading order, and carries no
+     meaning, which the source line says. There are no coordinates in the table because there are none
+     to have.
+
+     The axes are read from the table as well: each has exactly two categories, and the first row's
+     pair is the top-left quadrant, since that is where a reader starts. A table the drawing cannot
+     show is refused (the stage stays empty and the table stands alone): an axis with other than two
+     categories, a quadrant given two names, a row without a link to its Case Study, or two rows with
+     one number.
+
+     Each mark is a link: selecting it opens the Case Study. Hovering it, focusing it, or tapping it
+     once shows its line in the readout (a first tap shows it; a second opens it). The row marked
+     data-lead is shown before a reader picks one. A hover is a preview: leaving the mark returns the
+     readout to the Engagement last focused or tapped.
+
+     The marks gather at the centre and spread to their quadrants the first time the diagram comes into
+     view, with the marks aria-busy while they travel; under reduced motion they are simply there.
+
+     Compact (data-compact on the figure, for a featured copy): the marks and the axes without the
+     quadrant names, and the readout without the line. */
+  register("engagement-overview", function (fig, stage, data, opts) {
+    function col(name) {
+      var i = data.columns.indexOf(name) - 1;
+      if (i < 0) throw new Error("engagement-overview: the table has no " + name + " column");
+      return i;
+    }
+    var NAME = col("Engagement"), SCOPE = col("Scope"), OUTPUT = col("Output"),
+        QUAD = col("Quadrant"), SAYS = col("Described as"), LINE = col("In one line");
+    var trs = fig.querySelectorAll("tbody tr");
+    if (!data.rows.length) throw new Error("engagement-overview: the table has no Engagements");
+
+    /* The two categories on each axis, in order of first appearance. */
+    function categories(c) {
+      var found = [];
+      data.rows.forEach(function (r) { if (found.indexOf(r.cells[c]) < 0) found.push(r.cells[c]); });
+      if (found.length !== 2) {
+        throw new Error("engagement-overview: " + data.columns[c + 1] + " has " + found.length +
+                        " categories, not two: " + found.join(", "));
+      }
+      return found;
+    }
+    var scopes = categories(SCOPE), outputs = categories(OUTPUT);
+    var quads = {}, numbers = {};
+    var marks = data.rows.map(function (r, i) {
+      var link = trs[i].querySelector("a[href]");
+      if (!link) throw new Error("engagement-overview: " + r.cells[NAME] + " links to no Case Study");
+      if (numbers[r.label]) throw new Error("engagement-overview: two Engagements are numbered " + r.label);
+      numbers[r.label] = true;
+      var across = scopes.indexOf(r.cells[SCOPE]), down = outputs.indexOf(r.cells[OUTPUT]);
+      var key = across + "," + down;
+      if (quads[key] && quads[key].name !== r.cells[QUAD]) {
+        throw new Error("engagement-overview: one quadrant is named both " + quads[key].name +
+                        " and " + r.cells[QUAD]);
+      }
+      quads[key] = quads[key] || { name: r.cells[QUAD], col: across, row: down, members: [] };
+      var m = { no: r.label, name: r.cells[NAME], says: r.cells[SAYS], line: r.cells[LINE],
+                href: link.getAttribute("href"), lead: trs[i].hasAttribute("data-lead"), quad: quads[key] };
+      quads[key].members.push(m);
+      return m;
+    });
+
+    /* The plot, in the drawing's own units. x runs left to right across the scope categories, y top
+       to bottom across the outputs; each quadrant is half of each. */
+    var W = 520, H = 430, L = 44, R = 508, T = 16, B = 384, MX = (L + R) / 2, MY = (T + B) / 2;
+    function X(u) { return L + (R - L) * u; }
+    function Y(u) { return T + (B - T) * u; }
+    /* Where a quadrant's members go: evenly down its height, clear of its name (at the outer edge),
+       and stepping in from its outer side, the side their labels do not run to. */
+    Object.keys(quads).forEach(function (k) {
+      var q = quads[k], n = q.members.length;
+      var lo = q.row ? 0.15 : 0.55, hi = q.row ? 0.45 : 0.82;
+      q.members.forEach(function (m, j) {
+        var t = n === 1 ? 0.5 : j / (n - 1);
+        var inset = 0.1 + 0.06 * j;
+        m.x = q.col ? 1 - inset : inset;
+        m.y = hi - (hi - lo) * t;
+        m.right = !q.col;
+      });
+    });
+
+    var frame = make("div", "exhibit__frame", stage);
+    var plot = make("div", "overview", frame);
+    var svg = [];
+    svg.push('<svg viewBox="0 0 ' + W + " " + H + '" aria-hidden="true" focusable="false">');
+    svg.push('<rect class="overview__ground" x="' + L + '" y="' + T + '" width="' + (R - L) + '" height="' + (B - T) + '" rx="8"/>');
+    svg.push('<rect class="overview__lead-quadrant" x="' + L + '" y="' + T + '" width="' + (MX - L) + '" height="' + (MY - T) + '" rx="8"/>');
+    svg.push('<path class="overview__divide" d="M' + MX + " " + T + " V" + B + " M" + L + " " + MY + " H" + R + '"/>');
+    svg.push("</svg>");
+    plot.innerHTML = svg.join("");
+
+    /* Words over the drawing are HTML at the page's own sizes, placed by percentage, so they stay
+       legible however wide the diagram is drawn. */
+    function place(el, x, y) {
+      el.style.setProperty("--x", (x / W * 100) + "%");
+      el.style.setProperty("--y", (y / H * 100) + "%");
+      return el;
+    }
+    if (!opts.compact) {
+      Object.keys(quads).forEach(function (k) {
+        var q = quads[k];
+        var qn = make("span", "overview__quadrant" + (q.row ? " is-low" : ""), plot, q.name);
+        qn.setAttribute("aria-hidden", "true");
+        place(qn, q.col ? MX + 14 : L + 14, q.row ? B - 12 : T + 12);
+      });
+    }
+    var axes = make("div", "overview__axes", plot);
+    axes.setAttribute("aria-hidden", "true");
+    place(make("span", "overview__axis", axes, scopes[0]), L, B + 12);
+    place(make("span", "overview__axis is-end", axes, scopes[1]), R, B + 12);
+    place(make("span", "overview__axis is-y", axes, outputs[1]), L - 12, B);
+    place(make("span", "overview__axis is-y is-end", axes, outputs[0]), L - 12, T);
+
+    var field = make("div", "overview__marks", plot);
+    field.style.setProperty("--cx", (MX / W * 100) + "%");
+    field.style.setProperty("--cy", (MY / H * 100) + "%");
+    var readout = make("div", "overview__card", stage);
+    readout.setAttribute("aria-live", "polite");
+    var cardNo = make("span", "overview__no", readout);
+    cardNo.setAttribute("aria-hidden", "true");
+    var cardName = make("b", "overview__name", readout);
+    cardName.setAttribute("data-result", "");
+    var cardSays = make("span", "overview__says", readout);
+    var cardLine = opts.compact ? null : make("p", "overview__line", readout);
+
+    /* Hovering previews a mark; leaving it returns the readout to the one chosen by focus or a tap
+       (at first, the lead), so a readout seen only by hovering is never left standing. */
+    /* picked: whether the reader has chosen yet. The lead is shown, not chosen, so a first tap on it
+       previews too. */
+    var chosen = null, picked = false, previewTap = false;
+    function choose(m) {
+      chosen = m;
+      show(m);
+    }
+    function show(m) {
+      cardNo.textContent = m.no;
+      cardName.textContent = m.name;
+      cardSays.textContent = m.says;
+      if (cardLine) cardLine.textContent = m.line;
+      marks.forEach(function (o) { o.el.classList.toggle("is-shown", o === m); });
+    }
+    marks.forEach(function (m, i) {
+      var a = make("a", "overview__mark" + (m.right ? "" : " is-left-label"), field);
+      a.href = m.href;
+      a.style.setProperty("--i", String(i));
+      place(a, X(m.x), Y(1 - m.y));
+      make("span", "overview__dot", a, m.no).setAttribute("aria-hidden", "true");
+      make("span", "visually-hidden", a, "Engagement " + m.no + ": ");
+      make("span", "overview__label", a, m.name);
+      a.addEventListener("mouseenter", function () { show(m); });
+      a.addEventListener("mouseleave", function () { show(chosen); });
+      a.addEventListener("focus", function () { picked = true; choose(m); });
+      /* A first tap shows the line; a tap on the one already chosen opens it. Decided as the finger
+         lands, before the focus and mouse events a tap also fires have chosen it. */
+      a.addEventListener("pointerdown", function (e) {
+        previewTap = e.pointerType === "touch" && (!picked || chosen !== m);
+      });
+      a.addEventListener("click", function (e) {
+        if (previewTap) {
+          e.preventDefault();
+          picked = true;
+          choose(m);
+        }
+        previewTap = false;
+      });
+      m.el = a;
+    });
+    choose(marks.filter(function (m) { return m.lead; })[0] || marks[0]);
+
+    if (!reduced) {
+      field.classList.add("is-arriving");
+      field.setAttribute("aria-busy", "true");
+      var arrive = function () {
+        /* One frame at the centre first, so the marks have somewhere to travel from. */
+        window.requestAnimationFrame(function () {
+          window.requestAnimationFrame(function () {
+            field.classList.add("is-here");
+            window.setTimeout(function () {
+              field.classList.remove("is-arriving", "is-here");
+              field.removeAttribute("aria-busy");
+            }, 250 + 110 * marks.length + 900);
+          });
+        });
+      };
+      if (!("IntersectionObserver" in window)) {
+        arrive();
+      } else {
+        var seen = new window.IntersectionObserver(function (es) {
+          es.forEach(function (e) {
+            if (e.isIntersecting) { seen.disconnect(); arrive(); }
+          });
+        }, { threshold: 0.3 });
+        seen.observe(plot);
       }
     }
   });

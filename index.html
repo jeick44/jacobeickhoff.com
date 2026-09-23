@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -40,40 +43,77 @@
 <main id="main">
 
   <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow hero__eyebrow">Finance &amp; Accounting BBA &middot; UW&ndash;Eau Claire &middot; May 2027</p>
-      <h1 class="hero__name">Jacob Eickhoff</h1>
-      <p class="hero__tagline">Finance. AI. Consulting.</p>
-      <p class="hero__lede">I go into a process nobody has written down, find where it actually
-        breaks, and build the tool that closes the gap &mdash; inside a regulated environment,
-        under constraints somebody else set. Then I write down the reasoning, including the parts
-        that turned out to be wrong.</p>
-      <div class="hero__ctas">
-        <a class="btn btn--primary" href="#engagements">View the work</a>
-        <a class="btn btn--ghost" href="#contact">Get in touch</a>
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <h1 class="hero__headline">I find where an undocumented process <em>actually</em> breaks, and
+          build the tool that closes the gap.</h1>
+        <p class="hero__dek">Credit origination, customer mapping and filings research, built inside
+          regulated environments under constraints somebody else set, with the reasoning written
+          down, including the parts that turned out to be wrong.</p>
+        <div class="hero__ctas">
+          <a class="btn btn--primary" href="#work">See the work <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          <a class="btn btn--ghost" href="/work/credit-process-rebuild/">Read a case study</a>
+        </div>
+        <p class="hero__who">
+          <img src="/assets/img/headshot.jpg" width="800" height="800" alt="">
+          <span><strong>Jacob Eickhoff</strong> Finance &amp; Accounting, UW&ndash;Eau Claire &middot;
+            seeking consulting roles, May 2027</span>
+        </p>
       </div>
+
+      <figure class="exhibit exhibit--hero" id="exhibit-engagement-overview"
+              data-exhibit="engagement-overview" data-provenance="published">
+        <div class="exhibit__head">
+          <h2 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Three Engagements
+            scoped by a Sponsor, three self-directed, and four of the six shipped as tooling</h2>
+          <p class="exhibit__instruction">Hover or tab to an Engagement; select one to open it.</p>
+        </div>
+        <div class="exhibit__stage" data-stage></div>
+        <details class="exhibit__data">
+          <summary class="exhibit__data-toggle">View the data</summary>
+          <div class="exhibit__table">
+            <table>
+              <caption>The six Engagements by who set the scope and what the work produced</caption>
+              <thead>
+                <tr><th scope="col">No.</th><th scope="col">Engagement</th><th scope="col">Scope</th><th scope="col">Output</th><th scope="col">Quadrant</th><th scope="col">Described as</th><th scope="col">In one line</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>01</td><th scope="row"><a href="/work/customer-intelligence/">Customer Intelligence</a></th><td>Scope set by a Sponsor</td><td>Shipped tooling</td><td>Tools under someone else&rsquo;s rules</td><td>Sponsor-set &middot; shipped tooling</td><td>Mapping and profitability tools giving leadership a spatial view of a customer base it had only seen as rows.</td></tr>
+                <tr data-lead><td>02</td><th scope="row"><a href="/work/credit-process-rebuild/">Credit Process Rebuild</a></th><td>Scope set by a Sponsor</td><td>Shipped tooling</td><td>Tools under someone else&rsquo;s rules</td><td>Sponsor-set &middot; shipped tooling &middot; ongoing</td><td>Loan origination rebuilt as local-only browser tools, and the approval presentation split into three stages.</td></tr>
+                <tr><td>03</td><th scope="row"><a href="/work/the-competition/">The Competition</a></th><td>Scope set by a Sponsor</td><td>Analysis</td><td>Analysis to a brief</td><td>Sponsor-set &middot; analysis</td><td>&ldquo;Operational AI Adoption in a Winner-Take-Most Economy&rdquo; &mdash; reported with the periods the signal pointed the wrong way.</td></tr>
+                <tr><td>04</td><th scope="row"><a href="/work/the-research/">The Research</a></th><td>Self-directed</td><td>Analysis</td><td>Research I can be wrong in</td><td>Self-directed, faculty-advised &middot; analysis</td><td>Whether AI-edited language in SEC filings predicts returns &mdash; rebuilt after I withdrew my own first result.</td></tr>
+                <tr><td>05</td><th scope="row"><a href="/work/tradelog-and-indy/">TradeLog and Indy</a></th><td>Self-directed</td><td>Shipped tooling</td><td>Systems I own end to end</td><td>Self-directed &middot; product design and architecture</td><td>A decision-discipline system for active investors. Adherence to a plan committed in advance is measured from the broker&rsquo;s execution record, so the distance between intended and actual decisions can be seen and reviewed; Indy, a companion charting toolkit, records what a chart displayed.</td></tr>
+                <tr><td>06</td><th scope="row"><a href="/work/macrosense/">MacroSense</a></th><td>Self-directed</td><td>Shipped tooling</td><td>Systems I own end to end</td><td>Self-directed &middot; system</td><td>A two-layer allocation system built and run end to end by one person &mdash; published as architecture, not performance.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <figcaption class="exhibit__source"><b>Source:</b> published; each Engagement&rsquo;s scope
+          and output as its Case Study states them. Placement is by category, not by score: where a
+          mark sits inside its quadrant means nothing.</figcaption>
+      </figure>
     </div>
   </section>
 
   <section class="stats" aria-labelledby="stats-heading">
-    <div class="wrap">
-      <h2 class="eyebrow" id="stats-heading">What that has added up to</h2>
+    <div class="wrap stats__grid">
+      <h2 class="stats__intro" id="stats-heading">What two years of it has added up to.</h2>
       <ul class="stats__list">
         <li class="stat reveal">
           <p class="stat__figure">
             <span class="stat__value" data-stat-final="3,923">3,923</span>
             <span class="stat__unit">assertions</span>
           </p>
-          <span class="stat__label">Automated checks standing guard over one credit-origination
-            toolset. None of them failing.</span>
+          <span class="stat__label">Automated checks over one credit-origination toolset. None of
+            them failing.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
             <span class="stat__value" data-stat-final="13">13</span>
             <span class="stat__unit">tools shipped</span>
           </p>
-          <span class="stat__label">Browser tools across two Engagements, none of them needing a
-            server, an account or an install.</span>
+          <span class="stat__label">Browser tools across two Engagements. No server, no account, no
+            install.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -81,126 +121,191 @@
             <span class="stat__unit">decisions recorded</span>
           </p>
           <span class="stat__label">Architecture decisions written down with the alternative each
-            one was chosen over.</span>
+            was chosen over.</span>
         </li>
       </ul>
+    </div>
+  </section>
+
+  <section class="section" id="work">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 class="section__title">Six Engagements. Three of them, <em>working</em>, below.</h2>
+        <p class="section__lede">Each exhibit is the mechanism from a Case Study, running. Every
+          figure not published elsewhere on the site is synthetic and labelled so.</p>
+      </div>
+
+      <!-- FEATURED WORK. Each feature is its Case Study's argument beside a compact copy of one of its
+           Exhibits (data-compact), which that Case Study's own ticket adds: the radius map, the
+           MacroSense pipeline and the Gate. -->
+      <div class="features">
+        <article class="feature reveal" id="feature-customer-intelligence">
+          <div class="feature__copy">
+            <p class="feature__meta"><span>Engagement 01</span><span>Customer Intelligence</span></p>
+            <h3 class="feature__title">A map of dots gets looked at. A number for the spot somebody
+              pointed at gets <em>argued with</em>.</h3>
+            <p class="feature__body">Leadership had only ever seen its customer base as rows in an
+              export. The tool that changed that ran on one idea: select an area, see real numbers for
+              it.</p>
+            <p class="feature__why"><b>Why the readout shows its arithmetic.</b> A colour scale is a
+              conclusion presented as an observation. Hovering a location shows the subtraction, so
+              the disagreement happens over a rate or a balance, where it can be settled.</p>
+            <a class="more" href="/work/customer-intelligence/">Read the Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          </div>
+        </article>
+
+        <article class="feature feature--flip reveal" id="feature-macrosense">
+          <div class="feature__copy">
+            <p class="feature__meta"><span>Engagement 06</span><span>MacroSense</span><span>Self-directed</span></p>
+            <h3 class="feature__title">An allocation process that can be replayed, argued with, and
+              <em>shown to be wrong</em>.</h3>
+            <p class="feature__body">A two-layer system built and run end to end by one person: it
+              fetches, classifies the macro regime, allocates across fifteen funds, and writes itself
+              a plain-English briefing, on a timer.</p>
+            <p class="feature__why"><b>Why there is no return figure here.</b> The history it can be
+              tested over is fifty-six trading days. A ratio annualised from that describes the
+              window, not the system, so this is published as architecture.</p>
+            <a class="more" href="/work/macrosense/">Read the Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          </div>
+        </article>
+
+        <article class="feature reveal" id="feature-the-research">
+          <div class="feature__copy">
+            <p class="feature__meta"><span>Engagement 04</span><span>The Research</span><span>Faculty-advised</span></p>
+            <h3 class="feature__title">A pass bar written down <em>before any detector ran</em>, and a
+              study allowed to come back empty.</h3>
+            <p class="feature__body">Whether AI-edited language in SEC filings predicts abnormal
+              returns. The first question is whether that editing can be seen at all, so every
+              detector has to clear the Gate before it may score a real filing.</p>
+            <p class="feature__why"><b>Why it was rebuilt.</b> I withdrew my own published first
+              result after finding three defects in it. If no detector clears the bar, that is the
+              finding, and the bar is not lowered.</p>
+            <a class="more" href="/work/the-research/">Read the Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="engagements" id="engagements">
+        <h3 class="engagements__title">All six Engagements</h3>
+        <ul class="engagements__list">
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 01</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/customer-intelligence/">Customer Intelligence</a></h4>
+            <p class="engagement-card__sponsor">A community bank in the Upper Midwest</p>
+            <p class="engagement-card__line">Browser-based mapping and profitability tools that gave
+              leadership a spatial and demographic view of a customer base it had only ever seen as
+              rows.</p>
+          </li>
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 02</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/credit-process-rebuild/">Credit Process Rebuild</a></h4>
+            <p class="engagement-card__sponsor">A community bank in the Upper Midwest &middot; ongoing</p>
+            <p class="engagement-card__line">Loan origination rebuilt as local-only browser tools:
+              intake, tax-document extraction, spreads, and an approval presentation restructured
+              into three separate stages.</p>
+          </li>
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 03</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/the-competition/">The Competition</a></h4>
+            <p class="engagement-card__sponsor">Four-person team &middot; hedge fund case competition</p>
+            <p class="engagement-card__line">&ldquo;Operational AI Adoption in a Winner-Take-Most
+              Economy&rdquo; &mdash; reported alongside the two earlier periods in which the same
+              signal pointed the wrong way.</p>
+          </li>
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 04</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/the-research/">The Research</a></h4>
+            <p class="engagement-card__sponsor">Independent &middot; faculty-advised</p>
+            <p class="engagement-card__line">Whether AI-generated language in SEC filings predicts
+              abnormal returns &mdash; rebuilt from the ground up after I withdrew my own first
+              result.</p>
+          </li>
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 05</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/tradelog-and-indy/">TradeLog and Indy</a></h4>
+            <p class="engagement-card__sponsor">Self-directed</p>
+            <p class="engagement-card__line">Verified Adherence: holding a discretionary process to a
+              rule written down in advance, and making the gap between the two visible.</p>
+          </li>
+          <li class="engagement-card reveal">
+            <p class="engagement-card__index">Engagement 06</p>
+            <h4 class="engagement-card__name"><a class="engagement-card__link"
+                href="/work/macrosense/">MacroSense</a></h4>
+            <p class="engagement-card__sponsor">Self-directed</p>
+            <p class="engagement-card__line">An allocation system built end to end by one person
+              &mdash; regime detection, sentiment scoring, portfolio construction and a scheduler
+              &mdash; published as architecture rather than as performance.</p>
+          </li>
+        </ul>
+        <p class="engagements__note">All six Case Studies are published; the
+          <a href="/work/">work index</a> is the same six with a little more of each. An Engagement is
+          listed here from the moment it exists, and its card is linked only once its page does
+          &mdash; a link to a page that is not there yet is worse than no link.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--shade">
+    <div class="wrap">
+      <article class="feature feature--quote reveal">
+        <div class="feature__copy">
+          <p class="feature__meta"><span>Case Study</span><span>Engagement 02</span><span>Ongoing</span></p>
+          <h3 class="feature__title">Rebuilding loan origination as tools that <em>never touch a
+            server</em>.</h3>
+          <p class="feature__body">Nine browser tools, 3,923 checks, a review process split into three
+            stages to spend less of the lender&rsquo;s attention, and six defects the green suite never
+            saw.</p>
+          <a class="btn btn--primary feature__action" href="/work/credit-process-rebuild/">Read the full
+            Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+        </div>
+        <blockquote class="pull-quote">
+          <p class="pull-quote__text">&ldquo;A redesign that saves the analyst an hour by spending two of
+            the lender&rsquo;s has made things worse while looking better.&rdquo;</p>
+          <p class="pull-quote__from">From What I Did, on why the approval presentation was separated
+            into fill, analyse, then review.</p>
+        </blockquote>
+      </article>
     </div>
   </section>
 
   <section class="section" id="about">
-    <div class="wrap">
-      <p class="eyebrow">About</p>
-      <div class="about__grid">
-        <img class="about__portrait" src="/assets/img/headshot.jpg" width="800" height="800"
+    <div class="wrap about__grid reveal">
+      <img class="about__portrait" src="/assets/img/headshot.jpg" width="800" height="800"
              alt="Jacob Eickhoff, photographed against a plain background in a navy jacket.">
-        <div>
-          <h2 class="section__title">A finance student who ships software, and an engineer who
-            <em>reads the credit file</em>.</h2>
-          <p class="section__lede">I am a Finance and Accounting student at UW&ndash;Eau Claire,
-            and for the last two years I have been the person a community bank in the Upper
-            Midwest hands an undocumented process to. I sit on both sides of it: I do the credit
-            analysis, and I build the tooling that changes how the analysis gets done.</p>
-          <p class="section__lede">The work here is organised as Engagements: each one had a
-            Sponsor, a scope and an outcome that was not mine to choose. Every one of them carries
-            a What I Learned section &mdash; a defect found, an assumption that proved wrong, a
-            perspective that changed. That section is the reason the rest is worth reading.</p>
-          <dl class="about__facts">
-            <dt>Studying</dt>
-            <dd>BBA Finance, Accounting minor &middot; University of Wisconsin&ndash;Eau Claire
-              &middot; expected May 2027</dd>
-            <dt>Working on</dt>
-            <dd>Credit analysis and AI implementation for a community bank in the Upper Midwest</dd>
-            <dt>Also</dt>
-            <dd>Division III track and field captain &middot; based in St. Cloud, Minnesota</dd>
-          </dl>
-          <p class="about__more"><a href="/about/">The longer version &mdash; timeline, education,
-            skills, and why every Case Study reports a problem</a></p>
-        </div>
+      <div>
+        <h2 class="section__title">A finance student who ships software, and an engineer who
+          <em>reads the credit file</em>.</h2>
+        <p class="section__lede">For two years I have been the person a community bank in the Upper
+          Midwest hands an undocumented process to. I do the credit analysis, and I build the tooling
+          that changes how the analysis gets done. Every Case Study carries a What I Learned section:
+          a defect found, an assumption that proved wrong. That section is the reason the rest is
+          worth reading.</p>
+        <dl class="about__facts">
+          <div><dt>Studying</dt><dd>BBA Finance, Accounting minor &middot; May 2027</dd></div>
+          <div><dt>Working on</dt><dd>Credit analysis and AI implementation</dd></div>
+          <div><dt>Also</dt><dd>D-III track and field captain</dd></div>
+        </dl>
       </div>
     </div>
   </section>
 
-  <section class="section section--shade" id="engagements">
-    <div class="wrap">
-      <p class="eyebrow">The work</p>
-      <h2 class="section__title">Six Engagements, each written the same way.</h2>
-      <p class="section__lede">One Sponsor, one scope, one outcome per Engagement &mdash; and the
-        same five sections in the same order every time: The Situation, What I Did, What Changed,
-        What I Learned, Where Else This Applies.</p>
-      <ul class="engagements__list">
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 01</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/customer-intelligence/">Customer Intelligence</a></h3>
-          <p class="engagement-card__sponsor">A community bank in the Upper Midwest</p>
-          <p class="engagement-card__line">Browser-based mapping and profitability tools that gave
-            leadership a spatial and demographic view of a customer base it had only ever seen as
-            rows.</p>
-        </li>
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 02</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/credit-process-rebuild/">Credit Process Rebuild</a></h3>
-          <p class="engagement-card__sponsor">A community bank in the Upper Midwest &middot; ongoing</p>
-          <p class="engagement-card__line">Loan origination rebuilt as local-only browser tools:
-            intake, tax-document extraction, spreads, and an approval presentation restructured
-            into three separate stages.</p>
-        </li>
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 03</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/the-competition/">The Competition</a></h3>
-          <p class="engagement-card__sponsor">Four-person team &middot; hedge fund case competition</p>
-          <p class="engagement-card__line">&ldquo;Operational AI Adoption in a Winner-Take-Most
-            Economy&rdquo; &mdash; reported alongside the two earlier periods in which the same
-            signal pointed the wrong way.</p>
-        </li>
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 04</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/the-research/">The Research</a></h3>
-          <p class="engagement-card__sponsor">Independent &middot; faculty-advised</p>
-          <p class="engagement-card__line">Whether AI-generated language in SEC filings predicts
-            abnormal returns &mdash; rebuilt from the ground up after I withdrew my own first
-            result.</p>
-        </li>
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 05</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/tradelog-and-indy/">TradeLog and Indy</a></h3>
-          <p class="engagement-card__sponsor">Self-directed</p>
-          <p class="engagement-card__line">Verified Adherence: holding a discretionary process to a
-            rule written down in advance, and making the gap between the two visible.</p>
-        </li>
-        <li class="engagement-card reveal">
-          <p class="engagement-card__index">Engagement 06</p>
-          <h3 class="engagement-card__name"><a class="engagement-card__link"
-              href="/work/macrosense/">MacroSense</a></h3>
-          <p class="engagement-card__sponsor">Self-directed</p>
-          <p class="engagement-card__line">An allocation system built end to end by one person
-            &mdash; regime detection, sentiment scoring, portfolio construction and a scheduler
-            &mdash; published as architecture rather than as performance.</p>
-        </li>
-      </ul>
-      <p class="engagements__note">All six Case Studies are published; the
-        <a href="/work/">work index</a> is the same six with a little more of each. An Engagement is
-        listed here from the moment it exists, and its card is linked only once its page does
-        &mdash; a link to a page that is not there yet is worse than no link.</p>
-    </div>
-  </section>
-
-  <section class="section contact" id="contact">
-    <div class="wrap">
-      <p class="eyebrow hero__eyebrow">Contact</p>
-      <h2 class="contact__title">Happy to walk through any of it.</h2>
-      <p class="contact__lede">If something here is relevant to a role or a problem you are
-        looking at, email is the fastest way to reach me. I am seeking consulting and finance
-        roles for May 2027, and internships before then.</p>
+  <section class="contact" id="contact">
+    <div class="wrap contact__grid">
+      <div>
+        <h2 class="contact__title">Happy to walk through any of it.</h2>
+        <p class="contact__lede">Seeking consulting and finance roles for May 2027, and internships
+          before then. Email is the fastest way to reach me.</p>
+      </div>
       <div class="contact__actions">
         <a class="btn btn--primary" href="mailto:jacobeickhoff01@gmail.com">Email me</a>
         <a class="btn btn--ghost" href="https://www.linkedin.com/in/jacob-eickhoff" rel="noopener">LinkedIn</a>
       </div>
-      <p class="contact__address"><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></p>
     </div>
   </section>
 
