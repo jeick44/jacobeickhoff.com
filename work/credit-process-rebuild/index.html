@@ -242,18 +242,51 @@
                   lender&rsquo;s has made things worse while looking better.</p>
               </div>
             </details>
+            <p>The tax-document tool reads a return and produces a per-customer income statement with
+              debt-service coverage. The rule underneath it: in a credit file a wrong number costs more
+              than a missing one, because a missing number is visibly missing and a wrong one is what
+              everybody works from.</p>
+            <figure class="exhibit" id="exhibit-extraction-triage" data-exhibit="triage"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> Three returns
+                  in, three different answers out</h3>
+                <p class="exhibit__instruction">Choose a document to hand the tool.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Three synthetic returns handed to the tax-document tool: what it finds in
+                      each, the answer it gives, and each line of the income statement it produces</caption>
+                    <thead>
+                      <tr><th scope="col">Line</th><th scope="col">Electronically filed return</th><th scope="col">Scanned, image-only return</th><th scope="col">Export with a scrambled line</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">What the tool finds</th><td>Text layer present</td><td>No text layer</td><td>One description unreadable</td></tr>
+                      <tr><th scope="row">Answer</th><td>Extracted</td><td>Refused, by name</td><td>Extracted, one line held</td></tr>
+                      <tr><th scope="row">Gross receipts</th><td>$412,300</td><td>Not read</td><td>$412,300</td></tr>
+                      <tr><th scope="row">Cost of goods sold</th><td>&minus;$171,900</td><td>Not read</td><td>&minus;$171,900</td></tr>
+                      <tr><th scope="row">Repairs and maintenance</th><td>&minus;$18,450</td><td>Not read</td><td>Line 19 &mdash; description unreadable: $18,450, held for review</td></tr>
+                      <tr><th scope="row">Depreciation (added back)</th><td>+$22,100</td><td>Not read</td><td>+$22,100</td></tr>
+                      <tr><th scope="row">Cash available for debt service</th><td>$244,050</td><td>Not computed</td><td>Pending</td></tr>
+                      <tr><th scope="row">Debt-service coverage</th><td>1.38&times;</td><td>Not computed</td><td>Not computed</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; behaviour as described in the
+                Case Study. Every dollar figure and the coverage ratio are synthetic: a real return is one
+                of the Sponsor&rsquo;s customers&rsquo; tax records, so no real return is shown.</figcaption>
+            </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">Extraction that refuses rather than guesses</summary>
               <div class="disclosure__body">
-                <p>The tax-document tool reads a return and produces a per-customer income statement
-                  with debt-service coverage. A scanned, image-only return is refused by name and
-                  pointed at the route that works, rather than run through character recognition and
-                  emitted as numbers that look like figures. Where an export has scrambled a
-                  line&rsquo;s description, the amount is flagged for review instead of attached to the
-                  nearest plausible label.</p>
-                <p>The rule underneath both: in a credit file a wrong number costs more than a missing
-                  one, because a missing number is visibly missing and a wrong one is what everybody
-                  works from.</p>
+                <p>A scanned, image-only return is refused by name and pointed at the route that works,
+                  rather than run through character recognition and emitted as numbers that look like
+                  figures. Where an export has scrambled a line&rsquo;s description, the amount is flagged
+                  for review instead of attached to the nearest plausible label.</p>
               </div>
             </details>
           </section>

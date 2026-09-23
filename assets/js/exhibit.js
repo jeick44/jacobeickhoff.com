@@ -775,6 +775,141 @@
     update();
   });
 
+  /* ---- KIND: triage ------------------------------------------------------------------------------
+     Three returns handed to the tax-document tool, one column each. The table's first row says what
+     the tool finds in each document and its second the answer it gives; its last two rows are the
+     cash available for debt service and the debt-service coverage it produces; every row between is
+     one line of the income statement. A line's cell is its amount ("−$171,900"), "Not read", or an
+     amount held for review under the words the tool could read instead of a label
+     ("Line 19 — description unreadable: $18,450, held for review").
+
+     The tool's rule is that a wrong number costs more than a missing one, and the kind reads it back
+     from each column, refusing a table that breaks it (the stage stays empty and the table stands
+     alone):
+       - a document the tool cannot read is refused whole: every line not read, no total, no
+         coverage, and an answer that says it refused. A figure read from part of it is a guess;
+       - a line held for review holds the total and the coverage with it: neither is a figure, and
+         the answer says a line is held;
+       - a document read in full adds up: the total is its lines' sum, and the coverage is a ratio.
+     Choosing a document shows its answer at once; nothing plays, so reduced motion changes nothing. */
+  register("triage", function (fig, stage, data) {
+    var NOT_READ = "Not read";
+    var docs = data.columns.slice(1);
+    var rows = data.rows;
+    if (!docs.length || rows.length < 5) throw new Error("triage: the table has no documents or no statement");
+    var finds = rows[0], answer = rows[1], total = rows[rows.length - 2], cover = rows[rows.length - 1];
+    var lines = rows.slice(2, -2);
+
+    function money(s) {
+      var m = /^([+−-]?)\$(\d[\d,]*)$/.exec(s);
+      return m ? (m[1] === "+" || m[1] === "" ? 1 : -1) * Number(m[2].replace(/,/g, "")) : null;
+    }
+    function held(s) {
+      var m = /^(.+): (\$\d[\d,]*), held for review$/.exec(s);
+      return m ? { label: m[1], amount: m[2] } : null;
+    }
+
+    var results = docs.map(function (name, d) {
+      var read = 0, sum = 0, hold = 0;
+      var shown = lines.map(function (r) {
+        var c = r.cells[d], h = held(c), v = money(c);
+        if (c === NOT_READ) return null;
+        read++;
+        if (h) { hold++; return { label: h.label, value: h.amount + " · held for review", held: true }; }
+        if (v === null) throw new Error("triage: " + name + " gives " + r.label + " as " + JSON.stringify(c));
+        sum += v;
+        return { label: r.label, value: c };
+      });
+      var said = answer.cells[d], state;
+      var sumOut = total.cells[d], coverOut = cover.cells[d];
+      if (!read) {
+        state = "refused";
+        if (!/^Refused/.test(said)) throw new Error("triage: " + name + " is read nowhere and answers " + said);
+      } else if (read < lines.length) {
+        throw new Error("triage: " + name + " is read in part, and a figure read from a document the tool cannot read is a guess");
+      } else if (hold) {
+        state = "held";
+        if (!/held/.test(said)) throw new Error("triage: " + name + " holds a line and answers " + said);
+      } else {
+        state = "extracted";
+        if (/^Refused|held/.test(said)) throw new Error("triage: " + name + " is read in full and answers " + said);
+      }
+      if (state === "extracted") {
+        if (money(sumOut) !== sum) throw new Error("triage: " + name + "'s lines add up to " + sum + ", not " + sumOut);
+        if (!/^\d+\.\d+×$/.test(coverOut)) throw new Error("triage: " + name + " gives coverage as " + coverOut);
+      } else if (money(sumOut) !== null || /\d/.test(coverOut)) {
+        throw new Error("triage: " + name + " computes a figure while " + (state === "held" ? "a line is held" : "nothing was read"));
+      }
+      return { name: name, finds: finds.cells[d], said: said, state: state, lines: shown,
+               total: { label: total.label, value: sumOut }, cover: { label: cover.label, value: coverOut } };
+    });
+
+    var ICONS = {
+      extracted: '<path d="M5 10.5l3 3L15 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+      held: '<path d="M10 3l8 14H2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 8v4M10 14.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
+      refused: '<circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15L15 5" stroke="currentColor" stroke-width="1.8"/>'
+    };
+    /* What the tool says beside its answer, as the Case Study describes it: a lead in bold, the
+       sentence, and a note in small type. */
+    var SAYS = {
+      extracted: { body: "A per-customer income statement with debt-service coverage, every figure traced to its line on the return." },
+      held: { body: "The export scrambled one line’s description. Its amount is flagged for review instead of attached to the nearest plausible label — and coverage waits for it." },
+      refused: { lead: "This return is an image-only scan.",
+                 body: " No figures were read from it. Request the electronically filed copy, or key the schedule into the spreads template.",
+                 aside: "Character recognition would produce numbers that look like figures. In a credit file a wrong number costs more than a missing one." }
+    };
+
+    var box = make("div", "triage", stage);
+    var group = make("div", "triage__docs", box);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Documents");
+    var out = make("div", "triage__out", box);
+    out.setAttribute("aria-live", "polite");
+
+    var buttons = results.map(function (r, i) {
+      var b = button(group, "triage__doc", r.name, i === 0);
+      make("small", "", b, r.finds);
+      b.addEventListener("click", function () { show(i); });
+      return b;
+    });
+
+    function row(list, item, cls) {
+      var tr = make("div", "stmt__row" + (cls ? " " + cls : ""), list);
+      make("dt", "", tr, item.label);
+      /* The stage says "pending" and "not computed" in the running text's case. */
+      make("dd", "", tr, /^[A-Z][a-z]/.test(item.value) ? item.value.charAt(0).toLowerCase() + item.value.slice(1) : item.value);
+    }
+
+    /* The answer stays one element, so what it says is the Exhibit's result from one choice to the
+       next; what follows it is redrawn for each document. */
+    var verdict = make("p", "triage__verdict", out);
+    var icon = make("span", "triage__icon", verdict);
+    icon.setAttribute("aria-hidden", "true");
+    var answerEl = make("span", "", verdict);
+    answerEl.setAttribute("data-result", "");
+    var body = make("div", "triage__body", out);
+
+    function show(i) {
+      var r = results[i];
+      buttons.forEach(function (b, k) { b.setAttribute("aria-pressed", String(k === i)); });
+      verdict.className = "triage__verdict triage__verdict--" + r.state;
+      icon.innerHTML = '<svg viewBox="0 0 20 20" focusable="false">' + ICONS[r.state] + "</svg>";
+      answerEl.textContent = r.said;
+      body.textContent = "";
+      var says = SAYS[r.state], p = make("p", "", body);
+      if (says.lead) make("b", "", p, says.lead);
+      p.appendChild(document.createTextNode(says.body));
+      if (says.aside) make("p", "triage__aside", body, says.aside);
+      if (r.state === "refused") return;
+      var list = make("dl", "stmt", body);
+      r.lines.forEach(function (ln) { row(list, ln, ln.held ? "is-held" : ""); });
+      row(list, r.total, "is-total");
+      row(list, r.cover, "");
+    }
+
+    show(0);
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
   window.Exhibit = { register: register, slider: slider };
