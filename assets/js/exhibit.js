@@ -1363,6 +1363,84 @@
     update();
   });
 
+  /* ---- KIND: timeline --------------------------------------------------------------------------
+     The About page's timeline. The table lists each entry newest first, with its dates, where it
+     happened and what it was, and its order is the content: the first row is the newest entry and
+     the current role. An entry whose dates run to "present" is still under way.
+
+     Each entry is a stop on a rail, across the page on a wide screen and down it on a phone (the
+     stylesheet decides), and a button: selecting it shows what it was underneath. The current role
+     is marked with aria-current and opens selected. A table whose newest entry has ended has no
+     current role to mark, and is refused rather than drawn with the mark on something finished.
+     Its columns are found by their headers, so a table reordered is still read right.
+
+     The rail is called the course (course__*), the path taken to now, since .timeline was v1's list
+     and the drawing is a different thing. */
+  register("timeline", function (fig, stage, data) {
+    var col = {};
+    ["When", "Where", "What it was"].forEach(function (name) {
+      var i = data.columns.indexOf(name);
+      if (i < 1) throw new Error("timeline: the table has no " + JSON.stringify(name) + " column");
+      col[name] = i - 1;
+    });
+    if (!data.rows.length) throw new Error("timeline: the table has no entries");
+    var entries = data.rows.map(function (r) {
+      var when = r.cells[col.When] || "";
+      return { what: r.label, when: when, where: r.cells[col.Where], note: r.cells[col["What it was"]],
+               running: /\bpresent$/i.test(when) };
+    });
+    if (!entries[0].running) {
+      throw new Error("timeline: the newest entry, " + entries[0].what + ", reads " +
+                      JSON.stringify(entries[0].when) + "; the current role runs to the present");
+    }
+    var running = entries.filter(function (en) { return en.running; }).length;
+    var picked = 0;
+
+    var frame = make("div", "exhibit__frame", stage);
+    var rail = make("ol", "course", frame);
+    var stops = entries.map(function (en, i) {
+      var li = make("li", "course__entry" + (i === 0 ? " is-now" : en.running ? " is-running" : ""), rail);
+      var b = button(li, "course__stop", null, i === 0);
+      if (i === 0) b.setAttribute("aria-current", "true");
+      make("span", "course__node", b).setAttribute("aria-hidden", "true");
+      make("span", "course__when", b, en.when);
+      make("span", "course__what", b, en.what);
+      if (i === 0) make("span", "course__flag", b, "Current role");
+      b.addEventListener("click", function () { picked = i; update(); });
+      return b;
+    });
+
+    /* The key, and the one count the title makes: how many entries are still under way, the current
+       role among them, so the count stands apart from the open ring that marks only the others. */
+    var key = make("p", "course__key", stage);
+    make("span", "course__swatch is-now", key).setAttribute("aria-hidden", "true");
+    key.appendChild(document.createTextNode("Current role "));
+    make("span", "course__swatch is-running", key).setAttribute("aria-hidden", "true");
+    key.appendChild(document.createTextNode("Also still under way "));
+    make("span", "course__swatch", key).setAttribute("aria-hidden", "true");
+    key.appendChild(document.createTextNode("Ended"));
+    make("span", "course__tally", key, running + " of " + entries.length + " under way, the current role included");
+
+    var readout = make("div", "exhibit__readout course__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var when = make("p", "course__readout-when", readout);
+    var shown = make("p", "course__readout-what", readout);
+    shown.setAttribute("data-result", "");
+    var where = make("p", "course__readout-where", readout);
+    var note = make("p", "course__readout-note", readout);
+
+    function update() {
+      var en = entries[picked];
+      stops.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === picked)); });
+      when.textContent = en.when + (picked === 0 ? " · current role" : "");
+      shown.textContent = en.what;
+      where.textContent = en.where;
+      note.textContent = en.note;
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
   window.Exhibit = { register: register, slider: slider };

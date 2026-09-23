@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -102,95 +105,39 @@
     <div class="wrap">
       <p class="eyebrow">Timeline</p>
       <h2 class="section__title">What I have been doing, and when.</h2>
-      <ol class="timeline">
-
-        <li class="timeline__item timeline__item--now reveal">
-          <p class="timeline__when">Autumn 2026 &mdash; present</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">AI Integration Phase</h3>
-            <p class="timeline__where">A community bank in the Upper Midwest &middot; remote
-              &middot; ongoing</p>
-            <p class="timeline__note">The relationship did not end when the summer did; it moved.
-              The work is remote now, and pointed at AI integration and new tooling rather than at
-              credit analysis. Engagement 02 is therefore ongoing rather than concluded. It is
-              carried alongside a full course load and a varsity track and field season.</p>
+      <figure class="exhibit" id="exhibit-timeline" data-exhibit="timeline" data-provenance="published">
+        <div class="exhibit__head">
+          <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Four of the seven are
+            still under way, and the newest is the bank work, now carried on remotely</h3>
+          <p class="exhibit__instruction">Select an entry to read what it was; the current role is
+            marked.</p>
+        </div>
+        <div class="exhibit__stage" data-stage></div>
+        <details class="exhibit__data">
+          <summary class="exhibit__data-toggle">View the data</summary>
+          <div class="exhibit__table exhibit__table--prose">
+            <table>
+              <caption>Every entry on the timeline, newest first; the first is the current role</caption>
+              <thead>
+                <tr><th scope="col">Role or Engagement</th><th scope="col">When</th><th scope="col">Where</th><th scope="col">What it was</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">AI Integration Phase</th><td>Autumn 2026 &mdash; present</td><td>A community bank in the Upper Midwest &middot; remote &middot; ongoing</td><td>The relationship did not end when the summer did; it moved. The work is remote now, and pointed at AI integration and new tooling rather than at credit analysis. Engagement 02 is therefore ongoing rather than concluded. It is carried alongside a full course load and a varsity track and field season.</td></tr>
+                <tr><th scope="row">Engagement 02 &mdash; Credit Process Rebuild</th><td>Jun 2026 &mdash; present</td><td>A community bank in the Upper Midwest &middot; on site through the summer &middot; ongoing</td><td>Loan origination rebuilt as local-only browser tools: intake, tax-document extraction, spreads, and the approval presentation restructured into a Three-Stage Review. Begun on site over the summer and not concluded &mdash; it is what the AI Integration Phase above is a continuation of.</td></tr>
+                <tr><th scope="row">Engagement 01 &mdash; Customer Intelligence</th><td>May &mdash; Jun 2026</td><td>A community bank in the Upper Midwest &middot; on site</td><td>Browser-based mapping and profitability tools that gave leadership a spatial and demographic view of a customer base it had only ever seen as rows in a spreadsheet.</td></tr>
+                <tr><th scope="row">Chamber of Commerce business liaison</th><td>Apr 2026</td><td>University of Wisconsin&ndash;Eau Claire</td><td>One of a small group of Bloomberg-capable students sent to represent the university at a Chamber of Commerce breakfast, talking to regional executives and business owners about AI, financial analysis and careers.</td></tr>
+                <tr><th scope="row">The Competition</th><td>Jan 2026 &mdash; present</td><td>Four-person team &middot; hedge fund case competition</td><td>&ldquo;Operational AI Adoption in a Winner-Take-Most Economy.&rdquo; I built the language-processing and machine-learning pipeline behind the paper, and reported the two earlier periods in which the same signal pointed the wrong way rather than only the one in which it worked.</td></tr>
+                <tr><th scope="row">Merchandise and community outreach lead</th><td>Nov 2024 &mdash; Mar 2025</td><td>Bonds Social Club</td><td>Outreach to stakeholders across 35+ institutions, a go-to-market plan for 35 merchandise items, campus bookstore placement, and 5+ partner meetings out of it. The least technical thing on this list and the one that taught me the most about getting a decision out of somebody who does not report to me.</td></tr>
+                <tr><th scope="row">Independent research</th><td>Jan 2024 &mdash; present</td><td>Self-directed, and faculty-advised</td><td>Equity analysis across US markets on Bloomberg and FactSet, a portfolio framework built on full-market sentiment signals, and The Research &mdash; the faculty-advised study on whether AI-generated language in SEC filings predicts abnormal returns, which I withdrew after catching my own false positive, and then rebuilt from the ground up.</td></tr>
+              </tbody>
+            </table>
           </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">Jun 2026 &mdash; present</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">Engagement 02 &mdash; Credit Process Rebuild</h3>
-            <p class="timeline__where">A community bank in the Upper Midwest &middot; on site
-              through the summer &middot; ongoing</p>
-            <p class="timeline__note">Loan origination rebuilt as local-only browser tools:
-              intake, tax-document extraction, spreads, and the approval presentation restructured
-              into a Three-Stage Review. Begun on site over the summer and not concluded &mdash;
-              it is what the AI Integration Phase above is a continuation of.</p>
-          </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">May &mdash; Jun 2026</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">Engagement 01 &mdash; Customer Intelligence</h3>
-            <p class="timeline__where">A community bank in the Upper Midwest &middot; on site</p>
-            <p class="timeline__note">Browser-based mapping and profitability tools that gave
-              leadership a spatial and demographic view of a customer base it had only ever seen
-              as rows in a spreadsheet.</p>
-          </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">Apr 2026</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">Chamber of Commerce business liaison</h3>
-            <p class="timeline__where">University of Wisconsin&ndash;Eau Claire</p>
-            <p class="timeline__note">One of a small group of Bloomberg-capable students sent to
-              represent the university at a Chamber of Commerce breakfast, talking to regional
-              executives and business owners about AI, financial analysis and careers.</p>
-          </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">Jan 2026 &mdash; present</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">The Competition</h3>
-            <p class="timeline__where">Four-person team &middot; hedge fund case competition</p>
-            <p class="timeline__note">&ldquo;Operational AI Adoption in a Winner-Take-Most
-              Economy.&rdquo; I built the language-processing and machine-learning pipeline behind
-              the paper, and reported the two earlier periods in which the same signal pointed the
-              wrong way rather than only the one in which it worked.</p>
-          </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">Nov 2024 &mdash; Mar 2025</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">Merchandise and community outreach lead</h3>
-            <p class="timeline__where">Bonds Social Club</p>
-            <p class="timeline__note">Outreach to stakeholders across 35+ institutions, a
-              go-to-market plan for 35 merchandise items, campus bookstore placement, and 5+
-              partner meetings out of it. The least technical thing on this list and the one that
-              taught me the most about getting a decision out of somebody who does not report to
-              me.</p>
-          </div>
-        </li>
-
-        <li class="timeline__item reveal">
-          <p class="timeline__when">Jan 2024 &mdash; present</p>
-          <div class="timeline__body">
-            <h3 class="timeline__what">Independent research</h3>
-            <p class="timeline__where">Self-directed, and faculty-advised</p>
-            <p class="timeline__note">Equity analysis across US markets on Bloomberg and FactSet,
-              a portfolio framework built on full-market sentiment signals, and The Research &mdash; the
-              faculty-advised study on whether AI-generated language in SEC filings predicts
-              abnormal returns, which I withdrew after catching my own false positive, and then
-              rebuilt from the ground up.</p>
-          </div>
-        </li>
-
-      </ol>
+        </details>
+        <figcaption class="exhibit__source"><b>Source:</b> published; the seven entries this page has
+          always listed, unchanged and newest first. Dates are given to the month or the season, and
+          the bank behind Engagements 01 and 02 is not named or sized, under the rule that a figure
+          about a Sponsor&rsquo;s business is generalised or left out.</figcaption>
+      </figure>
     </div>
   </section>
 
