@@ -1599,8 +1599,129 @@
     update();
   });
 
+  /* ---- KIND: mentions-deployment ----------------------------------------------------------------
+     Two ways of scoring the same passages. The table's columns, in order: the passage, its text, how
+     many times that text mentions the term (the column's header names it), and then one column per
+     sign of deployment, each Yes or No. The frequency score
+     is the mentions; the deployment score is the signs a passage carries. The one slider writes
+     more mentions into every passage: the frequency scores climb with it, and the deployment
+     scores cannot move, because nothing the slider writes is a sign of deployment.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
+     a mention count that is not the number of times its own text says AI, since the count is read
+     off the text and a figure that disagrees with it is a second copy of the data, or a sign cell
+     that is not Yes or No. */
+  register("mentions-deployment", function (fig, stage, data) {
+    /* The term counted, written once: the passages' text is split on it, and a count is its matches. */
+    var WORD = "AI", TERM = new RegExp("\\b(" + WORD + ")\\b"), MOST = 10;
+    var signs = data.columns.slice(3);
+    if (!data.rows.length || !signs.length) throw new Error("mentions-deployment: the table has no passages or no signs");
+    var passages = data.rows.map(function (r) {
+      var said = (r.cells[0].split(TERM).length - 1) / 2;
+      if (r.values[1] !== said) {
+        throw new Error("mentions-deployment: " + r.label + " is counted " + JSON.stringify(r.cells[1]) +
+                        " but its text mentions AI " + said + " times");
+      }
+      var carries = r.cells.slice(2).map(function (c, i) {
+        var w = c.toLowerCase();
+        if (w !== "yes" && w !== "no") {
+          throw new Error("mentions-deployment: " + r.label + " reads " + JSON.stringify(c) + " for " + signs[i]);
+        }
+        return w === "yes";
+      });
+      return {
+        label: r.label, text: r.cells[0], mentions: said,
+        signs: signs.filter(function (s, i) { return carries[i]; })
+      };
+    });
+    var widest = Math.max.apply(null, passages.map(function (p) { return p.mentions; })) + MOST;
+    var added = 0;
+
+    var bar = make("div", "exhibit__controls mentions__controls", stage);
+    make("span", "mentions__control", bar, data.columns[2] + " added").setAttribute("aria-hidden", "true");
+    slider(bar, {
+      min: 0, max: MOST, step: 1, value: 0, label: data.columns[2] + " added to every passage",
+      valueText: function (v) { return v + (v === 1 ? " mention" : " mentions") + " added to every passage"; },
+      onChange: function (v) { added = v; update(); }
+    });
+
+    /* One card per passage: its text with every mention marked and the added ones after it, then
+       the two scores as bars on their own scales, each with its figure in words beside it. */
+    var list = make("ol", "mentions", stage);
+    var cards = passages.map(function (p) {
+      var li = make("li", "mentions__passage", list);
+      make("p", "mentions__label", li, p.label);
+      var quote = make("p", "mentions__text", li);
+      p.text.split(TERM).forEach(function (part, i) {
+        if (i % 2) make("mark", "mentions__term", quote, part);
+        else if (part) quote.appendChild(document.createTextNode(part));
+      });
+      /* The added mentions are shown, not read out: a run of the same word tells a screen reader
+         nothing the slider's value text and the frequency figure do not. */
+      var extra = make("span", "", quote);
+      extra.setAttribute("aria-hidden", "true");
+      function score(name, cls) {
+        var row = make("div", "mentions__score " + cls, li);
+        make("span", "mentions__name", row, name);
+        var track = make("span", "mentions__track", row);
+        track.setAttribute("aria-hidden", "true");
+        var fill = make("span", "mentions__fill", track);
+        var value = make("span", "mentions__value", row);
+        return { fill: fill, value: value };
+      }
+      var freq = score("Frequency", "is-frequency");
+      var dep = score("Deployment", "is-deployment");
+      dep.fill.style.width = p.signs.length / signs.length * 100 + "%";
+      dep.value.textContent = p.signs.length + " of " + signs.length + " signs";
+      make("p", "mentions__signs", li, p.signs.length ? p.signs.join(" · ") : "No sign of deployment");
+      return { extra: extra, freq: freq };
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    function line(words) {
+      var p = make("p", "exhibit__count", readout);
+      var b = make("b", "", p);
+      b.setAttribute("data-result", "");
+      p.appendChild(document.createTextNode(words));
+      return b;
+    }
+    var mentioned = line(" mentions of " + WORD + " across the passages, which is what frequency scores count");
+    var shown = line(" signs of deployment across them, which is what deployment scores count");
+    var note = make("p", "exhibit__note", readout);
+
+    function sum(f) { return passages.reduce(function (t, p) { return t + f(p); }, 0); }
+    function leader(f) {
+      return passages.reduce(function (best, p) { return f(p) > f(best) ? p : best; });
+    }
+    var byDeployment = leader(function (p) { return p.signs.length; });
+    var byFrequency = leader(function (p) { return p.mentions; });
+    var lastByFrequency = leader(function (p) { return -p.mentions; });
+    shown.textContent = sum(function (p) { return p.signs.length; });
+
+    function update() {
+      cards.forEach(function (c, i) {
+        var n = passages[i].mentions + added;
+        c.extra.textContent = "";
+        for (var k = 0; k < added; k++) {
+          c.extra.appendChild(document.createTextNode(" "));
+          make("mark", "mentions__term is-added", c.extra, WORD);
+        }
+        c.freq.fill.style.width = n / widest * 100 + "%";
+        c.freq.value.textContent = n + (n === 1 ? " mention" : " mentions");
+      });
+      mentioned.textContent = sum(function (p) { return p.mentions; }) + added * passages.length;
+      note.textContent = (added
+        ? "Every frequency score rose by " + added + "; no deployment score moved. "
+        : "") + "A frequency score ranks " + byFrequency.label + " first and " + lastByFrequency.label +
+        " last, however many mentions are added; " + byDeployment.label + " carries the most signs of deployment.";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
-     and for the harness, which proves the slider on a fixture as well as on the age-serial Exhibit. */
+     and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
 
   if (document.readyState === "loading") {

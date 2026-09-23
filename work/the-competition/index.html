@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Four-person team &middot; hedge fund case competition</dd></div>
         <div><dt>Status</dt><dd>Paper submitted</dd></div>
         <div><dt>Governing constraint</dt><dd>Self-Computed: direction shown, magnitudes withheld</dd></div>
-        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>10 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Self-Computed</span> Every
         performance figure from this Engagement was computed by the team from terminal data. Nobody
@@ -156,6 +156,39 @@
               deployment rather than on the frequency of the word, roll the passages up to one score per
               company, cut the index into quartiles on it, and measure the top-quartile-minus-bottom
               spread forward against an equal-weight benchmark.</p>
+            <figure class="exhibit" id="exhibit-mentions-vs-deployment" data-exhibit="mentions-deployment"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Mentioning AI
+                  more raises a frequency score and leaves the deployment score where it was</h3>
+                <p class="exhibit__instruction">Move the slider to write more mentions of AI into every
+                  passage.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Four synthetic passages, each scored two ways: how often it mentions AI,
+                      and which of the four signs of deployment it carries</caption>
+                    <thead>
+                      <tr><th scope="col">Passage</th><th scope="col">Text</th><th scope="col">Mentions of AI</th><th scope="col">Named internal system</th><th scope="col">Capital expenditure attached</th><th scope="col">Process change described</th><th scope="col">Headcount discussed</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Passage A</th><td>AI is at the centre of everything we do. We are an AI-first business, and AI will define the next decade for our customers.</td><td>3</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+                      <tr><th scope="row">Passage B</th><td>Our in-house claims router now makes the first review of every claim. Its build was capitalised this year, and the review staff now handle exceptions only.</td><td>0</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+                      <tr><th scope="row">Passage C</th><td>We are exploring AI across the business and expect AI to become a meaningful driver of efficiency over time.</td><td>2</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
+                      <tr><th scope="row">Passage D</th><td>The demand forecaster we built with AI tooling replaced the weekly manual reorder, and its capital cost is broken out below.</td><td>1</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; four passages written for
+                this Exhibit in the manner of a filing or an earnings call. They quote no real document
+                and name no company. The four signs of deployment are the ones this page names, and
+                each counts once here; the pipeline and its scoring are the team&rsquo;s work and are
+                not reproduced.</figcaption>
+            </figure>
             <p>My own part, stated plainly: I contributed to the pipeline, read every prior year&rsquo;s
               winning entry to work out what the judges actually rewarded, and co-wrote the final
               submission.</p>
@@ -207,7 +240,7 @@
             <figure class="exhibit" id="exhibit-flattering-window" data-exhibit="spread-direction"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The signal
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The signal
                   pointed the wrong way in two of the three periods it was tested over</h3>
                 <p class="exhibit__instruction">Switch to the one-period chart a less careful paper
                   would have published.</p>
