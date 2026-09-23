@@ -58,7 +58,7 @@
         <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
         <div><dt>Status</dt><dd>Ongoing &middot; AI Integration Phase</dd></div>
         <div><dt>Governing constraint</dt><dd>The Local-Only Constraint</dd></div>
-        <div><dt>Reading time</dt><dd>6 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>7 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Ongoing</span> In its AI
         Integration Phase, so written in the present tense, with unmeasured outcomes labelled
@@ -185,15 +185,54 @@
               access API &mdash; no server, no database, no network call. That is the primary security
               control, so it is not left to discipline: a check fails the build if a network call or an
               external resource ever reaches a shipped file.</p>
-            <p>Two pieces of the rebuild are process design rather than software.</p>
+            <p>Two pieces of the rebuild are process design rather than software. The first is the
+              Three-Stage Review. The approval presentation used to be produced by doing three things at
+              once: filling in the figures, working out why they look the way they do, and checking the
+              result. Interleaved, every question the analyst cannot answer becomes an interruption
+              &mdash; a call to the lender who wrote the deal, mid-analysis.</p>
+            <figure class="exhibit exhibit--wide" id="exhibit-three-stage-review" data-exhibit="three-stage"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Same file, same
+                  five questions: one phone call instead of five</h3>
+                <p class="exhibit__instruction">Play one file through each process.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>One synthetic file: each piece of work, the question it raises that only
+                      the lender can answer, and the step at which each process does it</caption>
+                    <thead>
+                      <tr><th scope="col">Part of the file</th><th scope="col">Kind of work</th><th scope="col">Question for the lender</th><th scope="col">Before: interleaved</th><th scope="col">After: three stages</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Part A</th><td>Fill the figures</td><td>None</td><td>1</td><td>1</td></tr>
+                      <tr><th scope="row">Part A</th><td>Analyse the why</td><td>1</td><td>2</td><td>5</td></tr>
+                      <tr><th scope="row">Part A</th><td>Review</td><td>2</td><td>4</td><td>9</td></tr>
+                      <tr><th scope="row">Part B</th><td>Fill the figures</td><td>None</td><td>3</td><td>2</td></tr>
+                      <tr><th scope="row">Part B</th><td>Analyse the why</td><td>None</td><td>5</td><td>6</td></tr>
+                      <tr><th scope="row">Part B</th><td>Review</td><td>None</td><td>8</td><td>10</td></tr>
+                      <tr><th scope="row">Part C</th><td>Fill the figures</td><td>None</td><td>6</td><td>3</td></tr>
+                      <tr><th scope="row">Part C</th><td>Analyse the why</td><td>3</td><td>7</td><td>7</td></tr>
+                      <tr><th scope="row">Part C</th><td>Review</td><td>5</td><td>11</td><td>11</td></tr>
+                      <tr><th scope="row">Part D</th><td>Fill the figures</td><td>4</td><td>9</td><td>4</td></tr>
+                      <tr><th scope="row">Part D</th><td>Analyse the why</td><td>None</td><td>10</td><td>8</td></tr>
+                      <tr><th scope="row">Part D</th><td>Review</td><td>None</td><td>12</td><td>12</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; one synthetic file with five
+                open questions, whose four parts are placeholders, not the Sponsor&rsquo;s presentation. The measured change in
+                lender callbacks is a Pending Result and is not shown: there is no before-and-after
+                measurement yet.</figcaption>
+            </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">The Three-Stage Review, and the cost it is
                 optimising</summary>
               <div class="disclosure__body">
-                <p>The approval presentation used to be produced by doing three things at once: filling
-                  in the figures, working out why they look the way they do, and checking the result.
-                  Interleaved, every question the analyst cannot answer becomes an interruption &mdash;
-                  a call to the lender who wrote the deal, mid-analysis.</p>
                 <p>The rebuild separates them: fill the figures, analyse the why, then review. A
                   question only the originating lender can answer is marked where it arises and
                   re-listed in one place at the end, so a phone call is one phone call rather than a

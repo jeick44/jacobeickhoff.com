@@ -1706,6 +1706,174 @@ button {
   color: var(--ink-mute);
 }
 
+/* ---- kind: three-stage ---------------------------------------------------------------------------
+   A swimlane drawn in SVG: the analyst's work along the top, a block per step coloured by its kind,
+   the lender's grey track below, and a playhead that sweeps the file. A question is a pennant flag
+   (staged) or an arrow down to a call (interleaved); each stays faint until the playhead reaches
+   it. Below a readable width the drawing keeps that width and scrolls inside its frame. */
+.lanes__controls {
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.lanes__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  align-items: center;
+}
+
+.lanes__play {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease);
+}
+
+.lanes__play svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.lanes__play:hover,
+.lanes__play:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.lanes__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+.lanes__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+.lanes__legend li::before {
+  content: "";
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 2px;
+  background: var(--kind);
+}
+
+svg.lanes {
+  display: block;
+  width: 100%;
+  min-width: 35rem;
+  height: auto;
+  font-family: var(--font-sans);
+}
+
+.lanes__who {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+
+.lanes__track {
+  stroke: var(--line-soft);
+  stroke-width: 22;
+  stroke-linecap: round;
+}
+
+.lanes__block {
+  fill: var(--kind);
+}
+
+.lanes__flag {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.lanes__arrow {
+  stroke: var(--bad);
+  stroke-width: 2;
+}
+
+.lanes__head,
+.lanes__pill {
+  fill: var(--bad);
+}
+
+.lanes__pill-words {
+  font-size: 9.5px;
+  font-weight: 700;
+  fill: var(--paper);
+  text-anchor: middle;
+}
+
+.lanes__held {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--ink);
+  text-anchor: middle;
+}
+
+/* A question or a call the playhead has not reached yet. */
+.lanes__faint {
+  opacity: 0.12;
+}
+
+.lanes__playhead {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.lanes__playdot {
+  fill: var(--ink);
+}
+
+.lanes__mark {
+  font-size: 10.5px;
+  fill: var(--ink-mute);
+}
+
+/* Three counts side by side in ruled boxes, each figure above its words. */
+.lanes__tally {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: var(--space-sm);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.exhibit .lanes__tally .exhibit__count {
+  padding: 0.8rem 1rem;
+  background: var(--paper);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-mute);
+  overflow-wrap: break-word;
+}
+
+.lanes__tally .exhibit__count b {
+  display: block;
+  margin: 0 0 0.2rem;
+  font-size: 1.9rem;
+  line-height: 1.05;
+}
+
 /* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
    a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
    exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
