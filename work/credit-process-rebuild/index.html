@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -123,6 +126,41 @@
               and no tool requires a server. I treat that as the starting point rather than an obstacle
               to route around, because the reasoning behind it is a threat model and not an IT
               preference.</p>
+            <figure class="exhibit exhibit--wide" id="exhibit-blast-radius" data-exhibit="blast-radius"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The constraint
+                  is about concentration, not connectivity</h3>
+                <p class="exhibit__instruction">Compromise one machine, then switch to a central server
+                  and compromise that.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Customer files exposed when one machine is compromised, by
+                      architecture</caption>
+                    <thead>
+                      <tr><th scope="col">Machine compromised</th><th scope="col">Local-only (today)</th><th scope="col">With a central server</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Analyst 1 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Analyst 2 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Analyst 3 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Analyst 4 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Analyst 5 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Analyst 6 workstation</th><td>8</td><td>8</td></tr>
+                      <tr><th scope="row">Central server</th><td>No server</td><td>48</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; six analysts and
+                forty-eight files are a diagram, not the Sponsor&rsquo;s headcount or book. The decision
+                is recorded with the conditions that would reverse it: outside access, routine
+                concurrent editing, or access control finer than the share can express.</figcaption>
+            </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">Why the constraint is about concentration, not
                 connectivity</summary>

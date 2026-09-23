@@ -1264,6 +1264,444 @@ button {
   font-size: var(--text-base);
 }
 
+/* =================================================================================================
+   EXHIBITS - a numbered, sourced figure that states a finding (CONTEXT.md). One component.
+   The markup contract is in the header of exhibit.js. The data is the table in the markup (ADR-0004);
+   the stage is empty until the script draws into it, and takes no room while it is.
+   ============================================================================================== */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The prose column is the container a wide Exhibit measures itself against, so it can run past the
+   reading measure to the column's edge and never past it. */
+.case-body__prose {
+  container-type: inline-size;
+}
+
+.exhibit {
+  margin: var(--space-lg) 0 var(--space-xl);
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .exhibit--wide {
+    width: 100cqi;
+  }
+}
+
+.exhibit__head {
+  border-top: 2px solid var(--ink);
+  padding-top: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.exhibit__title {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* Blue, for the Exhibit label, is one of the places the palette reserves it. */
+.exhibit__label {
+  display: block;
+  margin-bottom: var(--space-3xs);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--blue-deep);
+}
+
+.exhibit .exhibit__instruction {
+  margin: var(--space-2xs) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/* A thumb landing on a stage scrolls the page. Only a draggable mark inside it - the slider - claims
+   the gesture; suites/run.py fails any other element in an Exhibit that does. */
+.exhibit__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-sm);
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+.exhibit__stage:empty {
+  display: none;
+}
+
+.exhibit__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+/* A diagram that cannot reflow keeps a readable width and scrolls sideways in its own frame, never
+   the page's. */
+.exhibit__frame,
+.exhibit__table {
+  /* Positioned, so anything absolutely placed inside the diagram - a hub, a visually hidden label -
+     is clipped by the frame instead of escaping it and widening the page. */
+  position: relative;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.exhibit .exhibit__count {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.exhibit__count b {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  margin-right: var(--space-3xs);
+  transition: color 200ms var(--ease);
+}
+
+.exhibit__readout.is-hot .exhibit__count b {
+  color: var(--bad);
+}
+
+.exhibit .exhibit__note {
+  margin: var(--space-3xs) 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  min-height: 1.5em;
+}
+
+.exhibit__data {
+  margin-top: var(--space-sm);
+  font-size: var(--text-sm);
+}
+
+.exhibit__data-toggle {
+  display: inline-flex;
+  gap: var(--space-2xs);
+  align-items: baseline;
+  list-style: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--blue-deep);
+}
+
+.exhibit__data-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.exhibit__data-toggle::before {
+  content: "";
+  flex: none;
+  width: 0.65rem;
+  height: 0.65rem;
+  align-self: center;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 2px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 2px 100% no-repeat;
+}
+
+.exhibit__data[open] > .exhibit__data-toggle::before {
+  background-size: 100% 2px, 2px 0;
+}
+
+.exhibit__table {
+  margin-top: var(--space-2xs);
+}
+
+.exhibit__table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.exhibit__table caption {
+  caption-side: top;
+  text-align: left;
+  padding-bottom: var(--space-2xs);
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}
+
+.exhibit__table th,
+.exhibit__table td {
+  padding: var(--space-3xs) var(--space-sm) var(--space-3xs) 0;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.exhibit__table thead th {
+  border-bottom-color: var(--line);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.exhibit__table tbody th {
+  font-weight: 400;
+}
+
+.exhibit__table td {
+  text-align: right;
+}
+
+.exhibit__source {
+  margin-top: var(--space-sm);
+  padding-top: var(--space-2xs);
+  border-top: 1px solid var(--line);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  color: var(--ink-mute);
+}
+
+.exhibit__source b {
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* A segmented choice: one pressed option among a few, each a real button. */
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  max-width: 100%;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--mist);
+}
+
+.seg__option {
+  border: 0;
+  border-radius: var(--pill);
+  padding: var(--space-2xs) var(--space-sm);
+  background: transparent;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease);
+}
+
+.seg__option:hover,
+.seg__option:focus-visible {
+  color: var(--ink);
+}
+
+.seg__option[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line), 0 1px 3px var(--line);
+}
+
+/* THE SHARED SLIDER. The one mark that claims a touch gesture, because it is the one that is dragged.
+   The padding keeps the thumb inside the control at either end; the height is a comfortable target. */
+.slider {
+  display: flex;
+  align-items: center;
+  min-width: 8rem;
+  height: 2.75rem;
+  padding-inline: 0.625rem;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.slider__track {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: var(--pill);
+  background: var(--line);
+}
+
+.slider__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--pill);
+  background: var(--blue);
+}
+
+.slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--blue);
+  border-radius: 50%;
+  background: var(--paper);
+  transform: translate(-50%, -50%);
+}
+
+.slider:focus-visible {
+  outline: none;
+}
+
+.slider:focus-visible .slider__thumb {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* ---- kind: blast-radius --------------------------------------------------------------------------
+   Workstations along the top, the customer files along the bottom, and between them either a
+   straight line from each analyst to their own group or, with a server, every line running through
+   it. One column per workstation, and the lines are drawn in the same columns. */
+.blast {
+  min-width: 34rem;
+  display: grid;
+  grid-template-columns: repeat(var(--blast-columns), minmax(0, 1fr));
+}
+
+.blast__machines,
+.blast__links,
+.blast__files {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+.blast__machine {
+  margin: 0 var(--space-3xs);
+  padding: var(--space-2xs) var(--space-3xs);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: border-color 200ms var(--ease), background-color 200ms var(--ease);
+}
+
+.blast__machine:hover,
+.blast__machine:focus-visible {
+  border-color: var(--blue);
+}
+
+.blast__machine[aria-pressed="true"] {
+  border-color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 8%, var(--paper));
+}
+
+.blast__name {
+  display: block;
+}
+
+/* Never colour alone: a compromised machine says so in words, beside the red. */
+.blast__tag {
+  display: none;
+  margin-top: 0.15rem;
+  font-weight: 700;
+  color: var(--bad);
+}
+
+.blast__tag::before {
+  content: "\00d7\00a0";
+}
+
+.blast__machine[aria-pressed="true"] .blast__tag {
+  display: block;
+}
+
+.blast__links {
+  position: relative;
+  height: 7rem;
+}
+
+.blast__links svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.blast__link {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1.5;
+  transition: stroke 200ms var(--ease);
+}
+
+.blast__link.is-dashed {
+  stroke-dasharray: 3 3;
+}
+
+.blast__link.is-hot {
+  stroke: var(--bad);
+  stroke-width: 2.5;
+}
+
+.blast__machine--hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 9rem;
+  margin: 0;
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.blast__machine--hub[aria-pressed="true"] {
+  border-color: var(--bad);
+  background: var(--bad);
+}
+
+.blast__machine--hub .blast__tag {
+  color: var(--paper);
+}
+
+.blast__group {
+  display: grid;
+  grid-template-columns: repeat(4, 0.85rem);
+  gap: 0.3rem;
+  justify-content: center;
+}
+
+/* Exposed is filled; untouched is an outline. The shape changes as well as the colour. */
+.blast__file {
+  height: 1.1rem;
+  border: 1.5px solid var(--ink-mute);
+  border-radius: 2px;
+  background: var(--paper);
+  transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
+}
+
+.blast__file.is-exposed {
+  border-color: var(--bad);
+  background: var(--bad);
+}
+
+.exhibit .blast__shelf {
+  grid-column: 1 / -1;
+  margin: var(--space-xs) 0 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}
+
 /* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
    a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
    exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
@@ -1473,6 +1911,20 @@ button {
   }
 
   .spine {
+    break-inside: avoid-page;
+  }
+
+  /* A printed Exhibit is its title, its table and its source line. The drawing is a live control
+     surface and prints as buttons, so it stays on screen. */
+  .exhibit__stage {
+    display: none;
+  }
+
+  .exhibit__data-toggle::before {
+    display: none !important;
+  }
+
+  .exhibit {
     break-inside: avoid-page;
   }
 }
