@@ -1,6 +1,6 @@
 /* =================================================================================================
-   motion.js - scroll reveals, the Stat Callout counters, and the expand-all control. The site is
-   complete without it.
+   motion.js - scroll reveals, the Stat Callout counters, the expand-all control, and a Case
+   Study's table of contents and reading-progress rule. The site is complete without it.
 
    IT RUNS IN THE HEAD, ON PURPOSE, AND IT IS NOT DEFERRED.
      Its first act is to put `js-motion` on <html>, and that class is what turns the hiding rules
@@ -82,10 +82,80 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", wireExpandAll);
-  } else {
+  /* ---- the Spine's table of contents, and the reading-progress rule ----------------------------
+     ALSO BEFORE THE REDUCED-MOTION RETURN. Knowing where you are on a long page is orientation, not
+     motion: the mark moves from one link to the next and the rule lengthens, and neither animates.
+
+     The mark is aria-current="location" on the link for the section the reader is in: the last
+     section whose top has passed a line a quarter of the way down the screen, below the sticky
+     chrome. At the very bottom of the page it is the last section, whose top may never reach that
+     line on a tall screen. The rule is created here rather than shipped, so a reader with no script
+     is not given a progress bar that never moves. Neither ever scrolls the window: they only read
+     where it is. */
+  function wireSpine() {
+    var toc = document.querySelector("[data-spine-toc]");
+    if (!toc) return;
+    var links = [], targets = [];
+    var as = toc.querySelectorAll('a[href^="#"]');
+    for (var i = 0; i < as.length; i++) {
+      var t = document.getElementById(as[i].getAttribute("href").slice(1));
+      if (t) {
+        links.push(as[i]);
+        targets.push(t);
+      }
+    }
+    var header = document.querySelector(".site-header");
+    var rule = document.createElement("div");
+    rule.className = "reading-progress";
+    rule.setAttribute("data-reading-progress", "");
+    rule.setAttribute("aria-hidden", "true");
+    document.body.appendChild(rule);
+
+    var marked = -1, pending = false;
+    function update() {
+      pending = false;
+      var chrome = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
+      var room = document.documentElement.scrollHeight - window.innerHeight;
+      var y = window.scrollY;
+      rule.style.top = chrome + "px";
+      rule.style.transform = "scaleX(" + (room > 0 ? Math.min(1, y / room) : 1) + ")";
+
+      var line = chrome + window.innerHeight * 0.25, cur = -1;
+      for (var k = 0; k < targets.length; k++) {
+        if (targets[k].getBoundingClientRect().top <= line) cur = k;
+      }
+      var last = targets.length - 1;
+      /* Within two pixels of the end counts as the end: scroll positions are fractional. */
+      if (room > 0 && y >= room - 2 && last >= 0 &&
+          targets[last].getBoundingClientRect().top < window.innerHeight) {
+        cur = last;
+      }
+      if (cur !== marked) {
+        if (marked >= 0) links[marked].removeAttribute("aria-current");
+        if (cur >= 0) links[cur].setAttribute("aria-current", "location");
+        marked = cur;
+      }
+    }
+    function schedule() {
+      if (!pending) {
+        pending = true;
+        window.requestAnimationFrame(update);
+      }
+    }
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    update();
+  }
+
+  function wireControls() {
     wireExpandAll();
+    wireSpine();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", wireControls);
+  } else {
+    wireControls();
   }
 
   if (reduced || !("IntersectionObserver" in window)) {

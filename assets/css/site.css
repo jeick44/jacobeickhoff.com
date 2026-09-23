@@ -11,6 +11,8 @@
    when the script is blocked, fails, or simply has not arrived yet. So the hiding rule is scoped
    to a class that motion.js adds to <html> as its first act. No script, no class, no hiding, and
    the page is just a page. suites/run.py fails the run on any opacity:0 outside that scope.
+   (The Spine's table of contents is not hidden in this sense below 64rem: it is a second route to
+   headings the page already shows, dropped where there is no column beside the prose for it.)
    ============================================================================================== */
 
 :root {
@@ -93,6 +95,12 @@
   --radius-photo: 12px;
   --radius-ring: 2px;
   --pill: 999px;
+
+  /* The sticky chrome, and what has to clear it: the header sits at one layer, the progress rule
+     drawn along its lower edge at the next, and anything else sticky stops this far from the top. */
+  --z-chrome: 40;
+  --z-over-chrome: 41;
+  --chrome-clearance: 6rem;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --speed: 800ms;
 
@@ -310,7 +318,7 @@ button {
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: var(--z-chrome);
   background: color-mix(in srgb, var(--paper) 94%, transparent);
   -webkit-backdrop-filter: saturate(1.4) blur(10px);
   backdrop-filter: saturate(1.4) blur(10px);
@@ -639,6 +647,47 @@ button {
   max-width: 32ch;
 }
 
+/* THE NUMBERS ROW. On a Case Study the three Stat Callouts are not a band but a row in the page
+   head, on white: the frame, then the figures, then the argument. */
+.stats--row {
+  /* Back to the light-ground emphasis: `initial` unsets the band's, and the fallback applies. */
+  --emphasis: initial;
+  background: var(--paper);
+  color: var(--ink);
+  padding-block: 0 clamp(2.5rem, 5vw, 3.5rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.stats--row .eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  max-width: none;
+  margin-bottom: var(--space-sm);
+}
+
+.stats--row .stats__list {
+  gap: var(--space-md);
+}
+
+.stats--row .stat {
+  border-top: 2px solid var(--ink);
+}
+
+.stats--row .stat__value {
+  font-size: var(--text-xl);
+}
+
+.stats--row .stat__unit {
+  color: var(--blue-deep);
+}
+
+.stats--row .stat__label {
+  color: var(--ink-soft);
+}
+
 /* =================================================================================================
    ABOUT BAND
    ============================================================================================== */
@@ -910,12 +959,46 @@ button {
   color: var(--ink-soft);
 }
 
+.case-head {
+  border-bottom: 0;
+  padding-bottom: var(--space-lg);
+}
+
+/* The frame before the detail: Sponsor, status, governing constraint, reading time. */
+.case-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin: var(--space-lg) 0 0;
+  padding-block: var(--space-sm);
+  border-block: 1px solid var(--line);
+  font-size: var(--text-sm);
+}
+
+.case-meta dt {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.case-meta dd {
+  margin: var(--space-3xs) 0 0;
+  font-weight: 600;
+}
+
+/* Four short facts stacked one above another take a phone's whole first screen; two by two they
+   take half of it. */
+@media (max-width: 40rem) {
+  .case-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* The one line on the page that says an Engagement is not finished. It is a statement about the
    claims on this page, so it reads as a caption and not as a badge. */
 .case-head__status {
-  margin-top: var(--space-md);
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--line);
+  margin-top: var(--space-sm);
   font-size: var(--text-sm);
   color: var(--ink-soft);
   max-width: 58ch;
@@ -941,6 +1024,94 @@ button {
 .spine,
 .case-foot {
   max-width: var(--measure);
+}
+
+/* The Spine's table of contents beside the prose on a wide screen, and gone on a narrow one, where
+   the page is one column and the headings are the contents. */
+.case-body__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+}
+
+.toc {
+  display: none;
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 64rem) {
+  .case-body__grid {
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: var(--space-2xl);
+  }
+
+  .toc {
+    display: block;
+    position: sticky;
+    top: var(--chrome-clearance);
+    align-self: start;
+  }
+}
+
+.toc__title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--space-xs);
+}
+
+.toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 1px solid var(--line);
+  counter-reset: spine;
+}
+
+.toc__list li {
+  counter-increment: spine;
+}
+
+/* The Spine is the one place on the site a section number carries information: it is the same
+   five in the same order on every Case Study, and "section 4" means the same thing on all six. */
+.toc__link {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  padding: 0.45rem 0 0.45rem var(--space-sm);
+  margin-left: -1px;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  color: var(--ink-mute);
+  line-height: 1.3;
+  transition: color 200ms var(--ease), border-color 200ms var(--ease);
+}
+
+.toc__link::before {
+  content: counter(spine, decimal-leading-zero);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.12rem;
+}
+
+.toc__link[aria-current] {
+  color: var(--ink);
+  border-left-color: var(--blue);
+  font-weight: 600;
+}
+
+/* The reading-progress rule, drawn by motion.js under the chrome. It exists only when the script
+   does, because a progress bar that cannot move is not a progress bar. */
+.reading-progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--z-over-chrome);
+  width: 100%;
+  height: 2px;
+  background: var(--blue);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  pointer-events: none;
 }
 
 /* The same control in the same place, on a page that is not a Case Study. */
@@ -995,12 +1166,17 @@ button {
   margin-bottom: var(--space-sm);
 }
 
-.spine .eyebrow {
-  font-size: var(--text-xs);
-  line-height: 1.6;
-  color: var(--ink-mute);
-  margin-bottom: var(--space-2xs);
+/* The drop cap: the first letter of The Situation, and nowhere else. */
+.case-body__prose > .spine:first-of-type > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 4.1em;
+  font-weight: 600;
+  line-height: 0.82;
+  padding: 0.08em 0.1em 0 0;
+  color: var(--ink);
 }
+
 
 /* Two flags, one treatment, and the difference between them is load-bearing. A Pending Result is an
    outcome nobody has measured yet (CONTEXT.md); a withheld one was measured and is not being
@@ -1230,7 +1406,9 @@ button {
   .hero__ctas,
   .contact__actions,
   .expand-all,
-  .crumb {
+  .crumb,
+  .toc,
+  .reading-progress {
     display: none;
   }
 

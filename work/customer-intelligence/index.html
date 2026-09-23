@@ -46,13 +46,18 @@
         <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
         <span class="crumb__here">Engagement 01</span>
       </nav>
-      <p class="eyebrow hero__eyebrow">Engagement 01 &middot; A community bank in the Upper Midwest</p>
       <h1 class="case-head__title">Customer Intelligence</h1>
       <p class="case-head__lede">Leadership could not see where its customers were, or how old they
         were, without a day of spreadsheet work first. Four browser tools &mdash; three maps and the
         utility that feeds them &mdash; turned both into questions somebody could answer inside the
         meeting that raised them, on a laptop, with nothing to install and no backend behind
         it.</p>
+      <dl class="case-meta">
+        <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
+        <div><dt>Status</dt><dd>In use</dd></div>
+        <div><dt>Governing constraint</dt><dd>No backend, nothing to install</dd></div>
+        <div><dt>Reading time</dt><dd>6 minutes</dd></div>
+      </dl>
       <p class="case-head__status"><span class="case-head__flag">In use</span> The build is
         finished, and is written here in the past tense. The tools are not finished with: they are
         open on executives&rsquo; machines, which is this Engagement&rsquo;s strongest outcome and
@@ -60,7 +65,7 @@
     </div>
   </section>
 
-  <section class="stats" aria-labelledby="stats-heading">
+  <section class="stats stats--row" aria-labelledby="stats-heading">
     <div class="wrap">
       <h2 class="eyebrow" id="stats-heading">What this Engagement shipped</h2>
       <ul class="stats__list">
@@ -93,171 +98,178 @@
   </section>
 
   <div class="case-body">
-    <div class="wrap">
+    <div class="wrap case-body__grid">
+      <nav class="toc" aria-label="The Spine" data-spine-toc>
+        <p class="toc__title">The Spine</p>
+        <ol class="toc__list">
+          <li><a class="toc__link" href="#the-situation">The Situation</a></li>
+          <li><a class="toc__link" href="#what-i-did">What I Did</a></li>
+          <li><a class="toc__link" href="#what-changed">What Changed</a></li>
+          <li><a class="toc__link" href="#what-i-learned">What I Learned</a></li>
+          <li><a class="toc__link" href="#where-else-this-applies">Where Else This Applies</a></li>
+        </ol>
+      </nav>
+      <div class="case-body__prose">
 
-      <p class="case-body__tools">
-        <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
-      </p>
+          <p class="case-body__tools">
+            <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+          </p>
 
-      <section class="spine" id="the-situation">
-        <p class="eyebrow">Section 01</p>
-        <h2 class="spine__title">The Situation</h2>
-        <p>Two questions came up often enough to be recognisable: where are our customers, and
-          what does our age profile look like. Both were answerable; neither was answerable cheaply.
-          The core system exported rows &mdash; an address, a balance, sometimes a date of birth
-          &mdash; and rows are not a map. Either view meant hours of manual work in a spreadsheet,
-          so the answer arrived after the conversation that wanted it, or not at all.</p>
-        <p>The cost is the part worth noticing, because it never appears as a problem. Nobody
-          records the analysis they decided not to ask for.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">What an expensive question costs, and why nobody
-            logs it</summary>
-          <div class="disclosure__body">
-            <p>A question that takes a day to answer is not a question with a one-day turnaround.
-              It is a question asked only when somebody is already willing to spend the day &mdash;
-              rarely, and usually once the answer can only confirm. So the backlog is invisible: no
-              queue of unasked questions, no report of the analysis nobody requested. What these
-              tools changed first was the price of asking.</p>
-          </div>
-        </details>
-      </section>
+          <section class="spine" id="the-situation">
+            <h2 class="spine__title">The Situation</h2>
+            <p>Two questions came up often enough to be recognisable: where are our customers, and
+              what does our age profile look like. Both were answerable; neither was answerable cheaply.
+              The core system exported rows &mdash; an address, a balance, sometimes a date of birth
+              &mdash; and rows are not a map. Either view meant hours of manual work in a spreadsheet,
+              so the answer arrived after the conversation that wanted it, or not at all.</p>
+            <p>The cost is the part worth noticing, because it never appears as a problem. Nobody
+              records the analysis they decided not to ask for.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">What an expensive question costs, and why nobody
+                logs it</summary>
+              <div class="disclosure__body">
+                <p>A question that takes a day to answer is not a question with a one-day turnaround.
+                  It is a question asked only when somebody is already willing to spend the day &mdash;
+                  rarely, and usually once the answer can only confirm. So the backlog is invisible: no
+                  queue of unasked questions, no report of the analysis nobody requested. What these
+                  tools changed first was the price of asking.</p>
+              </div>
+            </details>
+          </section>
 
-      <section class="spine" id="what-i-did">
-        <p class="eyebrow">Section 02</p>
-        <h2 class="spine__title">What I Did</h2>
-        <p>Four single-file browser tools: three maps &mdash; one descriptive, one financial, one
-          comparing two periods &mdash; and a data-preparation utility that turns a raw export into
-          the one shape all three read. Each is a single HTML file opened from the machine it runs
-          on: no server, no login, no database, nothing to install, and so nothing to approve
-          before it could be tried. The one thing any of them fetches is map imagery; no customer
-          data leaves the machine. The order they arrived in is the part I would defend.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">From a proof of concept to an interaction
-            model</summary>
-          <div class="disclosure__body">
-            <p>The first version held no real data: a map, dots at hardcoded coordinates, two
-              layers, about five hundred lines. Its job was to settle the question that would
-              otherwise have blocked every other one &mdash; whether this could be done in a
-              browser, with no backend, here.</p>
-            <p>What turned the picture into a tool was one idea: select an area, see real numbers
-              for it. Click to drop a circle, drag a slider to size it, and the panel reports what is
-              inside &mdash; dollars, record counts, the age distribution. Everything added
-              afterwards is that idea on another dimension. It also changed the demos: a map of
-              dots gets looked at, and a number that answers for the spot somebody pointed at gets
-              argued with.</p>
-          </div>
-        </details>
-        <details class="disclosure">
-          <summary class="disclosure__summary">A colour is a conclusion, so the location shows
-            its arithmetic</summary>
-          <div class="disclosure__body">
-            <p>The profitability map colours each location by its net annual income &mdash;
-              what its loans earn at their own rate, less what its deposits cost &mdash; green
-              through red, with a grid view that aggregates an area into cells the reader sizes. But
-              a colour scale is a conclusion presented as an observation, and a reader has no way to
-              check one, so hovering a location does not restate its colour. It shows the
-              subtraction:</p>
-            <figure class="specimen">
-              <p class="specimen__title">Net annual income &middot; one location</p>
-              <dl class="specimen__rows">
-                <dt>Loan income</dt>
-                <dd>+$84,200</dd>
-                <dt>Deposit expense</dt>
-                <dd>&minus;$31,600</dd>
-                <dt>Net</dt>
-                <dd>+$52,600/yr</dd>
-              </dl>
-              <figcaption>A location readout, on synthetic data. The colour is the summary; these
-                three lines are what it summarises.</figcaption>
-            </figure>
-            <p>Each line is also the line a lender would challenge first, so the disagreement
-              happens over a rate or a balance, where it can be settled.</p>
-          </div>
-        </details>
-        <details class="disclosure">
-          <summary class="disclosure__summary">Detect the anomaly, correct only when it is safe,
-            flag the correction visibly</summary>
-          <div class="disclosure__body">
-            <p>Real exports arrive broken in small ways: a title row above the headers, an address
-              with no coordinates, an age column holding dates. One tool absorbs all of it, to one
-              standing rule.</p>
-            <p>Detect the anomaly. Correct it only where the correction is unambiguous &mdash; a
-              date of birth becomes an age, a missing coordinate is filled from a matching address
-              in a previously cleaned file. Otherwise leave the cell empty. And flag every
-              correction where the person using the output cannot miss it: the cell highlighted, its
-              reason on hover, a count of them above the preview. A tool that quietly improves its
-              input is indistinguishable from one that quietly damages it.</p>
-          </div>
-        </details>
-      </section>
+          <section class="spine" id="what-i-did">
+            <h2 class="spine__title">What I Did</h2>
+            <p>Four single-file browser tools: three maps &mdash; one descriptive, one financial, one
+              comparing two periods &mdash; and a data-preparation utility that turns a raw export into
+              the one shape all three read. Each is a single HTML file opened from the machine it runs
+              on: no server, no login, no database, nothing to install, and so nothing to approve
+              before it could be tried. The one thing any of them fetches is map imagery; no customer
+              data leaves the machine. The order they arrived in is the part I would defend.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">From a proof of concept to an interaction
+                model</summary>
+              <div class="disclosure__body">
+                <p>The first version held no real data: a map, dots at hardcoded coordinates, two
+                  layers, about five hundred lines. Its job was to settle the question that would
+                  otherwise have blocked every other one &mdash; whether this could be done in a
+                  browser, with no backend, here.</p>
+                <p>What turned the picture into a tool was one idea: select an area, see real numbers
+                  for it. Click to drop a circle, drag a slider to size it, and the panel reports what is
+                  inside &mdash; dollars, record counts, the age distribution. Everything added
+                  afterwards is that idea on another dimension. It also changed the demos: a map of
+                  dots gets looked at, and a number that answers for the spot somebody pointed at gets
+                  argued with.</p>
+              </div>
+            </details>
+            <details class="disclosure">
+              <summary class="disclosure__summary">A colour is a conclusion, so the location shows
+                its arithmetic</summary>
+              <div class="disclosure__body">
+                <p>The profitability map colours each location by its net annual income &mdash;
+                  what its loans earn at their own rate, less what its deposits cost &mdash; green
+                  through red, with a grid view that aggregates an area into cells the reader sizes. But
+                  a colour scale is a conclusion presented as an observation, and a reader has no way to
+                  check one, so hovering a location does not restate its colour. It shows the
+                  subtraction:</p>
+                <figure class="specimen">
+                  <p class="specimen__title">Net annual income &middot; one location</p>
+                  <dl class="specimen__rows">
+                    <dt>Loan income</dt>
+                    <dd>+$84,200</dd>
+                    <dt>Deposit expense</dt>
+                    <dd>&minus;$31,600</dd>
+                    <dt>Net</dt>
+                    <dd>+$52,600/yr</dd>
+                  </dl>
+                  <figcaption>A location readout, on synthetic data. The colour is the summary; these
+                    three lines are what it summarises.</figcaption>
+                </figure>
+                <p>Each line is also the line a lender would challenge first, so the disagreement
+                  happens over a rate or a balance, where it can be settled.</p>
+              </div>
+            </details>
+            <details class="disclosure">
+              <summary class="disclosure__summary">Detect the anomaly, correct only when it is safe,
+                flag the correction visibly</summary>
+              <div class="disclosure__body">
+                <p>Real exports arrive broken in small ways: a title row above the headers, an address
+                  with no coordinates, an age column holding dates. One tool absorbs all of it, to one
+                  standing rule.</p>
+                <p>Detect the anomaly. Correct it only where the correction is unambiguous &mdash; a
+                  date of birth becomes an age, a missing coordinate is filled from a matching address
+                  in a previously cleaned file. Otherwise leave the cell empty. And flag every
+                  correction where the person using the output cannot miss it: the cell highlighted, its
+                  reason on hover, a count of them above the preview. A tool that quietly improves its
+                  input is indistinguishable from one that quietly damages it.</p>
+              </div>
+            </details>
+          </section>
 
-      <section class="spine" id="what-changed">
-        <p class="eyebrow">Section 03</p>
-        <h2 class="spine__title">What Changed</h2>
-        <p>The tools are in active use by the bank&rsquo;s CFO, its president and its senior
-          lending staff, and were the subject of a formal presentation to that group. The outcome I
-          am most confident stating is the one I did not compute: this Engagement is why I was
-          offered an ongoing role, which was somebody else&rsquo;s assessment of the work rather
-          than mine.</p>
-        <p>They also produced a finding nobody had stated before: a concentration of the deposit
-          base in the bank&rsquo;s oldest customers, pronounced enough to belong in a funding
-          conversation rather than a demographic one. It is described here without its figures, and
-          that is not modesty. The tools are my work product and the finding is the
-          Sponsor&rsquo;s business; only one of those gets a number on this site.</p>
-      </section>
+          <section class="spine" id="what-changed">
+            <h2 class="spine__title">What Changed</h2>
+            <p>The tools are in active use by the bank&rsquo;s CFO, its president and its senior
+              lending staff, and were the subject of a formal presentation to that group. The outcome I
+              am most confident stating is the one I did not compute: this Engagement is why I was
+              offered an ongoing role, which was somebody else&rsquo;s assessment of the work rather
+              than mine.</p>
+            <p>They also produced a finding nobody had stated before: a concentration of the deposit
+              base in the bank&rsquo;s oldest customers, pronounced enough to belong in a funding
+              conversation rather than a demographic one. It is described here without its figures, and
+              that is not modesty. The tools are my work product and the finding is the
+              Sponsor&rsquo;s business; only one of those gets a number on this site.</p>
+          </section>
 
-      <section class="spine" id="what-i-learned">
-        <p class="eyebrow">Section 04</p>
-        <h2 class="spine__title">What I Learned</h2>
-        <p>That a check which returns a plausible answer on bad input is worse than one that
-          refuses.</p>
-        <p>An age column sometimes arrives holding date serials &mdash; a date of birth stored as
-          a count of days, never formatted as a date. The map recognised that and converted it,
-          above a floor of twenty thousand days, which lands in October 1954. So a customer born
-          earlier &mdash; anyone aged roughly seventy-one or older &mdash; failed the serial test,
-          then every other test, and came back as zero. Zero is a real age band in the tool rather
-          than an error value, so those customers were neither dropped nor flagged. They were filed
-          with the infants, and the band being emptied was the band the demographic finding was
-          about. It was the third defect of that kind here: an age filter that counted records it
-          had been told to exclude, a loader that read every dollar value as zero, and this.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">How it surfaced, and why it is still logged rather
-            than fixed</summary>
-          <div class="disclosure__body">
-            <p>Not by reading the code. I built a fixture from the shape of a real export to test
-              something else, and two of its ten ages came back as zero when I knew what they should
-              have been. The same guard, written twice a few weeks apart, had drifted; the
-              preparation tool had the range right the whole time.</p>
-            <p>It is logged with its fix rather than quietly corrected, because applying it
-              moves ages on screen in a tool executives are reading now &mdash; and from wrong to
-              right is still somebody&rsquo;s numbers changing without warning.</p>
-          </div>
-        </details>
-        <p>The general lesson is the one I have found no way around. Real files break parsers in
-          ways no synthetic fixture predicts, because synthetic data is generated out of the same
-          assumptions the parser was written under: it agrees with the code by construction. Every
-          edge case the preparation tool handles came from a file that broke it first.</p>
-      </section>
+          <section class="spine" id="what-i-learned">
+            <h2 class="spine__title">What I Learned</h2>
+            <p>That a check which returns a plausible answer on bad input is worse than one that
+              refuses.</p>
+            <p>An age column sometimes arrives holding date serials &mdash; a date of birth stored as
+              a count of days, never formatted as a date. The map recognised that and converted it,
+              above a floor of twenty thousand days, which lands in October 1954. So a customer born
+              earlier &mdash; anyone aged roughly seventy-one or older &mdash; failed the serial test,
+              then every other test, and came back as zero. Zero is a real age band in the tool rather
+              than an error value, so those customers were neither dropped nor flagged. They were filed
+              with the infants, and the band being emptied was the band the demographic finding was
+              about. It was the third defect of that kind here: an age filter that counted records it
+              had been told to exclude, a loader that read every dollar value as zero, and this.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">How it surfaced, and why it is still logged rather
+                than fixed</summary>
+              <div class="disclosure__body">
+                <p>Not by reading the code. I built a fixture from the shape of a real export to test
+                  something else, and two of its ten ages came back as zero when I knew what they should
+                  have been. The same guard, written twice a few weeks apart, had drifted; the
+                  preparation tool had the range right the whole time.</p>
+                <p>It is logged with its fix rather than quietly corrected, because applying it
+                  moves ages on screen in a tool executives are reading now &mdash; and from wrong to
+                  right is still somebody&rsquo;s numbers changing without warning.</p>
+              </div>
+            </details>
+            <p>The general lesson is the one I have found no way around. Real files break parsers in
+              ways no synthetic fixture predicts, because synthetic data is generated out of the same
+              assumptions the parser was written under: it agrees with the code by construction. Every
+              edge case the preparation tool handles came from a file that broke it first.</p>
+          </section>
 
-      <section class="spine" id="where-else-this-applies">
-        <p class="eyebrow">Section 05</p>
-        <h2 class="spine__title">Where Else This Applies</h2>
-        <p><strong>Pricing a question before answering it.</strong> Any organisation where an
-          ordinary question costs a day of somebody&rsquo;s time has a set of questions it has
-          stopped asking and no record of which ones.</p>
-        <p><strong>Making a visual show its arithmetic.</strong> Heat maps, scores, ratings, risk
-          tiers, red-amber-green dashboards &mdash; each hands a reader a conclusion with the
-          working removed, and each is believed until the first person checks one.</p>
-        <p><strong>Detect, correct only when safe, flag always.</strong> Any pipeline cleaning
-          data on its way into a decision &mdash; claims intake, survey responses, meter reads, a
-          system migration &mdash; chooses between silence and visibility about what it changed.</p>
-      </section>
+          <section class="spine" id="where-else-this-applies">
+            <h2 class="spine__title">Where Else This Applies</h2>
+            <p><strong>Pricing a question before answering it.</strong> Any organisation where an
+              ordinary question costs a day of somebody&rsquo;s time has a set of questions it has
+              stopped asking and no record of which ones.</p>
+            <p><strong>Making a visual show its arithmetic.</strong> Heat maps, scores, ratings, risk
+              tiers, red-amber-green dashboards &mdash; each hands a reader a conclusion with the
+              working removed, and each is believed until the first person checks one.</p>
+            <p><strong>Detect, correct only when safe, flag always.</strong> Any pipeline cleaning
+              data on its way into a decision &mdash; claims intake, survey responses, meter reads, a
+              system migration &mdash; chooses between silence and visibility about what it changed.</p>
+          </section>
 
-      <p class="case-foot">
-        <a class="btn btn--solid" href="/work/">All six Engagements</a>
-        <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
-      </p>
+          <p class="case-foot">
+            <a class="btn btn--solid" href="/work/">All six Engagements</a>
+            <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
+          </p>
 
+      </div>
     </div>
   </div>
 

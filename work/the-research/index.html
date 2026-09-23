@@ -46,7 +46,6 @@
         <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
         <span class="crumb__here">Engagement 04</span>
       </nav>
-      <p class="eyebrow hero__eyebrow">Engagement 04 &middot; Independent &middot; faculty-advised</p>
       <h1 class="case-head__title">The Research</h1>
       <p class="case-head__lede">The question is whether the passages of an SEC filing that a
         language model has revised earn different abnormal returns around the filing date than the
@@ -55,6 +54,12 @@
         it claimed, and withdrew it. This page is the rebuild &mdash; the same question, an
         instrument built so that it can come back empty, and a pass bar written down before any
         detector ran.</p>
+      <dl class="case-meta">
+        <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
+        <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
+        <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
+        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
+      </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
         validation set, and nothing below has been revised in light of a number. The work is at the
@@ -63,7 +68,7 @@
     </div>
   </section>
 
-  <section class="stats" aria-labelledby="stats-heading">
+  <section class="stats stats--row" aria-labelledby="stats-heading">
     <div class="wrap">
       <h2 class="eyebrow" id="stats-heading">What this Engagement produced</h2>
       <ul class="stats__list">
@@ -96,187 +101,194 @@
   </section>
 
   <div class="case-body">
-    <div class="wrap">
+    <div class="wrap case-body__grid">
+      <nav class="toc" aria-label="The Spine" data-spine-toc>
+        <p class="toc__title">The Spine</p>
+        <ol class="toc__list">
+          <li><a class="toc__link" href="#the-situation">The Situation</a></li>
+          <li><a class="toc__link" href="#what-i-did">What I Did</a></li>
+          <li><a class="toc__link" href="#what-changed">What Changed</a></li>
+          <li><a class="toc__link" href="#what-i-learned">What I Learned</a></li>
+          <li><a class="toc__link" href="#where-else-this-applies">Where Else This Applies</a></li>
+        </ol>
+      </nav>
+      <div class="case-body__prose">
 
-      <p class="case-body__tools">
-        <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
-      </p>
+          <p class="case-body__tools">
+            <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+          </p>
 
-      <section class="spine" id="the-situation">
-        <p class="eyebrow">Section 01</p>
-        <h2 class="spine__title">The Situation</h2>
-        <p>Finance research reads corporate disclosure as text &mdash; tone, hedging, readability,
-          how much a filing changed since last year. All of it rests on an assumption that used to
-          be free: that a person wrote the words. If a language model revised them, the measure is
-          reading the model&rsquo;s style, and a company that looks newly cautious may be a company
-          that started running its footnotes through an assistant.</p>
-        <p>Nobody can say how often that happens, for a narrow reason: no published detector has
-          been validated on financial disclosure. The ones that exist were trained to separate web
-          prose from model output, and a footnote is neither. So the first question is not whether
-          AI-generated language predicts returns. It is whether it can be seen at all in this kind
-          of writing, and that has to be settled against labelled data before a filing is scored.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">Why the thing being detected is an edit and not a
-            draft</summary>
-          <div class="disclosure__body">
-            <p>An issuer does not hand a model a blank page and file what comes back. What a drafter
-              plausibly does is write the paragraph and ask for it to be tightened with the facts
-              kept, so the positive class here is a human passage a model revised rather than one a
-              model produced from nothing. That is what AI-generated language means on this page and
-              in the study: an edit, not a draft. Wholly generated text is kept only as an upper bound: a
-              detector that cannot separate that from human writing is blind, and a null result from
-              a blind instrument says nothing.</p>
-          </div>
-        </details>
-      </section>
+          <section class="spine" id="the-situation">
+            <h2 class="spine__title">The Situation</h2>
+            <p>Finance research reads corporate disclosure as text &mdash; tone, hedging, readability,
+              how much a filing changed since last year. All of it rests on an assumption that used to
+              be free: that a person wrote the words. If a language model revised them, the measure is
+              reading the model&rsquo;s style, and a company that looks newly cautious may be a company
+              that started running its footnotes through an assistant.</p>
+            <p>Nobody can say how often that happens, for a narrow reason: no published detector has
+              been validated on financial disclosure. The ones that exist were trained to separate web
+              prose from model output, and a footnote is neither. So the first question is not whether
+              AI-generated language predicts returns. It is whether it can be seen at all in this kind
+              of writing, and that has to be settled against labelled data before a filing is scored.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">Why the thing being detected is an edit and not a
+                draft</summary>
+              <div class="disclosure__body">
+                <p>An issuer does not hand a model a blank page and file what comes back. What a drafter
+                  plausibly does is write the paragraph and ask for it to be tightened with the facts
+                  kept, so the positive class here is a human passage a model revised rather than one a
+                  model produced from nothing. That is what AI-generated language means on this page and
+                  in the study: an edit, not a draft. Wholly generated text is kept only as an upper bound: a
+                  detector that cannot separate that from human writing is blind, and a null result from
+                  a blind instrument says nothing.</p>
+              </div>
+            </details>
+          </section>
 
-      <section class="spine" id="what-i-did">
-        <p class="eyebrow">Section 02</p>
-        <h2 class="spine__title">What I Did</h2>
-        <p>I rebuilt the measurement instrument. It has four parts.</p>
-        <p><strong>Passages are located by the filer&rsquo;s own tags.</strong> The first version
-          found the notes to the financial statements with a regular expression over the document
-          text. The extractor now reads the index the filer publishes alongside the filing and takes
-          the sections the filer tagged as notes &mdash; 4,653 passages from 1,324 notes across 74
-          filings, drawn from a 40-company sample of which 37 had filings in the window. All of them
-          are dated before 2020, so the human labels are certain by construction.</p>
-        <p><strong>The labels are built, not assumed.</strong> A validation set of 200 human
-          passages, 600 model-revised versions of them, and 50 wholly generated for the upper bound.
-          Every revision is paired with its own original, so a detector can be asked whether it
-          scores a passage as more machine-like than the text it came from.</p>
-        <p><strong>The instrument reports a Detectability Curve, not a score.</strong> Accuracy is
-          measured at three rungs of edit intensity &mdash; light, moderate, heavy &mdash; and a
-          passage&rsquo;s
-          rung is measured afterwards from edit distance and n-gram overlap against its original,
-          never inferred from the prompt that asked for it. A prompt is a request; edit intensity is
-          what happened.</p>
-        <p><strong>The Gate.</strong> A detector may score real filings only if it reaches an AUC of
-          at least 0.70 at the moderate rung and holds its false-positive rate at or below 5%
-          against genuine pre-2020 footnotes. Four were named in advance: the detector the withdrawn
-          pipeline scored with, kept as the incumbent baseline; Fast-DetectGPT; Binoculars; and a
-          stylometric floor with no neural weights behind it. If none clears the bar, the study
-          stops at the validation stage and reports that LLM editing of filing footnotes is not
-          detectable with current public methods &mdash; and that is the finding, not a failure to
-          find one. The bar is not lowered, the ladder is not re-cut, and the panel is not scored in
-          the hope that scale compensates.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">What a pilot run is allowed to decide</summary>
-          <div class="disclosure__body">
-            <p>Before paying for a strong model to write the edited passages, I ran the pipeline end
-              to end against revisions written by Llama 3.1 8B on my own machine. Against that
-              generator the stylometric floor separated revisions from their own originals at an AUC
-              of 0.781 at the moderate rung, rising at every rung and surviving where the revision
-              lost no length at all. The two neural detectors sat at or below chance on its edited
-              text; against wholly generated text both did better, and one of them almost
-              perfectly.</p>
-            <p>None of that is a result, and the run file says so on its first line: an 8B model has
-              a strong stylistic signature, a stylometric index measures exactly that, and the pilot
-              may therefore be detecting one model rather than detecting editing. I wrote that
-              down before the paid run rather than after. The one thing it decided is that the paid
-              run is worth making.</p>
-          </div>
-        </details>
-      </section>
+          <section class="spine" id="what-i-did">
+            <h2 class="spine__title">What I Did</h2>
+            <p>I rebuilt the measurement instrument. It has four parts.</p>
+            <p><strong>Passages are located by the filer&rsquo;s own tags.</strong> The first version
+              found the notes to the financial statements with a regular expression over the document
+              text. The extractor now reads the index the filer publishes alongside the filing and takes
+              the sections the filer tagged as notes &mdash; 4,653 passages from 1,324 notes across 74
+              filings, drawn from a 40-company sample of which 37 had filings in the window. All of them
+              are dated before 2020, so the human labels are certain by construction.</p>
+            <p><strong>The labels are built, not assumed.</strong> A validation set of 200 human
+              passages, 600 model-revised versions of them, and 50 wholly generated for the upper bound.
+              Every revision is paired with its own original, so a detector can be asked whether it
+              scores a passage as more machine-like than the text it came from.</p>
+            <p><strong>The instrument reports a Detectability Curve, not a score.</strong> Accuracy is
+              measured at three rungs of edit intensity &mdash; light, moderate, heavy &mdash; and a
+              passage&rsquo;s
+              rung is measured afterwards from edit distance and n-gram overlap against its original,
+              never inferred from the prompt that asked for it. A prompt is a request; edit intensity is
+              what happened.</p>
+            <p><strong>The Gate.</strong> A detector may score real filings only if it reaches an AUC of
+              at least 0.70 at the moderate rung and holds its false-positive rate at or below 5%
+              against genuine pre-2020 footnotes. Four were named in advance: the detector the withdrawn
+              pipeline scored with, kept as the incumbent baseline; Fast-DetectGPT; Binoculars; and a
+              stylometric floor with no neural weights behind it. If none clears the bar, the study
+              stops at the validation stage and reports that LLM editing of filing footnotes is not
+              detectable with current public methods &mdash; and that is the finding, not a failure to
+              find one. The bar is not lowered, the ladder is not re-cut, and the panel is not scored in
+              the hope that scale compensates.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">What a pilot run is allowed to decide</summary>
+              <div class="disclosure__body">
+                <p>Before paying for a strong model to write the edited passages, I ran the pipeline end
+                  to end against revisions written by Llama 3.1 8B on my own machine. Against that
+                  generator the stylometric floor separated revisions from their own originals at an AUC
+                  of 0.781 at the moderate rung, rising at every rung and surviving where the revision
+                  lost no length at all. The two neural detectors sat at or below chance on its edited
+                  text; against wholly generated text both did better, and one of them almost
+                  perfectly.</p>
+                <p>None of that is a result, and the run file says so on its first line: an 8B model has
+                  a strong stylistic signature, a stylometric index measures exactly that, and the pilot
+                  may therefore be detecting one model rather than detecting editing. I wrote that
+                  down before the paid run rather than after. The one thing it decided is that the paid
+                  run is worth making.</p>
+              </div>
+            </details>
+          </section>
 
-      <section class="spine" id="what-changed">
-        <p class="eyebrow">Section 03</p>
-        <h2 class="spine__title">What Changed</h2>
-        <p>What changed is the thing I would lead with in an interview: I withdrew my own published
-          result. A report I compiled in June 2026 carried three headline findings. I re-examined it
-          against the source data and against live filings, found three defects, and superseded
-          it.</p>
-        <p><strong>The score was a ranking wearing a probability&rsquo;s clothes.</strong> The final
-          quantity was a within-sample z-score through a sigmoid, and a filing was flagged if it
-          landed in the top quartile &mdash; which flags exactly a quarter of any sample by
-          construction, whatever the text says, and means adding one company changes the score of
-          every company already scored. It was reported as though it were the probability that a
-          filing was machine-written.</p>
-        <p><strong>The extractor was reading the wrong text.</strong> Tested against six live
-          filings, five landed on a cross-reference or a table-of-contents line rather than on the
-          notes. One company ranked near the top for AI language had been scored on 4,109 characters
-          of exhibit index and signature page. The heading pattern the extractor searched for
-          matched zero times in all six: a modern filing renders a note heading as &ldquo;1.
-          Significant Accounting Policies&rdquo;, never as &ldquo;Note 1 &mdash;&rdquo;.</p>
-        <p><strong>The trend appeared at dates where nothing had happened.</strong> I re-ran the
-          specification with a fabricated break in November of every year from 2017 to 2024, and
-          every one came back significant. Adding a linear time trend removed the effect, and so
-          did a separate specification carrying firm fixed effects and a form-type control. The
-          score drifts smoothly upward
-          across the decade, and the date I had picked is a point on that line rather than a break
-          in it.</p>
-        <p>So I wrote a correction, dated it, said the report was superseded and should not be
-          cited, and recorded that it go to anyone who had received it. The pipeline was then
-          rebuilt from scratch, with a provenance record on every passage &mdash; accession number,
-          source URL, note, character offsets. Any number in the write-up now traces back to text a
-          reader can open, which is the discipline whose absence let a signature page be reported as
-          a finding.</p>
-        <p class="pending-result">
-          <span class="pending-result__flag">Pending Result</span>
-          Whether AI-generated language in filings predicts abnormal returns is not answered here.
-          The
-          panel is not scored and is not authorised to be scored until a detector clears the Gate.
-          If none does, the reportable finding is non-detectability, with the curve attached so that
-          &ldquo;filers are not doing this&rdquo; stays distinguishable from &ldquo;this instrument
-          cannot see it&rdquo;.
-        </p>
-        <p>Where the rest of it stands. The study is faculty-advised, and that is a working
-          relationship rather than a name on a cover page. An application for research funding has
-          been submitted; it has not been decided and it has not been awarded. A conference is the
-          intended venue, whichever way the Gate falls. None of the three is an outcome.</p>
-      </section>
+          <section class="spine" id="what-changed">
+            <h2 class="spine__title">What Changed</h2>
+            <p>What changed is the thing I would lead with in an interview: I withdrew my own published
+              result. A report I compiled in June 2026 carried three headline findings. I re-examined it
+              against the source data and against live filings, found three defects, and superseded
+              it.</p>
+            <p><strong>The score was a ranking wearing a probability&rsquo;s clothes.</strong> The final
+              quantity was a within-sample z-score through a sigmoid, and a filing was flagged if it
+              landed in the top quartile &mdash; which flags exactly a quarter of any sample by
+              construction, whatever the text says, and means adding one company changes the score of
+              every company already scored. It was reported as though it were the probability that a
+              filing was machine-written.</p>
+            <p><strong>The extractor was reading the wrong text.</strong> Tested against six live
+              filings, five landed on a cross-reference or a table-of-contents line rather than on the
+              notes. One company ranked near the top for AI language had been scored on 4,109 characters
+              of exhibit index and signature page. The heading pattern the extractor searched for
+              matched zero times in all six: a modern filing renders a note heading as &ldquo;1.
+              Significant Accounting Policies&rdquo;, never as &ldquo;Note 1 &mdash;&rdquo;.</p>
+            <p><strong>The trend appeared at dates where nothing had happened.</strong> I re-ran the
+              specification with a fabricated break in November of every year from 2017 to 2024, and
+              every one came back significant. Adding a linear time trend removed the effect, and so
+              did a separate specification carrying firm fixed effects and a form-type control. The
+              score drifts smoothly upward
+              across the decade, and the date I had picked is a point on that line rather than a break
+              in it.</p>
+            <p>So I wrote a correction, dated it, said the report was superseded and should not be
+              cited, and recorded that it go to anyone who had received it. The pipeline was then
+              rebuilt from scratch, with a provenance record on every passage &mdash; accession number,
+              source URL, note, character offsets. Any number in the write-up now traces back to text a
+              reader can open, which is the discipline whose absence let a signature page be reported as
+              a finding.</p>
+            <p class="pending-result">
+              <span class="pending-result__flag">Pending Result</span>
+              Whether AI-generated language in filings predicts abnormal returns is not answered here.
+              The
+              panel is not scored and is not authorised to be scored until a detector clears the Gate.
+              If none does, the reportable finding is non-detectability, with the curve attached so that
+              &ldquo;filers are not doing this&rdquo; stays distinguishable from &ldquo;this instrument
+              cannot see it&rdquo;.
+            </p>
+            <p>Where the rest of it stands. The study is faculty-advised, and that is a working
+              relationship rather than a name on a cover page. An application for research funding has
+              been submitted; it has not been decided and it has not been awarded. A conference is the
+              intended venue, whichever way the Gate falls. None of the three is an outcome.</p>
+          </section>
 
-      <section class="spine" id="what-i-learned">
-        <p class="eyebrow">Section 04</p>
-        <h2 class="spine__title">What I Learned</h2>
-        <p>That the defects were not carelessness, which is the uncomfortable part. Each one was a
-          choice &mdash; which break date, which heading pattern, which cut-off counted as high
-          &mdash; made with the answer already on the screen, and none was recorded as a choice
-          because at the time none of them felt like one.</p>
-        <p>So the remedy is not more care: care is what produced it, aimed in the direction of the
-          result I expected. It is to commit to the decisions before the numbers exist, in a file
-          with a date on it &mdash; which is why The Gate can disqualify a detector I would rather
-          keep. The narrower version of the lesson: a result that has survived no placebo is not a
-          result. The check that cost me the finding took an afternoon, and I had not run it because
-          the finding agreed with what I expected.</p>
-        <details class="disclosure">
-          <summary class="disclosure__summary">The case for publishing a correction rather than
-            quietly replacing the work</summary>
-          <div class="disclosure__body">
-            <p>The tempting version is to rebuild, publish the better study, and let the first one
-              disappear. Nobody had cited it; it would have cost nothing visible. What decided it is
-              that I cannot be sure where the report went, and deleting my copy leaves the claim
-              alive in anyone else&rsquo;s with nothing attached to it. Naming the three defects is also
-              the only thing that lets a reader judge the rebuild &mdash; without them it is a set
-              of answers to no stated question.</p>
-          </div>
-        </details>
-      </section>
+          <section class="spine" id="what-i-learned">
+            <h2 class="spine__title">What I Learned</h2>
+            <p>That the defects were not carelessness, which is the uncomfortable part. Each one was a
+              choice &mdash; which break date, which heading pattern, which cut-off counted as high
+              &mdash; made with the answer already on the screen, and none was recorded as a choice
+              because at the time none of them felt like one.</p>
+            <p>So the remedy is not more care: care is what produced it, aimed in the direction of the
+              result I expected. It is to commit to the decisions before the numbers exist, in a file
+              with a date on it &mdash; which is why The Gate can disqualify a detector I would rather
+              keep. The narrower version of the lesson: a result that has survived no placebo is not a
+              result. The check that cost me the finding took an afternoon, and I had not run it because
+              the finding agreed with what I expected.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">The case for publishing a correction rather than
+                quietly replacing the work</summary>
+              <div class="disclosure__body">
+                <p>The tempting version is to rebuild, publish the better study, and let the first one
+                  disappear. Nobody had cited it; it would have cost nothing visible. What decided it is
+                  that I cannot be sure where the report went, and deleting my copy leaves the claim
+                  alive in anyone else&rsquo;s with nothing attached to it. Naming the three defects is also
+                  the only thing that lets a reader judge the rebuild &mdash; without them it is a set
+                  of answers to no stated question.</p>
+              </div>
+            </details>
+          </section>
 
-      <section class="spine" id="where-else-this-applies">
-        <p class="eyebrow">Section 05</p>
-        <h2 class="spine__title">Where Else This Applies</h2>
-        <p><strong>A score defined by a ranking is not a measurement.</strong> Vendor risk tiers,
-          performance bands, lead scores, accounts flagged for review &mdash; anything defined as
-          the top quartile identifies that share of the population whatever the population does, and
-          adding a case changes the score of every case already in it. The damage comes when a
-          sorting rule is escalated as a probability.</p>
-        <p><strong>Check what the extractor actually read.</strong> Any process pulling fields out
-          of documents &mdash; diligence, compliance review, invoice and contract automation &mdash;
-          reports what it found and almost never what it read instead. The cheapest check in this
-          study was opening six documents and looking at the characters that had been scored.</p>
-        <p><strong>Fix the pass bar before the measurement.</strong> Pilot evaluations, model
-          selection and vendor bake-offs reach the same fork: the success criteria are written down
-          before the numbers arrive, or afterwards, in which case they are a description of the
-          numbers. Fixing it first is what makes a negative result reportable rather than
-          embarrassing, and a negative result nobody can report is a budget that keeps getting
-          spent.</p>
-      </section>
+          <section class="spine" id="where-else-this-applies">
+            <h2 class="spine__title">Where Else This Applies</h2>
+            <p><strong>A score defined by a ranking is not a measurement.</strong> Vendor risk tiers,
+              performance bands, lead scores, accounts flagged for review &mdash; anything defined as
+              the top quartile identifies that share of the population whatever the population does, and
+              adding a case changes the score of every case already in it. The damage comes when a
+              sorting rule is escalated as a probability.</p>
+            <p><strong>Check what the extractor actually read.</strong> Any process pulling fields out
+              of documents &mdash; diligence, compliance review, invoice and contract automation &mdash;
+              reports what it found and almost never what it read instead. The cheapest check in this
+              study was opening six documents and looking at the characters that had been scored.</p>
+            <p><strong>Fix the pass bar before the measurement.</strong> Pilot evaluations, model
+              selection and vendor bake-offs reach the same fork: the success criteria are written down
+              before the numbers arrive, or afterwards, in which case they are a description of the
+              numbers. Fixing it first is what makes a negative result reportable rather than
+              embarrassing, and a negative result nobody can report is a budget that keeps getting
+              spent.</p>
+          </section>
 
-      <p class="case-foot">
-        <a class="btn btn--solid" href="/work/">All six Engagements</a>
-        <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
-      </p>
+          <p class="case-foot">
+            <a class="btn btn--solid" href="/work/">All six Engagements</a>
+            <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
+          </p>
 
+      </div>
     </div>
   </div>
 
