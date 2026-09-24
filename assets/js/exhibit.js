@@ -1720,6 +1720,79 @@
     update();
   });
 
+  /* ---- KIND: status-board ----------------------------------------------------------------------
+     The research overview's board. The table has one row per Research Track, its header linking to
+     the Track's full standing on the page, then the three standing slots - Settled, In progress,
+     What would falsify it - and the Case Study the Track leads to. A Track keeps all three slots
+     (CONTEXT.md), so a row with an empty slot is refused rather than drawn with a gap in it.
+     Columns are found by their headers.
+
+     Each slot is a button on the board, labelled with its slot and showing its words; selecting it
+     names the Track and slot underneath and links to that Track's standing in full. Each Track's
+     row ends in its Case Study link, the hand-off, read from the table's own link. Nothing animates. */
+  register("status-board", function (fig, stage, data) {
+    var SLOTS = ["Settled", "In progress", "What would falsify it"];
+    var col = {};
+    SLOTS.concat("Case Study").forEach(function (name) {
+      var i = data.columns.indexOf(name);
+      if (i < 1) throw new Error("status-board: the table has no " + JSON.stringify(name) + " column");
+      col[name] = i - 1;
+    });
+    if (!data.rows.length) throw new Error("status-board: the table has no Research Tracks");
+    var trs = fig.querySelectorAll("tbody tr");
+    var tracks = data.rows.map(function (r, i) {
+      var head = trs[i].querySelector("th a[href]");
+      var study = trs[i].children[col["Case Study"] + 1].querySelector("a[href]");
+      if (!study) throw new Error("status-board: " + r.label + " links to no Case Study");
+      SLOTS.forEach(function (name) {
+        if (!r.cells[col[name]]) throw new Error("status-board: " + r.label + " leaves " + name + " empty");
+      });
+      return { name: r.label, full: head ? head.getAttribute("href") : null,
+               study: study.getAttribute("href"), studyName: text(study),
+               slots: SLOTS.map(function (name) { return r.cells[col[name]]; }) };
+    });
+    var picked = { track: 0, slot: 0 };
+
+    var board = make("div", "board", stage);
+    var slotButtons = tracks.map(function (track, t) {
+      var row = make("div", "board__track", board);
+      make("p", "board__name", row, track.name);
+      var slots = make("div", "board__slots", row);
+      var buttons = track.slots.map(function (words, s) {
+        var b = button(slots, "board__slot", null, t === 0 && s === 0);
+        make("span", "board__term", b, SLOTS[s]);
+        make("span", "board__words", b, words);
+        b.addEventListener("click", function () { picked = { track: t, slot: s }; update(); });
+        return b;
+      });
+      var more = make("p", "board__more", row);
+      var a = make("a", null, more, track.studyName + ", the Case Study");
+      a.href = track.study;
+      return buttons;
+    });
+
+    var readout = make("div", "exhibit__readout board__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var shown = make("p", "board__readout-what", readout);
+    shown.setAttribute("data-result", "");
+    var inFull = make("p", "board__readout-full", readout);
+    var toStanding = make("a", null, inFull, "Read this track\u2019s standing in full");
+
+    function update() {
+      var track = tracks[picked.track];
+      slotButtons.forEach(function (buttons, t) {
+        buttons.forEach(function (b, s) {
+          b.setAttribute("aria-pressed", String(t === picked.track && s === picked.slot));
+        });
+      });
+      shown.textContent = track.name + ": " + SLOTS[picked.slot].toLowerCase();
+      inFull.hidden = !track.full;
+      if (track.full) toStanding.href = track.full;
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };

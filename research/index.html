@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -115,6 +118,36 @@
         other has a system that runs on a schedule and a history far too short to judge it by. Both
         are set out below in the same three slots, and the third slot is the one that says what
         would show the work to be wrong.</p>
+
+      <figure class="exhibit" id="exhibit-standing" data-exhibit="status-board" data-provenance="published">
+        <div class="exhibit__head">
+          <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Both tracks have
+            their machinery settled, and neither has yet met the test that could prove it wrong</h3>
+          <p class="exhibit__instruction">Select a slot for a link to that track&rsquo;s standing in
+            full; each track ends in its Case Study.</p>
+        </div>
+        <div class="exhibit__stage" data-stage></div>
+        <details class="exhibit__data">
+          <summary class="exhibit__data-toggle">View the data</summary>
+          <div class="exhibit__table exhibit__table--prose">
+            <table>
+              <caption>Each Research Track&rsquo;s three standing slots, in short; each track is set
+                out in full below</caption>
+              <thead>
+                <tr><th scope="col">Research Track</th><th scope="col">Settled</th><th scope="col">In progress</th><th scope="col">What would falsify it</th><th scope="col">Case Study</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row"><a href="#filings-and-returns">Track 01 &mdash; the filings study</a></th><td>A corpus that predates the models and traces to its source text; an instrument scored at three edit intensities</td><td>Four detectors, named in advance, measured on the labelled set; real filings left unscored until one clears the Gate</td><td>No detector clears the Gate, or the return effect vanishes once a time trend is in</td><td><a href="/work/the-research/">The Research</a></td></tr>
+                <tr><th scope="row"><a href="#allocation-framework">Track 02 &mdash; the allocation framework</a></th><td>An unattended loop on a timer, separable components, and a replay harness that shares the live code</td><td>Backfilling the stored history so a replay spans several market environments</td><td>No edge over holding the broad market once trading costs are charged, or regimes that move on a re-fit</td><td><a href="/work/macrosense/">MacroSense</a></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <figcaption class="exhibit__source"><b>Source:</b> published; each slot is shortened from
+          the track&rsquo;s own standing below, and adds nothing to it. No result appears in any slot:
+          the filings panel is not scored until a detector clears the Gate, and the framework&rsquo;s
+          history is too short to measure it over.</figcaption>
+      </figure>
 
       <p class="section__tools">
         <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>

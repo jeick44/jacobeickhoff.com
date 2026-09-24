@@ -3604,6 +3604,102 @@ button.prep__cell:focus-visible {
   }
 }
 
+/* ---- status board: Exhibit 1 --------------------------------------------------------------------
+   Each Research Track is a row of its three standing slots, and each slot names itself, so the
+   board reads the same as one column on a phone as it does as three from 48rem. The selected slot
+   takes the list's selected state; nothing else is coloured, because no slot is a pass or a fail. */
+.board {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.exhibit .board__name {
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.board__slots {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.board__slot {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3xs);
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-ring);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 200ms var(--ease), border-color 200ms var(--ease);
+}
+
+.board__slot:hover {
+  background: var(--mist);
+}
+
+.board__slot[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: var(--blue-wash);
+}
+
+.board__term {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-mute);
+}
+
+.board__slot[aria-pressed="true"] .board__term {
+  color: var(--blue-deep);
+}
+
+.board__words {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+.exhibit .board__more {
+  margin: var(--space-2xs) 0 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.board__readout {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-sm);
+}
+
+.exhibit .board__readout p {
+  margin: 0;
+}
+
+.exhibit .board__readout-what {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.018em;
+}
+
+.exhibit .board__readout-full {
+  margin-top: var(--space-2xs);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 48rem) {
+  .board__slots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* =================================================================================================
    CONTACT CHANNELS, AND THE ROUTES OFF THE 404
    ============================================================================================== */
