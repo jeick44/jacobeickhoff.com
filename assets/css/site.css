@@ -4231,6 +4231,11 @@ button.prep__cell:focus-visible {
   height: 2.5rem;
 }
 
+/* Past a hundred ticks the 1px gaps would outnumber the pixels a 320px stage has for them. */
+.dwin__days--dense {
+  gap: 0;
+}
+
 .dwin__day {
   flex: 1 1 0;
   height: 30%;
