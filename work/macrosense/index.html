@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
         <div><dt>Status</dt><dd>In flight &middot; not yet validated</dd></div>
         <div><dt>Governing constraint</dt><dd>Architecture, Not Performance</dd></div>
-        <div><dt>Reading time</dt><dd>9 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>10 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
         end to end and has not been validated, and those are two different sentences. The backtest
@@ -265,6 +265,41 @@
               series so the model can be run across several years and several regimes is the current
               work. The numbers go on this page when the window can carry them, and not before.
             </p>
+            <figure class="exhibit" id="exhibit-no-return-figure" data-exhibit="decision-window"
+                    data-provenance="published">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Why there is
+                  no return figure: the whole history holds a handful of decisions</h3>
+                <p class="exhibit__instruction">Pick a rebalance frequency to count the decisions the
+                  history holds.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The continuous history, replayed at three rebalance frequencies, and the
+                      decisions each would make in it, as the paragraph above counts them; every
+                      trading day is one decision a day</caption>
+                    <thead>
+                      <tr><th scope="col">Rebalance</th><th scope="col">Decisions in the window</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Every trading day</th><td>56</td></tr>
+                      <tr><th scope="row">Weekly, the backtest&rsquo;s default</th><td>roughly 11</td></tr>
+                      <tr><th scope="row">Monthly</th><td>2</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> published; this page&rsquo;s own
+                figures, the continuous history from 7 January to 27 March 2026 and the decisions the
+                paragraph above counts in it. The daily count is one decision on each trading day, and
+                the marks are spread evenly across the window rather than set on real dates. The
+                multi-year axis is drawn to no stated scale, because the page names no length for the
+                backfill beyond several years. Every return, ratio and drawdown the backtest computes
+                is withheld, because a window this short cannot support one.</figcaption>
+            </figure>
             <p>One thing belongs alongside that, because it is the same error one level down: the
               history carries no scored sentiment at all &mdash; those columns are absent from it, and
               the classifier imputes them to zero &mdash; so the company layer has never been in a

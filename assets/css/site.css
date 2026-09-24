@@ -4180,3 +4180,65 @@ button.prep__cell:focus-visible {
   line-height: 1.5;
   color: var(--ink-soft);
 }
+
+/* ---- decision-window: Exhibit 2 ------------------------------------------------------------------
+   Two tiers: a long axis for the several years a figure would need, with the whole history a sliver
+   at its right end, and that sliver enlarged beneath it, one tick per trading day. A decision is a
+   taller tick in the first data colour; the count beneath says it in words, so no reading rests on
+   colour. The ticks ease between frequencies, and the reduced-motion blanket collapses that. */
+.dwin__years,
+.dwin__zoom {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.exhibit .dwin__label {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.exhibit .dwin__label--end {
+  text-align: right;
+}
+
+.dwin__axis {
+  position: relative;
+  height: 0.75rem;
+  border-radius: 2px;
+  background: var(--line-soft);
+}
+
+/* The window, at the end of the axis. */
+.dwin__sliver {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 4px;
+  background: var(--data-1);
+}
+
+.dwin__zoom {
+  padding: var(--space-2xs);
+  border: 1px dashed var(--data-1);
+  border-radius: var(--radius-ring);
+}
+
+.dwin__days {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 2.5rem;
+}
+
+.dwin__day {
+  flex: 1 1 0;
+  height: 30%;
+  background: var(--line);
+  transition: height 200ms var(--ease), background-color 200ms var(--ease);
+}
+
+.dwin__day.is-decision {
+  height: 100%;
+  background: var(--data-1);
+}

@@ -2326,6 +2326,96 @@
     update();
   });
 
+  /* ---- KIND: decision-window -------------------------------------------------------------------
+     MacroSense's reason for printing no return: its whole history is one short window, and a replay
+     of it makes a handful of decisions. The table lists each rebalance frequency with the decisions
+     it would make in the window, most frequent first; the first row rebalances every trading day,
+     so its count is the window's length in trading days. A count may carry the page's own hedge
+     ("roughly 11"), which the drawing keeps, because the figure is the prose's and so is the hedge.
+
+     Two tiers. Above, a long axis for the several years a figure would need, with the window a
+     sliver at its end; the axis is drawn to no stated scale and says so in the source line, because
+     the page names no length for it. Below, the window enlarged, one tick per trading day, with a
+     mark (data-mark) on each day the chosen frequency decides, spread evenly across it. A segmented
+     choice picks the frequency; the result is the count of decisions.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
+     no "Decisions in the window" column, found by its header; a count that is not a whole number; a
+     first row that hedges, since it is the window's length; or counts that do not fall down the rows,
+     since a rarer rebalance cannot decide more often. */
+  register("decision-window", function (fig, stage, data) {
+    var col = data.columns.indexOf("Decisions in the window");
+    if (col < 1) throw new Error('decision-window: the table has no "Decisions in the window" column');
+    if (data.rows.length < 2) throw new Error("decision-window: there is nothing to compare one frequency with");
+    var options = data.rows.map(function (r, i) {
+      var m = /^(roughly )?(\d+)$/i.exec(r.cells[col - 1] || "");
+      if (!m || +m[2] < 1) {
+        throw new Error("decision-window: " + r.label + " counts " + JSON.stringify(r.cells[col - 1]) +
+                        ", not a number of decisions");
+      }
+      if (i === 0 && m[1]) throw new Error("decision-window: the first row is the window's length, and cannot hedge");
+      return { name: r.label, count: +m[2], said: r.cells[col - 1] };
+    });
+    options.forEach(function (o, i) {
+      if (i && o.count >= options[i - 1].count) {
+        throw new Error("decision-window: " + o.name + " decides as often as " + options[i - 1].name + " or more");
+      }
+    });
+    var days = options[0].count, pick = 0;
+
+    var bar = make("div", "exhibit__controls", stage);
+    var group = make("div", "seg", bar);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Rebalance frequency");
+    var picks = options.map(function (o, i) {
+      var b = button(group, "seg__option", o.name, i === 0);
+      b.addEventListener("click", function () { pick = i; update(); });
+      return b;
+    });
+
+    /* The long axis and the window at its end. */
+    var years = make("div", "dwin__years", stage);
+    make("p", "dwin__label", years, "Several years and several regimes: the history the backfill is building");
+    var axis = make("div", "dwin__axis", years);
+    axis.setAttribute("aria-hidden", "true");
+    make("span", "dwin__sliver", axis);
+    make("p", "dwin__label dwin__label--end", years, "The whole history so far");
+
+    /* The window, enlarged: a tick per trading day. */
+    var zoom = make("div", "dwin__zoom", stage);
+    make("p", "dwin__label", zoom, "The whole history, enlarged: " + days + " trading days");
+    var strip = make("div", "dwin__days", zoom);
+    strip.setAttribute("role", "img");
+    var ticks = [];
+    for (var d = 0; d < days; d++) ticks.push(make("span", "dwin__day", strip));
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var line = make("p", "exhibit__count", readout);
+    var tally = make("b", "", line);
+    tally.setAttribute("data-result", "");
+    var phrase = line.appendChild(document.createTextNode(""));
+    var note = make("p", "exhibit__note", readout);
+
+    function update() {
+      var o = options[pick], on = {};
+      picks.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === pick)); });
+      for (var k = 0; k < o.count; k++) on[Math.floor(k * days / o.count)] = true;
+      ticks.forEach(function (t, i) {
+        t.classList.toggle("is-decision", !!on[i]);
+        if (on[i]) t.setAttribute("data-mark", "");
+        else t.removeAttribute("data-mark");
+      });
+      strip.setAttribute("aria-label", o.said + " decisions marked across " + days + " trading days");
+      tally.textContent = o.said;
+      phrase.nodeValue = o.count === 1 ? " decision in the whole history" : " decisions in the whole history";
+      note.textContent = "One market environment, read " + (o.count === 2 ? "twice" : o.said + " times") +
+        ": a ratio annualised from it would describe the window, not the system.";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
