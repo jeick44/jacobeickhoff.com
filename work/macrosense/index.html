@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
         <div><dt>Status</dt><dd>In flight &middot; not yet validated</dd></div>
         <div><dt>Governing constraint</dt><dd>Architecture, Not Performance</dd></div>
-        <div><dt>Reading time</dt><dd>10 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>11 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
         end to end and has not been validated, and those are two different sentences. The backtest
@@ -221,6 +221,40 @@
               retrain on the first of the month, a filings pull on Sunday. Every step inside a cycle is
               independently fault-tolerant, because the point of a scheduler is that it is still running
               in March.</p>
+            <figure class="exhibit" id="exhibit-scheduler-week" data-exhibit="scheduler-week"
+                    data-provenance="published">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The
+                  scheduler&rsquo;s week: three jobs, each on its own calendar</h3>
+                <p class="exhibit__instruction">Pick the day the first of the month falls on, and
+                  watch the retrain move while the other jobs stay put.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The scheduler&rsquo;s jobs and when each runs, in the words of the
+                      paragraph above</caption>
+                    <thead>
+                      <tr><th scope="col">Job</th><th scope="col">Runs</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Rebalance</th><td>After the close on each trading day</td></tr>
+                      <tr><th scope="row">Model retrain</th><td>On the first of the month</td></tr>
+                      <tr><th scope="row">Filings pull</th><td>On Sunday</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> published; the three jobs as the
+                paragraph above states them. The week is drawn from those rules, not from the
+                scheduler&rsquo;s log: its weekdays are all trading days, though an exchange holiday
+                is not one and would take that day&rsquo;s rebalance away, and the day the month turns
+                on is the reader&rsquo;s to pick. Run times, the log itself and every performance figure
+                are withheld, because this page publishes the architecture and not the
+                results.</figcaption>
+            </figure>
             <p><strong>The briefing.</strong> In: the regime name, the probability vector, the previous
               weights, the new weights, the sentiment signals. Out: a few sentences of plain English
               saying what changed and why. A language model writes them; with no key available it falls
@@ -268,7 +302,7 @@
             <figure class="exhibit" id="exhibit-no-return-figure" data-exhibit="decision-window"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Why there is
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> Why there is
                   no return figure: the whole window holds a handful of decisions</h3>
                 <p class="exhibit__instruction">Pick a rebalance frequency to count the decisions the
                   window holds.</p>

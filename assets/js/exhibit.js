@@ -2434,6 +2434,120 @@
     update();
   });
 
+  /* ---- KIND: scheduler-week --------------------------------------------------------------------
+     MacroSense's scheduler, as a week on a calendar strip. The table lists each scheduled job with
+     when it runs, in the page's words; the kind reads three kinds of rule from them: "each trading
+     day" (every weekday, since the week drawn has no exchange holiday and the weekend is not
+     trading), "the first of the month", and a weekday by name ("on Sunday"). One lane per job, one
+     column per day, Monday first; each run is a mark (data-mark, "job, day").
+
+     The month turns on no fixed weekday, so the reader picks where the first of the month falls,
+     or that it falls in no day of this week; it opens on Saturday, where the three jobs land on
+     three separate days and each is plainly on its own calendar. The result is the sentence saying
+     where the retrain runs and what runs beside it.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
+     no "Runs" column, found by its header; a rule it cannot read; no job on the first of the month,
+     which leaves nothing to choose; or a job name with a word longer than LANE_WORD letters, which
+     would push its lane label and seven days past a 320px screen. */
+  var WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  var TRADING = 5, LANE_WORD = 9;
+  register("scheduler-week", function (fig, stage, data) {
+    var col = data.columns.indexOf("Runs");
+    if (col < 1) throw new Error('scheduler-week: the table has no "Runs" column');
+    if (!data.rows.length) throw new Error("scheduler-week: the table schedules no job");
+    var jobs = data.rows.map(function (r) {
+      var rule = (r.cells[col - 1] || "").toLowerCase(), day = -1;
+      r.label.split(/\s+/).forEach(function (w) {
+        if (w.length > LANE_WORD) {
+          throw new Error("scheduler-week: " + JSON.stringify(w) + " is too long a word for a lane label at 320px");
+        }
+      });
+      WEEKDAYS.forEach(function (d, i) { if (new RegExp("\\bon " + d.toLowerCase() + "\\b").test(rule)) day = i; });
+      var when = /\beach trading day\b/.test(rule) ? "trading" :
+                 /\bthe first of the month\b/.test(rule) ? "first" : day >= 0 ? "weekday" : null;
+      if (!when) throw new Error("scheduler-week: " + r.label + " runs " + JSON.stringify(r.cells[col - 1]) + ", a rule it cannot draw");
+      return { name: r.label, when: when, day: day };
+    });
+    var monthly = jobs.filter(function (j) { return j.when === "first"; });
+    if (!monthly.length) throw new Error("scheduler-week: no job runs on the first of the month, so there is nothing to choose");
+
+    /* The choice: the weekday the month turns on, or none this week. Opens on Saturday. */
+    var first = 5;
+    var bar = make("div", "exhibit__controls", stage);
+    var ask = make("span", "sched__ask", bar, "The first of the month falls on");
+    ask.id = fig.id + "-ask";
+    var group = make("div", "seg", bar);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-labelledby", ask.id);
+    var picks = WEEKDAYS.concat(["No day this week"]).map(function (d, i) {
+      var b = button(group, "seg__option", i < WEEKDAYS.length ? d.slice(0, 3) : d, i === first);
+      b.addEventListener("click", function () { first = i; update(); });
+      return b;
+    });
+
+    /* The strip: a corner, the seven days, then a lane per job. */
+    var grid = make("div", "sched", stage);
+    grid.setAttribute("role", "img");
+    make("span", null, grid);
+    var heads = WEEKDAYS.map(function (d, i) {
+      var h = make("span", "sched__day" + (i < TRADING ? "" : " is-shut"), grid, d.slice(0, 3));
+      h.setAttribute("aria-hidden", "true");
+      return h;
+    });
+    var cells = jobs.map(function (j) {
+      make("span", "sched__job", grid, j.name).setAttribute("aria-hidden", "true");
+      return WEEKDAYS.map(function (d, i) {
+        return make("span", "sched__cell" + (i < TRADING ? "" : " is-shut"), grid);
+      });
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var read = make("p", "sched__read", readout);
+    read.setAttribute("data-result", "");
+    make("p", "exhibit__note", readout, "Saturday and Sunday are not trading days, so no " +
+         jobs.filter(function (j) { return j.when === "trading"; }).map(function (j) { return lower(j.name); })
+             .join(" or ") + " runs on them.");
+
+    function lower(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+    function runs(j, i) {
+      return j.when === "trading" ? i < TRADING : j.when === "weekday" ? i === j.day : i === first;
+    }
+    function names(list) {
+      return list.length < 2 ? list.join("") : list.slice(0, -1).join(", ") + " and " + list[list.length - 1];
+    }
+
+    function update() {
+      picks.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === first)); });
+      heads.forEach(function (h, i) { h.classList.toggle("is-first", i === first); });
+      var said = [];
+      jobs.forEach(function (j, r) {
+        var on = [];
+        cells[r].forEach(function (c, i) {
+          var yes = runs(j, i);
+          c.classList.toggle("is-first", i === first);
+          c.classList.toggle("is-run", yes);
+          if (yes) { c.setAttribute("data-mark", j.name + ", " + WEEKDAYS[i]); on.push(WEEKDAYS[i]); }
+          else c.removeAttribute("data-mark");
+        });
+        said.push(j.name + ": " + (on.length ? names(on) : "no day this week"));
+      });
+      grid.setAttribute("aria-label", "The scheduler's week. " + said.join(". ") + ".");
+      var what = names(monthly.map(function (j) { return "the " + lower(j.name); }));
+      if (first >= WEEKDAYS.length) {
+        read.textContent = "With no first of the month this week, " + what + " does not run.";
+        return;
+      }
+      var beside = jobs.filter(function (j) { return j.when !== "first" && runs(j, first); })
+                       .map(function (j) { return "the " + lower(j.name); });
+      read.textContent = "With the first of the month on " + WEEKDAYS[first] + ", " + what + " runs that day, " +
+        (beside.length ? "beside " + names(beside) : "the only job on it") + ".";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
