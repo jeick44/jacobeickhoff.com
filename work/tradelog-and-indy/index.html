@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeLog and Indy — Engagement 05 — Jacob Eickhoff</title>
-<meta name="description" content="A discipline journal that computes rule compliance from the broker&#39;s own export instead of asking the trader for it, and keeps the trader&#39;s own answer beside it — published as product design and architecture, with no figure from the account.">
+<meta name="description" content="A decision-discipline system for active investors, with a companion charting toolkit: adherence to a plan committed in advance is measured from the broker&#39;s execution record and kept beside the adherence reported — published as product design and architecture, with no figure from the account.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -45,22 +45,23 @@
         <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
         <span class="crumb__here">Engagement 05</span>
       </nav>
-      <h1 class="case-head__title">TradeLog and Indy</h1>
-      <p class="case-head__lede">Every trading journal ends the session by asking whether you
-        followed your rules, and then lets you answer. TradeLog answers from the broker&rsquo;s own
-        export instead &mdash; <strong>Verified Adherence</strong>, computed from the record of what
-        was actually done &mdash; and keeps the trader&rsquo;s own answer beside it, because the
-        distance between the two is a signal the product refuses to average away. Indy is the
-        charting toolkit that feeds it, written up here as the diagnosis it started as.</p>
+      <h1 class="case-head__title">Holding investment decisions to a plan written <em>before the
+        decision</em>, and measuring the gap from the broker&rsquo;s record</h1>
+      <p class="case-head__lede">TradeLog and Indy: a decision-discipline system for active
+        investors, with a companion charting toolkit. A plan is committed before each decision, and
+        adherence to it is measured from the broker&rsquo;s own execution record &mdash;
+        <strong>Verified Adherence</strong> &mdash; then kept beside the adherence the investor
+        reports, because the distance between the two is the signal worth reviewing. Indy, the
+        companion toolkit, records what a chart displayed at a point in time.</p>
       <dl class="case-meta">
-        <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
+        <div><dt>Sponsor</dt><dd>Self-directed &middot; product design and architecture</dd></div>
         <div><dt>Status</dt><dd>Design and architecture published</dd></div>
         <div><dt>Governing constraint</dt><dd>Methodology Silence</dd></div>
         <div><dt>Reading time</dt><dd>8 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Design, not dollars</span> The
-        trader this was built for is me, which constrains what the page can say rather than
-        licensing it to say more. No dollar figure, account balance, return or behavioural finding
+        account this system was built around is my own, which constrains what the page can say
+        rather than licensing it to say more. No dollar figure, account balance, return or behavioural finding
         from that record appears here, and neither does any of the method the tooling was built
         around. What is published is the product and the architecture, which is the part that is
         mine to publish.</p>
@@ -84,7 +85,7 @@
             <span class="stat__value" data-stat-final="0">0</span>
             <span class="stat__unit">order paths to the broker</span>
           </p>
-          <span class="stat__label">Placing an order from the app was rejected outright; the
+          <span class="stat__label">Placing an order from the system was rejected outright; the
             integration reads and never writes.</span>
         </li>
         <li class="stat reveal">
@@ -119,32 +120,33 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>A trading journal asks whether the rules were followed and then accepts the answer of the
-              person whose rules they were &mdash; typed in afterwards, about decisions made under
-              pressure and reconsidered since. The entries most worth counting are the impulsive ones,
-              taken without a plan and disowned on review, and those are the ones least likely to be
-              written down at all.</p>
-            <p>So the figure a journal reports measures intention, and it improves with effort: the
-              more carefully somebody journals, the more convincing a number they produce about the
-              sessions the journal never saw.</p>
+            <p>An investor who works to a written plan is usually asked afterwards whether the plan
+              was followed, and the answer comes from the person whose plan it was &mdash; recorded
+              after the fact, about decisions made under pressure and reconsidered since. The
+              decisions most worth reviewing are the ones taken outside the plan and disowned on
+              review, and those are the ones least likely to be recorded at all.</p>
+            <p>So a self-reported adherence figure measures intention, and effort inflates it: the
+              more carefully somebody keeps a decision journal, the more convincing the number they
+              produce about the sessions the journal never saw.</p>
             <p>The record that would settle it already exists. The broker writes down every execution
               as it happens &mdash; entry, exit, size, fees, timestamps &mdash; and hands over the file.
               Nothing needs remembering. It needs reading, and then something has to be willing to
-              disagree with the trader about it.</p>
+              disagree with the investor about it.</p>
+            <p>TradeLog was built around a single futures account, my own.</p>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>TradeLog computes <strong>Verified Adherence</strong> from that export: Rules the trader
+            <p>TradeLog computes <strong>Verified Adherence</strong> from that export: Rules the investor
               committed to in advance, written as conditions a machine can check, evaluated against
-              every execution the broker recorded. Nothing the trader types reaches it.</p>
+              every execution the broker recorded. Nothing the investor types reaches it.</p>
             <p>The simpler product deletes the self-report at that point, and this one does the
-              opposite. <strong>Claimed Adherence</strong> &mdash; the trader&rsquo;s own account of the
+              opposite. <strong>Claimed Adherence</strong> &mdash; the investor&rsquo;s own account of the
               same session &mdash; is kept beside the computed figure, and the difference is displayed
               and treated as a signal rather than reconciled away. The record knows what happened and
-              can never know why; the trader knows why and has the only reason to be generous. That gap
-              measures where belief has drifted from behaviour, which is what the journal was always
-              supposed to be about, and averaging the two is the one operation that destroys it.</p>
+              can never know why; the investor knows why and has the only reason to be generous. That gap
+              measures where belief has drifted from behaviour, which is what a decision journal was
+              always supposed to be about, and averaging the two is the one operation that destroys it.</p>
             <p>Three decisions hold that figure up.</p>
             <p><strong>The evaluator is deterministic, and the clock is an argument.</strong> One pure
               function takes the executions, the ruleset, the account, the annotations and
@@ -153,21 +155,21 @@
               March re-evaluate today to what it evaluated to in March, and nothing recomputes adherence
               on its own, so there is one answer rather than one per surface.</p>
             <p><strong>Rules are stored, versioned configuration.</strong> They have to be editable, or
-              they are the app&rsquo;s rules rather than the trader&rsquo;s. But a threshold edited in
+              they are the system&rsquo;s rules rather than the investor&rsquo;s. But a threshold edited in
               place rewrites its own history: last month&rsquo;s adherence silently becomes a claim
               about this month&rsquo;s rule. So an edit mints a version and a day records the version it
               was graded under. A rule changed today changes what tomorrow is graded by and nothing
               already graded. The journaling rubric is versioned on the same seam one grain finer: Rules
               bind a day, because a clean day is a day-shaped claim, while a rubric binds the single
               entry it scored.</p>
-            <p><strong>Order placement is rejected outright.</strong> The appeal was real: the app
+            <p><strong>Order placement is rejected outright.</strong> The appeal was real: the system
               knows the budget is spent, and it could refuse the next order at the gateway rather than
               merely objecting to it. It was rejected because a gateway enforces only if it cannot be
               bypassed, and the broker&rsquo;s own platform is one keystroke away &mdash; so it buys no
               enforcement while adding two failure modes that did not exist before, a bug that moves
               money and a failed request that leaves a position open. What is left reads and never
               writes, server-side, with the key held outside the browser. When the connection fails the
-              app says so loudly: a stale count shown as a current one is worse than no count, because
+              system says so loudly: a stale count shown as a current one is worse than no count, because
               it gets believed.</p>
           </section>
 
@@ -202,11 +204,20 @@
               &mdash; so the shared logic is not a library. It lives as modules in a private repository
               and a build step concatenates them into the three deployable scripts: one source of truth,
               three outputs, nothing published.</p>
+            <p class="pending-result">
+              <span class="pending-result__flag">Pending Result</span>
+              Whether holding decisions to a written plan this way improves them is not answered here.
+              TradeLog is designed to improve three things: commitment to a plan before a decision,
+              honest review after it, and the ability to see drift between intention and action.
+              Whether it does so, for anyone, would take a long run of decisions read against the
+              same account before and after the change, and that record is not published. Returns
+              are out of scope.
+            </p>
             <p class="withheld-result">
               <span class="withheld-result__flag">Withheld</span>
-              What the committed Rules would have done across my own history is computed exactly, from
+              What the committed Rules would have done across the account&rsquo;s history is computed exactly, from
               executions that already happened, and it is not on this page. That figure is a personal
-              profit-and-loss number, and a number describing my trading account is not evidence about
+              profit-and-loss number, and a number describing my own account is not evidence about
               my engineering &mdash; it is what a reader would remember instead of it. The site&rsquo;s
               own check now refuses the shape of those figures in any shipped file, so this is a
               property of what gets published rather than a promise about my restraint.
@@ -231,8 +242,8 @@
               <summary class="disclosure__summary">The evidence this product would need, and why it is
                 not here</summary>
               <div class="disclosure__body">
-                <p>TradeLog&rsquo;s claim is behavioural: that computing compliance rather than
-                  collecting it changes what the user does. The only evidence that would settle it is a
+                <p>TradeLog is designed on a behavioural premise: that computing adherence rather
+                  than collecting it changes what an investor does. The only evidence that would settle it is a
                   long enough run of sessions read against the same account before the change &mdash; a
                   personal ledger, and the one document this page will not publish. Nothing here should
                   be read as a claim that the product worked.</p>
@@ -246,6 +257,14 @@
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
+            <p><strong>The framework is not specific to one account.</strong> Any investor, adviser
+              or investment committee held to a written plan has the same gap: the plan is committed
+              in advance, the executions are recorded by someone else, and adherence is reported by
+              the people who made the decisions. An adviser&rsquo;s recorded rationale against the
+              client&rsquo;s executed trades, or a committee&rsquo;s investment policy statement
+              against the portfolio&rsquo;s transactions, can be read the same way: adherence
+              computed from the execution record, kept beside the adherence reported, and the gap
+              reviewed rather than reconciled.</p>
             <p><strong>Self-report measures intention, and it fails hardest where it matters
               most.</strong> Control attestations, training completion, time recording, safety
               checklists &mdash; each asks the person who did the work to confirm they did it properly,
