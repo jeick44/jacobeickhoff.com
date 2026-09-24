@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
         <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
         <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
-        <div><dt>Reading time</dt><dd>9 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>11 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
@@ -263,6 +263,78 @@
               score drifts smoothly upward
               across the decade, and the date I had picked is a point on that line rather than a break
               in it.</p>
+            <figure class="exhibit" id="exhibit-placebo-breaks" data-exhibit="placebo-break"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> A break placed
+                  where nothing happened comes back significant in every year, until a time trend is
+                  added</h3>
+                <p class="exhibit__instruction">Move the placebo break to any year, then add a time
+                  trend to the specification.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>A synthetic score by quarter, and the quarters where a placebo break was
+                      tested</caption>
+                    <thead>
+                      <tr><th scope="col">Quarter</th><th scope="col">Score</th><th scope="col">Placebo break</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">2016 Q1</th><td>30.0</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2016 Q2</th><td>29.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2016 Q3</th><td>30.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2016 Q4</th><td>33.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2017 Q1</th><td>33.3</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2017 Q2</th><td>31.7</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2017 Q3</th><td>34.1</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2017 Q4</th><td>32.4</td><td>Tested</td></tr>
+                      <tr><th scope="row">2018 Q1</th><td>34.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2018 Q2</th><td>37.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2018 Q3</th><td>35.8</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2018 Q4</th><td>35.9</td><td>Tested</td></tr>
+                      <tr><th scope="row">2019 Q1</th><td>37.6</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2019 Q2</th><td>38.3</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2019 Q3</th><td>39.1</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2019 Q4</th><td>38.8</td><td>Tested</td></tr>
+                      <tr><th scope="row">2020 Q1</th><td>41.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2020 Q2</th><td>38.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2020 Q3</th><td>40.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2020 Q4</th><td>41.3</td><td>Tested</td></tr>
+                      <tr><th scope="row">2021 Q1</th><td>40.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2021 Q2</th><td>44.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2021 Q3</th><td>44.1</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2021 Q4</th><td>43.9</td><td>Tested</td></tr>
+                      <tr><th scope="row">2022 Q1</th><td>43.2</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2022 Q2</th><td>46.5</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2022 Q3</th><td>45.3</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2022 Q4</th><td>47.5</td><td>Tested</td></tr>
+                      <tr><th scope="row">2023 Q1</th><td>47.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2023 Q2</th><td>47.8</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2023 Q3</th><td>47.2</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2023 Q4</th><td>47.2</td><td>Tested</td></tr>
+                      <tr><th scope="row">2024 Q1</th><td>49.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2024 Q2</th><td>52.3</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2024 Q3</th><td>51.6</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2024 Q4</th><td>53.0</td><td>Tested</td></tr>
+                      <tr><th scope="row">2025 Q1</th><td>52.4</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2025 Q2</th><td>53.1</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2025 Q3</th><td>52.1</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">2025 Q4</th><td>52.9</td><td>&mdash;</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; an invented score on an
+                arbitrary scale, drifting upward with noise and with no break anywhere in it. Each
+                placebo break starts in the fourth quarter, the one holding November, as in the re-run.
+                The jump at the break is estimated by least squares, first on its own and then beside a
+                linear time trend, and called significant where its t-statistic is 1.96 or more either
+                way. No series, date or figure from the withdrawn report is reproduced, because that
+                report is superseded and should not be cited.</figcaption>
+            </figure>
             <p>So I wrote a correction, dated it, said the report was superseded and should not be
               cited, and recorded that it go to anyone who had received it. The pipeline was then
               rebuilt from scratch, with a provenance record on every passage &mdash; accession number,
