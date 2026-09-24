@@ -1013,7 +1013,7 @@
 
     var buttons = defects.map(function (d, i) {
       var b = button(list, "suite__defect", null, false);
-      make("span", "suite__sev" + (d.high ? " suite__sev--high" : ""), b, d.high ? "Would reach figures" : "Defect");
+      make("span", "suite__sev chip" + (d.high ? " chip--trouble" : ""), b, d.high ? "Would reach figures" : "Defect");
       make("span", "", b, d.name);
       b.style.setProperty("--defect-at", String(i));
       b.addEventListener("click", function () {
@@ -1798,48 +1798,54 @@
      companies with the detector reading each one's filing received, and when each joins the sample:
      "At the start", or "Added", one at a time and in table order. Every company in the sample is
      scored the way the withdrawn report scored it: its reading's z-score within the sample, put
-     through a sigmoid, and the top quarter by rank (rounded down) flagged.
+     through a sigmoid, and the top quartile by rank (rounded down) flagged.
 
      Two controls, each showing one consequence of that definition. "Add a company" brings in the
      next one, and every score already given moves, since the sample's mean and spread moved; a ring
-     stays where each score was. "Double every reading" makes every filing read twice as
-     machine-like, and no score moves, since a z-score does not see a change everyone shares. The
-     flagged count is a quarter of the sample either way. Once every company has joined, the first
-     control takes the sample back to its start.
+     stays where each score was. The segmented choice "As filed / Doubled" makes every filing read
+     twice as machine-like, and no score moves, since a z-score does not see a change everyone
+     shares. The flagged companies are the top quartile either way. Once every company has joined,
+     the first control takes the sample back to its start.
 
-     The results are each company's score, in table order with the newcomer last, and the flagged
-     tally: suites/run.py holds the drive's reading of them to the two consequences above.
-     Nothing plays over time, so there is no aria-busy, and there are no hover readouts.
+     The results are each company's score, in table order with the newcomer last, each followed by
+     "Flagged" when it is, and the flagged tally: suites/run.py holds the drive's reading of them to
+     the consequences above. Nothing plays over time, so there is no aria-busy, and there are no
+     hover readouts.
 
-     A table the drawing cannot show is refused: a reading that is not a figure, a company added
-     before the starting sample is complete, a starting sample too small for a quarter of it to be
-     anyone, no company left to add, or readings that are all the same (no spread to score against). */
+     A table the drawing cannot show is refused: a reading that is not a figure, a joining time other
+     than "At the start" or "Added", a company added before the starting sample is complete, a
+     starting sample too small for a quartile of it to be anyone, no company left to add, or readings
+     that are all the same (no spread to score against). */
   register("ranking", function (fig, stage, data) {
     var col = {};
-    ["Detector reading", "Joins the sample"].forEach(function (name) {
+    ["Reading", "Joins the sample"].forEach(function (name) {
       var i = data.columns.indexOf(name);
       if (i < 1) throw new Error("ranking: the table has no " + JSON.stringify(name) + " column");
       col[name] = i - 1;
     });
-    var firms = data.rows.map(function (r) {
-      var reading = r.values[col["Detector reading"]];
-      if (reading == null) throw new Error("ranking: " + r.label + " has no detector reading");
-      return { name: r.label, reading: reading,
-               starts: /^at the start$/i.test(r.cells[col["Joins the sample"]] || "") };
+    var companies = data.rows.map(function (r) {
+      var reading = r.values[col["Reading"]];
+      if (reading == null) throw new Error("ranking: " + r.label + " has no reading");
+      var joins = (r.cells[col["Joins the sample"]] || "").trim();
+      if (!/^(at the start|added)$/i.test(joins)) {
+        throw new Error("ranking: " + r.label + " joins the sample " + JSON.stringify(joins) +
+                        ", not \"At the start\" or \"Added\"");
+      }
+      return { name: r.label, reading: reading, starts: /^at the start$/i.test(joins) };
     });
     var base = 0;
-    while (base < firms.length && firms[base].starts) base++;
-    if (firms.slice(base).some(function (f) { return f.starts; })) {
+    while (base < companies.length && companies[base].starts) base++;
+    if (companies.slice(base).some(function (c) { return c.starts; })) {
       throw new Error("ranking: a company is added before the starting sample is complete");
     }
-    if (Math.floor(base / 4) < 1) throw new Error("ranking: a quarter of the starting sample flags nobody");
-    if (base === firms.length) throw new Error("ranking: the table has no company to add");
+    if (Math.floor(base / 4) < 1) throw new Error("ranking: the top quartile of the starting sample is nobody");
+    if (base === companies.length) throw new Error("ranking: the table has no company to add");
 
-    var size = base, doubled = false, before = null, note0 = "";
+    var size = base, doubled = false, before = null, fresh = -1;
 
-    /* The withdrawn definition, whole: within-sample z-score, sigmoid, top quarter by rank. */
+    /* The withdrawn definition, whole: within-sample z-score, sigmoid, top quartile by rank. */
     function score(n) {
-      var xs = firms.slice(0, n).map(function (f) { return doubled ? f.reading * 2 : f.reading; });
+      var xs = companies.slice(0, n).map(function (c) { return doubled ? c.reading * 2 : c.reading; });
       var mean = xs.reduce(function (a, x) { return a + x; }, 0) / n;
       var sd = Math.sqrt(xs.reduce(function (a, x) { return a + (x - mean) * (x - mean); }, 0) / n);
       if (!sd) throw new Error("ranking: every reading is the same, so there is no spread to score against");
@@ -1852,30 +1858,44 @@
     }
 
     var bar = make("div", "exhibit__controls", stage);
-    var add = button(bar, "btn btn--solid rank__add", "");
-    var twice = button(bar, "btn btn--outline rank__double", "Double every reading", false);
+    var add = button(bar, "btn btn--solid", "");
+    var group = make("div", "seg", bar);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Readings");
+    var readings = ["As filed", "Doubled"].map(function (name, i) {
+      var b = button(group, "seg__option", name, i === 0);
+      b.addEventListener("click", function () {
+        if (doubled === (i === 1)) return;
+        before = score(size);
+        doubled = i === 1;
+        update("doubled");
+      });
+      return b;
+    });
     add.addEventListener("click", function () {
       var was = score(size);
-      if (size < firms.length) { before = was; size++; } else { before = null; size = base; }
-      update(size === base ? "The sample is back to its start." : "added");
-    });
-    twice.addEventListener("click", function () {
-      before = score(size);
-      doubled = !doubled;
-      update("doubled");
+      if (size < companies.length) {
+        before = was;
+        size++;
+        update("added");
+      } else {
+        before = null;
+        size = base;
+        update("reset");
+      }
     });
 
     var frame = make("div", "exhibit__frame", stage);
     var chart = make("div", "rank", frame);
-    var head = make("p", "rank__head", chart);
+    var head = make("div", "rank__head", chart);
     head.setAttribute("aria-hidden", "true");
     make("span", "", head, data.columns[0]);
-    make("span", "", head, data.columns[1 + col["Detector reading"]]);
+    make("span", "", head, data.columns[1 + col["Reading"]]);
     make("span", "rank__head-score", head, "Score, as reported: the probability the filing was machine-written");
     var list = make("ol", "rank__list", chart);
-    var rows = firms.map(function (f) {
-      var li = make("li", "rank__firm", list);
-      make("span", "rank__name", li, f.name);
+    var rows = companies.map(function (c) {
+      var li = make("li", "rank__company", list);
+      make("span", "", li, c.name);
       var reading = make("span", "rank__reading", li);
       var track = make("span", "rank__track", li);
       track.setAttribute("aria-hidden", "true");
@@ -1883,7 +1903,8 @@
       var dot = make("span", "rank__dot", track);
       var value = make("b", "rank__score", li);
       value.setAttribute("data-result", "");
-      var flag = make("span", "rank__flag", li, "Flagged");
+      var flag = make("span", "rank__flag chip chip--trouble", li);
+      flag.setAttribute("data-result", "");
       return { li: li, reading: reading, ghost: ghost, dot: dot, value: value, flag: flag };
     });
 
@@ -1894,52 +1915,58 @@
     tally.setAttribute("data-result", "");
     var phrase = line.appendChild(document.createTextNode(""));
     var note = make("p", "exhibit__note", readout);
+    var note0 = "Each score says where a filing sits in this sample, not how likely it is to be machine-written.";
 
-    function update(why) {
+    /* mode: "added", "doubled", "reset", or nothing for the first drawing. */
+    function update(mode) {
       var now = score(size), n = size;
-      /* The tally counts the rows the rule flagged, never the quarter it is meant to be. */
+      if (mode === "added") fresh = n - 1;
+      else if (mode !== "doubled") fresh = -1;
+      /* The tally counts the rows the rule flagged, never the quartile it is meant to be. */
       var k = now.filter(function (s) { return s.flagged; }).length;
-      add.textContent = size < firms.length ? "Add a company" : "Back to the starting sample";
-      twice.setAttribute("aria-pressed", String(doubled));
+      add.textContent = size < companies.length ? "Add a company" : "Back to the starting sample";
+      readings.forEach(function (b, i) { b.setAttribute("aria-pressed", String(doubled === (i === 1))); });
       rows.forEach(function (r, i) {
         var s = now[i], old = before && i < before.length ? before[i] : null;
-        r.li.hidden = i >= n;
+        r.li.hidden = !s;
         r.value.textContent = s ? s.shown : "";
+        r.flag.textContent = s && s.flagged ? "Flagged" : "";
+        r.flag.hidden = !(s && s.flagged);
         if (!s) return;
         r.li.classList.toggle("is-flagged", s.flagged);
-        r.flag.hidden = !s.flagged;
-        r.li.classList.toggle("is-new", why === "added" && i === n - 1);
-        r.reading.textContent = String(doubled ? firms[i].reading * 2 : firms[i].reading);
+        r.li.classList.toggle("is-new", i === fresh);
+        r.reading.textContent = String(doubled ? companies[i].reading * 2 : companies[i].reading);
         r.dot.style.left = (s.at * 100) + "%";
         r.ghost.hidden = !old || old.shown === s.shown;
         if (old) r.ghost.style.left = (old.at * 100) + "%";
       });
       tally.textContent = k + " of " + n;
-      phrase.nodeValue = " flagged: the top quarter" + (n % 4 ? ", rounded down" : "");
+      phrase.nodeValue = " flagged: the top quartile" + (n % 4 ? ", rounded down" : "");
 
-      if (why === "added") {
+      if (mode === "added") {
         var kept = before.length, moved = 0, lost = [], gained = [];
         for (var i = 0; i < kept; i++) {
           if (before[i].shown !== now[i].shown) moved++;
-          if (before[i].flagged && !now[i].flagged) lost.push(firms[i].name);
-          if (!before[i].flagged && now[i].flagged) gained.push(firms[i].name);
+          if (before[i].flagged && !now[i].flagged) lost.push(companies[i].name);
+          if (!before[i].flagged && now[i].flagged) gained.push(companies[i].name);
         }
-        note.textContent = firms[n - 1].name + " joined. " +
+        note.textContent = companies[n - 1].name + " joined. " +
           (moved === kept ? "All " + kept : moved + " of " + kept) +
           " scores already given moved, and not one of those filings changed." +
           (lost.length ? " " + lost.join(" and ") + " lost " + (lost.length === 1 ? "its flag" : "their flags") + "." : "") +
           (gained.length ? " " + gained.join(" and ") + " gained one." : "");
-      } else if (why === "doubled") {
-        note.textContent = (doubled ? "Every reading doubled" : "Every reading halved") +
+      } else if (mode === "doubled") {
+        note.textContent = (doubled ? "Every reading doubled" : "Every reading back as filed") +
           ", and not one score moved: the same companies are flagged, because a score within the " +
           "sample does not see a change every filing shares.";
+      } else if (mode === "reset") {
+        note.textContent = "The sample is back to its start.";
       } else {
-        note.textContent = why || note0;
+        note.textContent = note0;
       }
     }
 
-    note0 = "Each score says where a filing sits in this sample, not how likely it is to be machine-written.";
-    update(null);
+    update();
   });
 
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
