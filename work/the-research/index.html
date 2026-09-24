@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -58,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
         <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
         <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
-        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>9 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
@@ -204,6 +207,49 @@
               construction, whatever the text says, and means adding one company changes the score of
               every company already scored. It was reported as though it were the probability that a
               filing was machine-written.</p>
+            <figure class="exhibit" id="exhibit-ranking-not-probability" data-exhibit="ranking"
+                    data-provenance="synthetic">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Adding one
+                  company moves every score already given, and a quarter are flagged whatever the text
+                  says</h3>
+                <p class="exhibit__instruction">Add a company to the sample and watch the scores of the
+                  others move, though not one of their filings changed.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Synthetic companies and the detector reading each one&rsquo;s filing
+                      received, in the order they join the sample</caption>
+                    <thead>
+                      <tr><th scope="col">Company</th><th scope="col">Detector reading</th><th scope="col">Joins the sample</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Filer A</th><td>42</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer B</th><td>57</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer C</th><td>31</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer D</th><td>64</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer E</th><td>48</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer F</th><td>36</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer G</th><td>53</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer H</th><td>45</td><td>At the start</td></tr>
+                      <tr><th scope="row">Filer I</th><td>88</td><td>Added</td></tr>
+                      <tr><th scope="row">Filer J</th><td>22</td><td>Added</td></tr>
+                      <tr><th scope="row">Filer K</th><td>71</td><td>Added</td></tr>
+                      <tr><th scope="row">Filer L</th><td>80</td><td>Added</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic; twelve invented companies
+                with invented detector readings on an arbitrary scale, scored the way the withdrawn
+                report scored them: each reading&rsquo;s z-score within the sample, put through a
+                sigmoid, with the top quarter by rank flagged (rounded down when the sample does not
+                divide by four). No company, reading or score from the withdrawn report is reproduced,
+                because that report is superseded and should not be cited.</figcaption>
+            </figure>
             <p><strong>The extractor was reading the wrong text.</strong> Tested against six live
               filings, five landed on a cross-reference or a table-of-contents line rather than on the
               notes. One company ranked near the top for AI language had been scored on 4,109 characters
