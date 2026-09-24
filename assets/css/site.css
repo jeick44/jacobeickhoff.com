@@ -93,6 +93,9 @@
   --measure: 46rem;
   --gutter: clamp(1rem, 4vw, 3rem);
   --radius: 10px;
+  /* The shared slider's track inset: half its thumb, so the thumb's centre reaches both ends. A mark
+     placed along a track (the age-serial floor) measures from the same inset. */
+  --slider-inset: 0.625rem;
   --radius-photo: 12px;
   --radius-ring: 2px;
   --pill: 999px;
@@ -1787,7 +1790,7 @@ button {
   align-items: center;
   min-width: 8rem;
   height: 2.75rem;
-  padding-inline: 0.625rem;
+  padding-inline: var(--slider-inset);
   touch-action: none;
   cursor: pointer;
 }
@@ -1810,8 +1813,8 @@ button {
 .slider__thumb {
   position: absolute;
   top: 50%;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: calc(2 * var(--slider-inset));
+  height: calc(2 * var(--slider-inset));
   border: 2px solid var(--blue);
   border-radius: 50%;
   background: var(--paper);
@@ -3524,4 +3527,102 @@ button.prep__cell:focus-visible {
 
 .route__link {
   text-decoration: none;
+}
+
+/* ---- kind: age-serial ----------------------------------------------------------------------------
+   The date-of-birth slider with the floor marked beneath its track, the serial arithmetic as a short
+   list, and a strip of the table's age bands. The band the map filed an age in is blue; when that band
+   is wrong it turns to the fail colour with a cross and says so, and the band the age belongs in is
+   outlined and says so. Never colour alone: every state has its words. Below a readable width the
+   strip keeps it and scrolls inside its frame. */
+/* In the flow under the track, so a label that wraps on a phone pushes the readout down rather than
+   covering it; it wraps inside what is left of the track to its right. */
+.exhibit .agecheck__floor {
+  margin: 0 0 0 calc(var(--slider-inset) + var(--at) * (100% - 2 * var(--slider-inset)));
+  max-width: calc((1 - var(--at)) * (100% - 2 * var(--slider-inset)) + var(--slider-inset));
+  padding: var(--space-2xs) 0 0 var(--space-3xs);
+  border-left: 2px solid var(--ink);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.agecheck__sums {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3xs) var(--space-sm);
+  margin: 0;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.agecheck__sums dt {
+  color: var(--ink-mute);
+}
+
+.agecheck__sums dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.agecheck__sums dd[data-result] {
+  font-family: var(--font-serif);
+  font-size: var(--text-name);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.agecheck__readout.is-hot .agecheck__sums dd[data-result] {
+  color: var(--bad);
+}
+
+.agecheck__bands {
+  display: grid;
+  grid-template-columns: repeat(var(--bands), minmax(0, 1fr));
+  gap: 2px;
+  min-width: calc(var(--bands) * 3rem);
+  margin: 0;
+  padding: 0 0 var(--space-3xs);
+  list-style: none;
+  font-size: var(--text-xs);
+}
+
+.agecheck__band {
+  display: grid;
+  grid-template-rows: auto 3.25rem;
+  gap: var(--space-3xs);
+  margin: 0;
+}
+
+.agecheck__band-name {
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.agecheck__tag {
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-3xs);
+  border: 1px solid var(--line-soft);
+  background: var(--paper);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.agecheck__band.is-filed .agecheck__tag {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: var(--paper);
+}
+
+.agecheck__band.is-wrong .agecheck__tag {
+  border-color: var(--bad);
+  background: var(--bad);
+  color: var(--paper);
+}
+
+.agecheck__band.is-belongs .agecheck__tag {
+  border: 2px dashed var(--ink);
+  color: var(--ink);
 }

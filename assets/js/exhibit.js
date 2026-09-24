@@ -1441,8 +1441,166 @@
     update();
   });
 
+  /* ---- KIND: age-serial ------------------------------------------------------------------------
+     The table lists dates of birth, oldest first: each one's day serial, whether the map's serial
+     test passes it, the age the map computed, the true age on the date its column names, and the
+     band that age belongs in. The serial test's column names its floor. The slider steps through
+     the rows, starting on the last date below the floor so the defect is what a reader sees first;
+     the readout gives the serial against the floor, and a strip of the table's bands shows where
+     the map filed the age and, when that is wrong, where it belongs.
+
+     The drawing can only show a table that agrees with it, so a table that does not is refused: a
+     serial that is not its date counted the way a spreadsheet counts, a true age that is not the one
+     on the named date or not in its band, a date that passes without being above the floor or fails
+     while above it, and a failed date that shows its true age rather than zero - which would
+     demonstrate a map without the defect. */
+  register("age-serial", function (fig, stage, data) {
+    var col = {}, floor = null, on = null;
+    data.columns.forEach(function (c, i) {
+      var m;
+      if (i < 1) return;
+      if (c === "Day serial") col.serial = i - 1;
+      else if (c === "Age the map computed") col.computed = i - 1;
+      else if (c === "Band it belongs in") col.band = i - 1;
+      else if ((m = /^Serial test, floor ([\d,]+)$/.exec(c))) { col.test = i - 1; floor = number(m[1]); }
+      else if ((m = /^Age on (\d{4}-\d{2}-\d{2})$/.exec(c))) { col.age = i - 1; on = day(m[1]); }
+    });
+    ["serial", "test", "computed", "age", "band"].forEach(function (k) {
+      if (col[k] == null) throw new Error("age-serial: the table has no " + k + " column");
+    });
+
+    /* A date, with its serial: whole days since the day before a spreadsheet's day 1. */
+    function day(iso) {
+      var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+      if (!m) throw new Error("age-serial: " + JSON.stringify(iso) + " is not a date");
+      return { y: +m[1], m: +m[2], d: +m[3],
+               serial: Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - Date.UTC(1899, 11, 30)) / 864e5) };
+    }
+    function fromSerial(n) {
+      var t = new Date(Date.UTC(1899, 11, 30) + n * 864e5);
+      return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
+    }
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+                  "September", "October", "November", "December"];
+    function words(t) { return t.d + " " + MONTHS[t.m - 1] + " " + t.y; }
+    function grouped(n) { return n.toLocaleString("en-US"); }
+
+    /* The bands, in the order the table first names them, youngest first. */
+    var bands = [];
+    function bandOf(age) {
+      for (var b = 0; b < bands.length; b++) if (age >= bands[b].lo && age <= bands[b].hi) return b;
+      throw new Error("age-serial: no band in the table holds age " + age);
+    }
+    data.rows.forEach(function (r) {
+      var name = r.cells[col.band], m = /^(\d+)–(\d+)$/.exec(name);
+      if (!m) throw new Error("age-serial: " + JSON.stringify(name) + " is not a band");
+      if (!bands.some(function (b) { return b.name === name; })) bands.push({ name: name, lo: +m[1], hi: +m[2] });
+    });
+    bands.sort(function (a, b) { return a.lo - b.lo; });
+
+    var entries = data.rows.map(function (r, i) {
+      var born = day(r.label), test = r.cells[col.test];
+      var en = { label: r.label, born: born, serial: r.values[col.serial], passes: test === "Passes",
+                 computed: r.values[col.computed], age: r.values[col.age], band: r.cells[col.band] };
+      var age = on.y - born.y - ((on.m < born.m || (on.m === born.m && on.d < born.d)) ? 1 : 0);
+      if (en.serial !== born.serial) {
+        throw new Error("age-serial: " + r.label + " is serial " + born.serial + ", not " + en.serial);
+      }
+      if (i && en.serial <= data.rows[i - 1].values[col.serial]) {
+        throw new Error("age-serial: the dates are not oldest first");
+      }
+      if (en.age !== age) throw new Error("age-serial: born " + r.label + " is aged " + age + ", not " + en.age);
+      if (bands[bandOf(age)].name !== en.band) {
+        throw new Error("age-serial: age " + age + " belongs in " + bands[bandOf(age)].name + ", not " + en.band);
+      }
+      if (test !== "Passes" && test !== "Fails") {
+        throw new Error("age-serial: " + r.label + "'s serial test reads " + JSON.stringify(test));
+      }
+      if (en.passes !== en.serial > floor) {
+        throw new Error("age-serial: " + r.label + " is serial " + en.serial + ", which the floor of " + floor +
+                        (en.passes ? " does not let through" : " lets through"));
+      }
+      if (en.computed !== (en.passes ? age : 0)) {
+        throw new Error("age-serial: " + r.label + (en.passes ? " passes" : " fails") +
+                        " the serial test, so the map computes " + (en.passes ? age : 0) + ", not " + en.computed);
+      }
+      return en;
+    });
+    var below = entries.filter(function (en) { return !en.passes; }).length;
+    if (!below || below === entries.length) {
+      throw new Error("age-serial: the table needs dates on both sides of the floor");
+    }
+    var floorDate = fromSerial(floor);
+
+    var picked = below - 1;
+    var scale = make("div", "agecheck__scale", stage);
+    var control = slider(scale, {
+      min: 0, max: entries.length - 1, step: 1, value: picked, label: "Date of birth",
+      valueText: function (i) { return words(entries[i].born); },
+      onChange: function (i) { picked = i; update(); },
+    });
+    /* The floor sits between the last date below it and the first above. */
+    var mark = make("p", "agecheck__floor", scale,
+                    "Floor: " + grouped(floor) + " days, " + MONTHS[floorDate.m - 1] + " " + floorDate.y);
+    mark.id = fig.id + "-floor";
+    mark.style.setProperty("--at", String((below - 0.5) / (entries.length - 1)));
+    control.el.setAttribute("aria-describedby", mark.id);
+
+    var readout = make("div", "exhibit__readout agecheck__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var sums = make("dl", "agecheck__sums", readout);
+    function row(term) {
+      make("dt", null, sums, term);
+      return make("dd", null, sums);
+    }
+    var bornOut = row("Date of birth");
+    var serialOut = row("Day serial");
+    var testOut = row("Serial test");
+    var computedOut = row("Age the map computed");
+    computedOut.setAttribute("data-result", "");
+    var ageOut = row("True age");
+    var note = make("p", "exhibit__note", readout);
+
+    var frame = make("div", "exhibit__frame", stage);
+    var strip = make("ol", "agecheck__bands", frame);
+    strip.setAttribute("aria-label", "Age bands");
+    strip.style.setProperty("--bands", String(bands.length));
+    var cells = bands.map(function (b) {
+      var li = make("li", "agecheck__band", strip);
+      make("span", "agecheck__band-name", li, b.name);
+      return { li: li, tag: make("span", "agecheck__tag", li) };
+    });
+
+    function update() {
+      var en = entries[picked], filed = bandOf(en.computed), belongs = bandOf(en.age);
+      var misfiled = filed !== belongs;
+      bornOut.textContent = words(en.born);
+      serialOut.textContent = grouped(en.serial) + (en.passes ? " — above the floor" : " — not above the floor");
+      testOut.textContent = en.passes ? "Passes" : "Fails";
+      computedOut.textContent = String(en.computed);
+      ageOut.textContent = String(en.age);
+      readout.classList.toggle("is-hot", misfiled);
+      cells.forEach(function (c, i) {
+        var tag = "";
+        if (i === filed) tag = misfiled ? "✕ Filed here" : "Filed here";
+        else if (i === belongs) tag = "Belongs here";
+        c.li.classList.toggle("is-filed", i === filed && !misfiled);
+        c.li.classList.toggle("is-wrong", i === filed && misfiled);
+        c.li.classList.toggle("is-belongs", i === belongs && misfiled);
+        c.tag.textContent = tag;
+      });
+      note.textContent = en.passes
+        ? "Converted, and filed in the " + bands[belongs].name + " band, where it belongs."
+        : "Not above the floor, so the serial test fails, every other test fails, and the age comes back as " +
+          en.computed + ": filed in the " + bands[filed].name + " band with the infants, not in the " +
+          bands[belongs].name + " band.";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
-     and for the harness, which proves the slider on a fixture because no shipped Exhibit uses it yet. */
+     and for the harness, which proves the slider on a fixture as well as on the age-serial Exhibit. */
   window.Exhibit = { register: register, slider: slider };
 
   if (document.readyState === "loading") {

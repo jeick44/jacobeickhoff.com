@@ -270,6 +270,60 @@
               with the infants, and the band being emptied was the band the demographic finding was
               about. It was the third defect of that kind here: an age filter that counted records it
               had been told to exclude, a loader that read every dollar value as zero, and this.</p>
+            <figure class="exhibit" id="exhibit-age-serial" data-exhibit="age-serial"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> A date of birth
+                  stored as a serial before October 1954 was filed at age zero, beside the band that
+                  should have held it</h3>
+                <p class="exhibit__instruction">Slide the date of birth across the floor and watch the
+                  computed age switch between zero and the true age.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Dates of birth, oldest first: each one&rsquo;s day serial, whether it
+                      passes the map&rsquo;s serial test by being above the floor, the age the map
+                      computed from it, its true age on 2026-09-01, the date the synthetic export in
+                      Exhibit 1 carries, and the ten-year band that age belongs in.</caption>
+                    <thead>
+                      <tr><th scope="col">Date of birth</th><th scope="col">Day serial</th><th scope="col">Serial test, floor 20,000</th><th scope="col">Age the map computed</th><th scope="col">Age on 2026-09-01</th><th scope="col">Band it belongs in</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">1930-05-15</th><td>11,093</td><td>Fails</td><td>0</td><td>96</td><td>90&ndash;99</td></tr>
+                      <tr><th scope="row">1935-05-15</th><td>12,919</td><td>Fails</td><td>0</td><td>91</td><td>90&ndash;99</td></tr>
+                      <tr><th scope="row">1940-05-15</th><td>14,746</td><td>Fails</td><td>0</td><td>86</td><td>80&ndash;89</td></tr>
+                      <tr><th scope="row">1945-05-15</th><td>16,572</td><td>Fails</td><td>0</td><td>81</td><td>80&ndash;89</td></tr>
+                      <tr><th scope="row">1950-05-15</th><td>18,398</td><td>Fails</td><td>0</td><td>76</td><td>70&ndash;79</td></tr>
+                      <tr><th scope="row">1954-10-02</th><td>19,999</td><td>Fails</td><td>0</td><td>71</td><td>70&ndash;79</td></tr>
+                      <tr><th scope="row">1954-10-04</th><td>20,001</td><td>Passes</td><td>71</td><td>71</td><td>70&ndash;79</td></tr>
+                      <tr><th scope="row">1955-05-15</th><td>20,224</td><td>Passes</td><td>71</td><td>71</td><td>70&ndash;79</td></tr>
+                      <tr><th scope="row">1960-05-15</th><td>22,051</td><td>Passes</td><td>66</td><td>66</td><td>60&ndash;69</td></tr>
+                      <tr><th scope="row">1965-05-15</th><td>23,877</td><td>Passes</td><td>61</td><td>61</td><td>60&ndash;69</td></tr>
+                      <tr><th scope="row">1970-05-15</th><td>25,703</td><td>Passes</td><td>56</td><td>56</td><td>50&ndash;59</td></tr>
+                      <tr><th scope="row">1975-05-15</th><td>27,529</td><td>Passes</td><td>51</td><td>51</td><td>50&ndash;59</td></tr>
+                      <tr><th scope="row">1980-05-15</th><td>29,356</td><td>Passes</td><td>46</td><td>46</td><td>40&ndash;49</td></tr>
+                      <tr><th scope="row">1985-05-15</th><td>31,182</td><td>Passes</td><td>41</td><td>41</td><td>40&ndash;49</td></tr>
+                      <tr><th scope="row">1990-05-15</th><td>33,008</td><td>Passes</td><td>36</td><td>36</td><td>30&ndash;39</td></tr>
+                      <tr><th scope="row">1995-05-15</th><td>34,834</td><td>Passes</td><td>31</td><td>31</td><td>30&ndash;39</td></tr>
+                      <tr><th scope="row">2000-05-15</th><td>36,661</td><td>Passes</td><td>26</td><td>26</td><td>20&ndash;29</td></tr>
+                      <tr><th scope="row">2005-05-15</th><td>38,487</td><td>Passes</td><td>21</td><td>21</td><td>20&ndash;29</td></tr>
+                      <tr><th scope="row">2010-05-15</th><td>40,313</td><td>Passes</td><td>16</td><td>16</td><td>10&ndash;19</td></tr>
+                      <tr><th scope="row">2015-05-15</th><td>42,139</td><td>Passes</td><td>11</td><td>11</td><td>10&ndash;19</td></tr>
+                      <tr><th scope="row">2020-05-15</th><td>43,966</td><td>Passes</td><td>6</td><td>6</td><td>0&ndash;9</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; the dates of birth are
+                points on a calendar, one every five years and one a day either side of the floor, and
+                belong to no one. The floor of twenty thousand days and the month it lands in are the ones
+                stated above; serials count days the way a spreadsheet does. The ten-year bands are
+                drawn for this Exhibit, not taken from the tool, and no customer&rsquo;s age or count
+                is shown, because each is the Sponsor&rsquo;s.</figcaption>
+            </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">How it surfaced, and why it is still logged rather
                 than fixed</summary>
