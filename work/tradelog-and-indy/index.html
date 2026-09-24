@@ -48,8 +48,8 @@
       <h1 class="case-head__title">Holding investment decisions to a plan written <em>before the
         decision</em>, and measuring the gap from the broker&rsquo;s record</h1>
       <p class="case-head__lede">TradeLog and Indy: a decision-discipline system for active
-        investors, with a companion charting toolkit. A plan is committed before each decision, and
-        adherence to it is measured from the broker&rsquo;s own execution record &mdash;
+        investors, with a companion charting toolkit. Rules are committed in advance, and adherence
+        to them is measured from the broker&rsquo;s own execution record &mdash;
         <strong>Verified Adherence</strong> &mdash; then kept beside the adherence the investor
         reports, because the distance between the two is the signal worth reviewing. Indy, the
         companion toolkit, records what a chart displayed at a point in time.</p>
@@ -60,10 +60,10 @@
         <div><dt>Reading time</dt><dd>8 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Design, not dollars</span> The
-        account this system was built around is my own, which constrains what the page can say
-        rather than licensing it to say more. No dollar figure, account balance, return or behavioural finding
-        from that record appears here, and neither does any of the method the tooling was built
-        around. What is published is the product and the architecture, which is the part that is
+        figures behind this system are personal, which constrains what the page can say rather
+        than licensing it to say more. No dollar figure, account balance, return or behavioural
+        finding from the account&rsquo;s record appears here, and neither does any of the method
+        behind the tooling. What is published is the product and the architecture, which is the part that is
         mine to publish.</p>
     </div>
   </section>
@@ -120,14 +120,14 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>An investor who works to a written plan is usually asked afterwards whether the plan
+            <p>An investor held to a written plan is usually asked afterwards whether the plan
               was followed, and the answer comes from the person whose plan it was &mdash; recorded
               after the fact, about decisions made under pressure and reconsidered since. The
               decisions most worth reviewing are the ones taken outside the plan and disowned on
               review, and those are the ones least likely to be recorded at all.</p>
             <p>So a self-reported adherence figure measures intention, and effort inflates it: the
-              more carefully somebody keeps a decision journal, the more convincing the number they
-              produce about the sessions the journal never saw.</p>
+              more carefully somebody keeps a written record of their decisions, the more convincing
+              the number they produce about the sessions that record never saw.</p>
             <p>The record that would settle it already exists. The broker writes down every execution
               as it happens &mdash; entry, exit, size, fees, timestamps &mdash; and hands over the file.
               Nothing needs remembering. It needs reading, and then something has to be willing to
@@ -145,7 +145,7 @@
               same session &mdash; is kept beside the computed figure, and the difference is displayed
               and treated as a signal rather than reconciled away. The record knows what happened and
               can never know why; the investor knows why and has the only reason to be generous. That gap
-              measures where belief has drifted from behaviour, which is what a decision journal was
+              measures where belief has drifted from behaviour, which is what a record of decisions was
               always supposed to be about, and averaging the two is the one operation that destroys it.</p>
             <p>Three decisions hold that figure up.</p>
             <p><strong>The evaluator is deterministic, and the clock is an argument.</strong> One pure
@@ -175,16 +175,16 @@
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>The journal stopped being a place to type. Executions arrive by import and are the
+            <p>TradeLog stopped being a place to type. Executions arrive by import and are the
               record; journaling became annotation of rows that already exist, restricted to what the
-              broker cannot know. The headline figure changed with it: it had been a score the journal
+              broker cannot know. The headline figure changed with it: it had been a score TradeLog
               computed about its own journaling, which measures how completely a form was filled in, and
               it became the one that says how much room the account has left before it ends.</p>
             <p><strong>Indy is the other half of that record.</strong> It is a charting toolkit whose
               job is to remove drafting labour rather than to supply judgement: where it could present
               evidence or resolve it, it presents, and it carries no direction readout at all. What it
               adds here is an export &mdash; what a chart showed at a point in time, emitted as
-              structured data and imported through the journal&rsquo;s existing surface as an
+              structured data and imported through TradeLog&rsquo;s existing surface as an
               Observation, carrying no claim that a trade was placed. A week&rsquo;s review became
               reading records instead of opening dated folders of screenshots.</p>
             <p>It began as an inherited script that did a fraction of what I wanted and did that
@@ -195,7 +195,7 @@
               elaborate, nothing depended on it, and a requirement nobody has is not a requirement. A
               second defect had two possible behaviours and nothing to tell them apart: a daily reset
               keyed off a call given a timezone where it wanted a session, so either the overnight
-              levels were cleared before the part of the day I actually traded, or they were never
+              levels were cleared before the investor&rsquo;s active session, or they were never
               cleared at all. Reading the code did not decide which, and neither had using it.
               Naming both turned a vague intention to rebuild into a specification of fifty numbered
               requirements.</p>
@@ -235,7 +235,7 @@
               day the data was. A feature justified by a plausible story about a user is a feature
               nobody has checked, and I had built the instrument that could check it before it occurred
               to me to point it at my own product. Indy taught the same thing from the other end: a
-              readout dead from the day it was written, on my chart every session for months, unnoticed
+              readout dead from the day it was written, displayed on the chart for months, unnoticed
               precisely because nothing depended on it. &ldquo;I use it and it works&rdquo; is not
               evidence that it works.</p>
             <details class="disclosure">
@@ -258,11 +258,11 @@
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
             <p><strong>The framework is not specific to one account.</strong> Any investor, adviser
-              or investment committee held to a written plan has the same gap: the plan is committed
-              in advance, the executions are recorded by someone else, and adherence is reported by
-              the people who made the decisions. An adviser&rsquo;s recorded rationale against the
+              or investment committee held to a written plan faces the same gap wherever the plan
+              is committed in advance, the executions are recorded by someone else, and adherence is
+              reported by the people who made the decisions. An adviser&rsquo;s recorded rationale against the
               client&rsquo;s executed trades, or a committee&rsquo;s investment policy statement
-              against the portfolio&rsquo;s transactions, can be read the same way: adherence
+              against the portfolio&rsquo;s transactions, could be read the same way: adherence
               computed from the execution record, kept beside the adherence reported, and the gap
               reviewed rather than reconciled.</p>
             <p><strong>Self-report measures intention, and it fails hardest where it matters
