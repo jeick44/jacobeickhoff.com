@@ -2336,13 +2336,17 @@
      Two tiers. Above, a long axis for the several years a figure would need, with the window a
      sliver at its end; the axis is drawn to no stated scale and says so in the source line, because
      the page names no length for it. Below, the window enlarged, one tick per trading day, with a
-     mark (data-mark) on each day the chosen frequency decides, spread evenly across it. A segmented
-     choice picks the frequency; the result is the count of decisions.
+     mark (data-mark) on each day the chosen frequency decides, spread evenly across it and set half
+     a step in, so no rarer frequency decides on the window's first day. A segmented choice picks the
+     frequency, opening on the second row: the first is every trading day, a solid bar that makes
+     the point by saturation, and the second is the page's own default. The result is the count.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
      no "Decisions in the window" column, found by its header; a count that is not a whole number; a
-     first row that hedges, since it is the window's length; or counts that do not fall down the rows,
-     since a rarer rebalance cannot decide more often. */
+     first row that hedges, since it is the window's length; a window of more trading days than
+     MAX_DAYS, whose ticks and their 1px gaps would overflow a 320px screen; or counts that do not
+     fall down the rows, since a rarer rebalance cannot decide more often. */
+  var MAX_DAYS = 100;
   register("decision-window", function (fig, stage, data) {
     var col = data.columns.indexOf("Decisions in the window");
     if (col < 1) throw new Error('decision-window: the table has no "Decisions in the window" column');
@@ -2361,29 +2365,33 @@
         throw new Error("decision-window: " + o.name + " decides as often as " + options[i - 1].name + " or more");
       }
     });
-    var days = options[0].count, pick = 0;
+    var days = options[0].count, pick = 1;
+    if (days > MAX_DAYS) {
+      throw new Error("decision-window: " + days + " trading days is more than " + MAX_DAYS +
+                      " ticks a narrow screen can draw one apiece");
+    }
 
     var bar = make("div", "exhibit__controls", stage);
     var group = make("div", "seg", bar);
     group.setAttribute("role", "group");
     group.setAttribute("aria-label", "Rebalance frequency");
     var picks = options.map(function (o, i) {
-      var b = button(group, "seg__option", o.name, i === 0);
+      var b = button(group, "seg__option", o.name, i === pick);
       b.addEventListener("click", function () { pick = i; update(); });
       return b;
     });
 
     /* The long axis and the window at its end. */
     var years = make("div", "dwin__years", stage);
-    make("p", "dwin__label", years, "Several years and several regimes: the history the backfill is building");
+    make("div", "dwin__label", years, "Several years and several regimes: the history the backfill is building");
     var axis = make("div", "dwin__axis", years);
     axis.setAttribute("aria-hidden", "true");
     make("span", "dwin__sliver", axis);
-    make("p", "dwin__label dwin__label--end", years, "The whole history so far");
+    make("div", "dwin__label dwin__label--end", years, "The window: every trading day so far");
 
     /* The window, enlarged: a tick per trading day. */
     var zoom = make("div", "dwin__zoom", stage);
-    make("p", "dwin__label", zoom, "The whole history, enlarged: " + days + " trading days");
+    make("div", "dwin__label", zoom, "The window, enlarged: " + days + " trading days");
     var strip = make("div", "dwin__days", zoom);
     strip.setAttribute("role", "img");
     var ticks = [];
@@ -2400,7 +2408,7 @@
     function update() {
       var o = options[pick], on = {};
       picks.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === pick)); });
-      for (var k = 0; k < o.count; k++) on[Math.floor(k * days / o.count)] = true;
+      for (var k = 0; k < o.count; k++) on[Math.floor((k + 0.5) * days / o.count)] = true;
       ticks.forEach(function (t, i) {
         t.classList.toggle("is-decision", !!on[i]);
         if (on[i]) t.setAttribute("data-mark", "");
@@ -2408,7 +2416,7 @@
       });
       strip.setAttribute("aria-label", o.said + " decisions marked across " + days + " trading days");
       tally.textContent = o.said;
-      phrase.nodeValue = o.count === 1 ? " decision in the whole history" : " decisions in the whole history";
+      phrase.nodeValue = o.count === 1 ? " decision in the window" : " decisions in the window";
       note.textContent = "One market environment, read " + (o.count === 2 ? "twice" : o.said + " times") +
         ": a ratio annualised from it would describe the window, not the system.";
     }

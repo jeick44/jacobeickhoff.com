@@ -4192,21 +4192,21 @@ button.prep__cell:focus-visible {
   gap: var(--space-3xs);
 }
 
-.exhibit .dwin__label {
+.dwin__label {
   margin: 0;
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--ink-mute);
 }
 
-.exhibit .dwin__label--end {
+.dwin__label--end {
   text-align: right;
 }
 
 .dwin__axis {
   position: relative;
   height: 0.75rem;
-  border-radius: 2px;
+  border-radius: var(--radius-ring);
   background: var(--line-soft);
 }
 
