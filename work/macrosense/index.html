@@ -13,6 +13,9 @@
      page until a third party answers. Here, the page renders immediately in the fallback face
      and the webfont swaps in when it arrives. See the header of motion.js. -->
 <script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
@@ -58,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
         <div><dt>Status</dt><dd>In flight &middot; not yet validated</dd></div>
         <div><dt>Governing constraint</dt><dd>Architecture, Not Performance</dd></div>
-        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>9 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
         end to end and has not been validated, and those are two different sentences. The backtest
@@ -169,6 +172,42 @@
               two growth regimes; shorts permitted inside tighter bounds in the two stress regimes,
               defensive holdings favoured and rate-sensitive ones penalised. When the convex solver
               fails it returns an equal-weight book and logs the reason at error level.</p>
+            <figure class="exhibit" id="exhibit-regime-vector" data-exhibit="regime-vector"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Why the
+                  briefing gets the whole vector, not the label</h3>
+                <p class="exhibit__instruction">Pick the leading regime, then drag from a close call
+                  to a decisive one.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The worked example&rsquo;s probability across all four regimes, in a close
+                      call and a decisive one, with Calm Growth leading and Turbulent Growth the
+                      runner-up; picking another leading regime moves the same values round in this
+                      order. Each regime&rsquo;s constraint set, as this page describes it</caption>
+                    <thead>
+                      <tr><th scope="col">Regime</th><th scope="col">Constraint set</th><th scope="col">Close call</th><th scope="col">Decisive</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Calm Growth</th><td>Long only, under a per-position cap</td><td>0.41</td><td>0.90</td></tr>
+                      <tr><th scope="row">Turbulent Growth</th><td>Long only, under a per-position cap</td><td>0.39</td><td>0.06</td></tr>
+                      <tr><th scope="row">Rate Stress</th><td>Shorts permitted inside tighter bounds; defensive holdings favoured, rate-sensitive ones penalised</td><td>0.12</td><td>0.02</td></tr>
+                      <tr><th scope="row">Risk Off</th><td>Shorts permitted inside tighter bounds; defensive holdings favoured, rate-sensitive ones penalised</td><td>0.08</td><td>0.02</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; the Case Study&rsquo;s
+                own worked example, a regime called at 0.41 against a runner-up at 0.39 and one called
+                at 0.90, not model output. The other probabilities are filled in only so that each call
+                sums to one. The classifier&rsquo;s real probabilities, its fitted parameters and any
+                performance figure are withheld, because this page publishes the architecture and not
+                the results.</figcaption>
+            </figure>
             <p><strong>The sentiment scorer.</strong> In: earnings-call transcripts and 10-K and 10-Q
               filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps
               between requests to stay inside the published rate limit. Out: a score per issuer on four

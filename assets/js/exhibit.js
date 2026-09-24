@@ -2206,6 +2206,111 @@
     update();
   });
 
+  /* ---- KIND: regime-vector ---------------------------------------------------------------------
+     MacroSense's classifier resolves to one of its regimes, with a probability across all of them,
+     and the briefing is handed the whole vector. The table lists each regime with the constraint set
+     the optimiser applies under it, and the page's worked example: a probability for each regime in
+     a close call and in a decisive one, one column each, with the first row leading and the second
+     the runner-up. The table's order is the order of the vector, so the rows are its ranks.
+
+     A bar per regime, and a button: pressing one makes it the leading regime, and the worked
+     example's values move round the regimes in the table's order (the runner-up is the next row).
+     The shared slider runs from the close call to the decisive one, and every bar moves between its
+     two columns. The result is the sentence stating the call, which names the leading regime and its
+     probability; below it, the constraint set the leading regime carries.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
+     a probability that is not a figure, a call that does not sum to one, or a first row that does
+     not lead in both calls. Its columns are found by their headers. */
+  register("regime-vector", function (fig, stage, data) {
+    var col = {};
+    ["Constraint set", "Close call", "Decisive"].forEach(function (name) {
+      var i = data.columns.indexOf(name);
+      if (i < 1) throw new Error("regime-vector: the table has no " + JSON.stringify(name) + " column");
+      col[name] = i - 1;
+    });
+    if (data.rows.length < 2) throw new Error("regime-vector: a vector needs at least two regimes");
+    var regimes = data.rows.map(function (r) {
+      var close = r.values[col["Close call"]], decisive = r.values[col.Decisive];
+      if (close === null || decisive === null) {
+        throw new Error("regime-vector: " + r.label + " has no probability in each call");
+      }
+      return { name: r.label, cons: r.cells[col["Constraint set"]] || "", close: close, decisive: decisive };
+    });
+    ["close", "decisive"].forEach(function (call) {
+      var sum = 0, top = regimes[0][call];
+      regimes.forEach(function (g) {
+        sum += g[call];
+        if (g[call] > top) throw new Error("regime-vector: the first row does not lead the " + call + " call");
+      });
+      if (Math.abs(sum - 1) > 0.005) throw new Error("regime-vector: the " + call + " call sums to " + sum.toFixed(2));
+    });
+    var n = regimes.length, lead = 0, margin = 0;
+    var COUNT = ["none", "one", "both", "all three", "all four", "all five", "all six"];
+    var every = COUNT[n] || "all " + n;
+
+    var bars = make("div", "regime", stage);
+    bars.setAttribute("role", "group");
+    bars.setAttribute("aria-label", "Leading regime");
+    var marks = regimes.map(function (g, i) {
+      var b = button(bars, "regime__bar", null, i === 0);
+      make("span", "regime__name", b, g.name);
+      var track = make("span", "regime__track", b);
+      track.setAttribute("aria-hidden", "true");
+      var fill = make("span", "regime__fill", track);
+      var val = make("span", "regime__val", b);
+      b.addEventListener("click", function () { lead = i; update(); });
+      return { b: b, fill: fill, val: val };
+    });
+
+    /* The ends of the slider are the table's own names for the two calls. */
+    var ctl = make("div", "regime__ctl", stage);
+    make("span", "regime__end", ctl, data.columns[col["Close call"] + 1]);
+    var s = slider(ctl, {
+      min: 0, max: 100, step: 5, value: 0, label: "Margin of the leading regime",
+      valueText: function (v) {
+        return regimes[lead].name + " at " + at(0, v / 100).toFixed(2);
+      },
+      onChange: function (v) { margin = v / 100; update(); }
+    });
+    make("span", "regime__end", ctl, data.columns[col.Decisive + 1]);
+
+    var readout = make("div", "exhibit__readout regime__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var read = make("p", "regime__read", readout);
+    read.setAttribute("data-result", "");
+    var cons = make("p", "regime__cons", readout);
+
+    /* The probability of the regime ranked k in the worked example, t of the way to decisive. */
+    function at(k, t) {
+      var g = regimes[k];
+      return g.close + (g.decisive - g.close) * t;
+    }
+    function lowerFirst(w) { return w.charAt(0).toLowerCase() + w.slice(1); }
+
+    function update() {
+      var t = margin;
+      marks.forEach(function (m, i) {
+        var p = at((i - lead + n) % n, t);
+        m.b.setAttribute("aria-pressed", String(i === lead));
+        m.fill.style.width = (p * 100) + "%";
+        m.val.textContent = p.toFixed(2);
+        /* Named in words, since the name and the figure are two spans read with no space between. */
+        m.b.setAttribute("aria-label", regimes[i].name + ", " + p.toFixed(2));
+      });
+      var L = regimes[lead].name, RU = regimes[(lead + 1) % n].name;
+      var pl = at(0, t).toFixed(2), pr = at(1, t).toFixed(2);
+      read.textContent = t < 0.4
+        ? "Called " + L + " at " + pl + ", with " + RU + " at " + pr + ". The label is the same; the call is close to a coin toss."
+        : t < 0.8 ? "Called " + L + " at " + pl + ". A lean, not a certainty — the briefing is handed " + every + "."
+        : "Called " + L + " at " + pl + ". Same label as the close call; a different statement.";
+      cons.textContent = "Constraint set for " + L + ": " + lowerFirst(regimes[lead].cons) + ".";
+      s.el.setAttribute("aria-valuetext", L + " at " + pl);
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
