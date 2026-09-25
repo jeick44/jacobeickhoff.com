@@ -1548,7 +1548,7 @@
 
     var readout = make("div", "exhibit__readout agecheck__readout", stage);
     readout.setAttribute("aria-live", "polite");
-    var sums = make("dl", "agecheck__sums", readout);
+    var sums = make("dl", "exhibit__pairs agecheck__sums", readout);
     function row(term) {
       make("dt", null, sums, term);
       return make("dd", null, sums);
@@ -2569,18 +2569,19 @@
      Deposit expense in dollars a year, the Net of the two, and its holder's Age and Age band. The
      row marked data-lead is the location the readout shows before a reader points at one.
 
-     A circle is placed by a click or a mouse drag on the map, or by choosing an Area (its centre is
+     A circle is placed by a mouse press or drag on the map, a tap on it, or by choosing an Area (its centre is
      the mean of its locations), and sized by the slider. The totals give what the circle holds and
      what it earns, and the age profile counts it by the table's bands. Every location is a button:
-     hovering, focusing or pressing one shows its subtraction. On first view the circle travels from
-     the first Area to the lead's, so the opening view is the circle holding the location it shows.
+     hovering, focusing or pressing one shows its subtraction. Before it plays, the map shows the state
+     the playback ends on; on first view the circle travels from the first Area to the lead's, so the
+     opening view is the circle holding the location it shows.
 
      Compact mode (the homepage) drops the choice of Area; the map, the slider and the readouts stay.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone): a
      net that is not the loan income less the deposit expense, a negative balance line, an age outside
-     its band, a location off the map's corner, an Area name too long to label a button at 320px, or no
-     lead location. */
+     its band, a location off the map's corner, an Area name too long to label a button at 320px, two
+     rows under one name, or no lead location. */
   register("radius-map", function (fig, stage, data, opts) {
     var LONGEST_NAME = 16, RADIUS = { min: 0.5, max: 6, step: 0.5, open: 1.5, value: 3 }, PLAY_MS = 1600;
     function col(name) {
@@ -2595,7 +2596,7 @@
     function miles(v) { return v.toFixed(1) + (v === 1 ? " mile" : " miles"); }
 
     var trs = fig.querySelectorAll("tbody tr");
-    var bands = [], areas = [];
+    var bands = [], areas = [], names = {};
     function band(name) {
       var m = /^(\d+)(?:–(\d+)|\+)$/.exec(name);
       if (!m) throw new Error("radius-map: " + JSON.stringify(name) + " is not an age band");
@@ -2605,6 +2606,8 @@
       var s = { label: r.label, area: r.cells[AREA], east: r.values[EAST], north: r.values[NORTH],
                 loan: dollars(r.cells[LOAN]), deposit: dollars(r.cells[DEPOSIT]), net: dollars(r.cells[NET]),
                 age: r.values[AGE], band: r.cells[BAND], lead: trs[i].hasAttribute("data-lead") };
+      if (names[s.label]) throw new Error("radius-map: two rows are named " + JSON.stringify(s.label));
+      names[s.label] = true;
       [["Miles east", s.east], ["Miles north", s.north], ["Loan income", s.loan],
        ["Deposit expense", s.deposit], ["Net", s.net], ["Age", s.age]].forEach(function (p) {
         if (p[1] === null) throw new Error("radius-map: " + s.label + " has no figure for " + p[0]);
@@ -2643,18 +2646,12 @@
     var circle = { east: home.east, north: home.north, r: RADIUS.value, area: home };
 
     var bar = make("div", "exhibit__controls rmap__controls", stage);
-    var areaButtons = [];
+    var picks = null;
     if (!opts.compact) {
       var pick = make("div", "rmap__control", bar);
       make("span", "rmap__control-name", pick, "Centre on").setAttribute("aria-hidden", "true");
-      var group = make("div", "seg", pick);
-      group.setAttribute("role", "group");
-      group.setAttribute("aria-label", "Centre the circle on an area");
-      areaButtons = areas.map(function (a) {
-        var b = button(group, "seg__option", a.name, a === home);
-        b.addEventListener("click", function () { stop(); place(a.east, a.north, a); });
-        return b;
-      });
+      picks = segmented(pick, "Centre the circle on an area", areas.map(function (a) { return a.name; }),
+        function (i) { var a = areas[i]; stop(); place(a.east, a.north, a); });
     }
     var sizer = make("div", "rmap__control rmap__sizer", bar);
     make("span", "rmap__control-name", sizer, "Radius").setAttribute("aria-hidden", "true");
@@ -2673,10 +2670,11 @@
        north up. The river and roads are drawn from fixed proportions of the map and hold no data. */
     map.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
       '<g transform="scale(' + W / 400 + " " + H / 320 + ')">' +
-      '<path class="rmap__river" d="M-10 150 C 60 130, 110 170, 170 150 S 260 110, 300 140 S 370 220, 410 210"/>' +
-      '<path class="rmap__road" d="M0 104 H400 M118 0 V320 M0 250 L400 150 M268 0 V320 M40 320 L330 40"/></g>' +
-      '<circle class="rmap__ring" vector-effect="non-scaling-stroke"/><circle class="rmap__pin"/></svg>';
-    var ring = map.querySelector(".rmap__ring"), pin = map.querySelector(".rmap__pin");
+      '<path class="rmap__river" vector-effect="non-scaling-stroke" d="M-10 150 C 60 130, 110 170, 170 150 S 260 110, 300 140 S 370 220, 410 210"/>' +
+      '<path class="rmap__road" vector-effect="non-scaling-stroke" d="M0 104 H400 M118 0 V320 M0 250 L400 150 M268 0 V320 M40 320 L330 40"/></g></svg>';
+    var svg = map.querySelector("svg");
+    var ring = svgChild(svg, "circle", "rmap__ring"), pin = svgChild(svg, "circle", "rmap__pin");
+    ring.setAttribute("vector-effect", "non-scaling-stroke");
     function at(el, east, north) {
       el.style.setProperty("--x", (east / W * 100) + "%");
       el.style.setProperty("--y", ((H - north) / H * 100) + "%");
@@ -2690,7 +2688,7 @@
     hint.setAttribute("aria-hidden", "true");
 
     var panel = make("div", "rmap__panel", layout);
-    var sums = make("dl", "rmap__sums", panel);
+    var sums = make("dl", "exhibit__pairs rmap__sums", panel);
     function result(term, cls) {
       make("dt", cls, sums, term);
       var dd = make("dd", cls, sums);
@@ -2702,7 +2700,7 @@
     var loanOut = result("Loan income");
     var depositOut = result("Deposit expense");
     var netOut = result("Net annual", "rmap__net");
-    make("p", "rmap__label", panel, "Age profile, inside");
+    make("div", "rmap__label", panel, "Age profile, inside");
     var ages = make("dl", "rmap__ages", panel);
     var bandRows = bands.map(function (b) {
       make("dt", null, ages, b.name);
@@ -2718,8 +2716,8 @@
     /* The location readout: the lead at first; hovering previews one, and focus or a press chooses it. */
     var tip = make("div", "rmap__tip", panel);
     tip.setAttribute("role", "status");
-    var tipName = make("p", "rmap__tip-name", tip);
-    var tipRows = make("dl", "rmap__tip-rows", tip);
+    var tipName = make("div", "rmap__tip-name", tip);
+    var tipRows = make("dl", "exhibit__pairs rmap__tip-rows", tip);
     function tipRow(term) { make("dt", null, tipRows, term); return make("dd", null, tipRows); }
     var tipLoan = tipRow("Loan income"), tipDeposit = tipRow("Deposit expense"), tipNet = tipRow("Net");
     var chosen = lead;
@@ -2732,10 +2730,12 @@
     }
     function choose(s) { chosen = s; show(s); }
 
+    /* A dot's strength is its net against the largest net, either way, in the table. */
+    var widest = Math.max.apply(null, spots.map(function (s) { return Math.abs(s.net); })) || 1;
     spots.forEach(function (s) {
       var b = at(button(map, "rmap__spot " + (s.net < 0 ? "is-loss" : "is-gain")), s.east, s.north);
       b.setAttribute("aria-label", s.label + ", " + s.area);
-      b.style.setProperty("--k", String(Math.min(1, Math.abs(s.net) / 40000)));
+      b.style.setProperty("--k", String(Math.abs(s.net) / widest));
       b.addEventListener("mouseenter", function () { show(s); });
       b.addEventListener("mouseleave", function () { show(chosen); });
       b.addEventListener("focus", function () { choose(s); });
@@ -2759,14 +2759,14 @@
       pin.setAttribute("r", Math.min(W, H) / 90);
       radiusValue.textContent = r.toFixed(1) + " mi";
       size.set(r, true);
-      areaButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(areas[i] === circle.area)); });
+      if (picks) picks.press(areas.indexOf(circle.area));
       var inside = spots.filter(function (s) {
         var hit = Math.hypot(s.east - circle.east, s.north - circle.north) <= r;
         s.el.classList.toggle("is-inside", hit);
         return hit;
       });
       function total(f) { return inside.reduce(function (t, s) { return t + f(s); }, 0); }
-      whereOut.textContent = r.toFixed(1) + (r === 1 ? " mile" : " miles") + " around " +
+      whereOut.textContent = miles(r) + " around " +
         (circle.area ? "the centre of " + circle.area.name : "a point on the map");
       countOut.textContent = String(inside.length);
       loanOut.textContent = money(total(function (s) { return s.loan; }));
@@ -2782,18 +2782,26 @@
       });
     }
 
-    /* A click, or a mouse drag, places the circle. A touch is left to scroll the page unless it is a
-       tap: the stage keeps panning, so a moving finger never reaches here as a drag. */
-    var dragging = false;
+    /* A mouse places the circle as it goes down and drags it. A touch or a pen places it only on the
+       tap's click, so a finger that lands on the map to scroll the page moves nothing. Pressing a
+       location chooses the location and leaves the circle where it is. */
+    var dragging = false, mouseDown = false;
     function fromPointer(e) {
       var box = map.getBoundingClientRect();
       if (!box.width) return;
+      stop();
+      if (hint.parentNode) hint.parentNode.removeChild(hint);
       place((e.clientX - box.left) / box.width * W, H - (e.clientY - box.top) / box.height * H, null);
     }
+    function onSpot(e) { return e.target.closest && e.target.closest(".rmap__spot"); }
     map.addEventListener("pointerdown", function (e) {
-      stop();
+      mouseDown = e.pointerType === "mouse";
+      if (!mouseDown || onSpot(e)) return;
       dragging = true;
-      if (hint.parentNode) hint.parentNode.removeChild(hint);
+      fromPointer(e);
+    });
+    map.addEventListener("click", function (e) {
+      if (mouseDown || onSpot(e)) return;
       fromPointer(e);
     });
     map.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
@@ -2825,12 +2833,10 @@
       playing = window.requestAnimationFrame(tick);
     }
 
+    /* Until it plays, the map shows the state the playback ends on: the lead's Area, at its size. */
     choose(lead);
     update();
     if (!reduced && "IntersectionObserver" in window) {
-      stage.setAttribute("aria-busy", "true");
-      circle.r = RADIUS.open;
-      place(start.east, start.north, start);
       seen = new window.IntersectionObserver(function (es) {
         es.forEach(function (e) {
           if (e.isIntersecting && seen) { seen.disconnect(); seen = null; play(); }
