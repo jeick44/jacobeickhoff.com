@@ -4556,3 +4556,134 @@ button.prep__cell:focus-visible {
   font-weight: 700;
   color: var(--ink-soft);
 }
+
+/* ---- kind: judges-rewarded -----------------------------------------------------------------------
+   Two structures for one paper, side by side where there is room and stacked on a phone. Each part is
+   a line of words (its name, its minutes, its verdict) over a bar on one shared axis of minutes, and
+   the judge's time is an ink tick at the same place on every bar. A part the time runs out on is hatched and says
+   "Not checked"; the verdict is always in words, never the fill alone. Everything reflows, so no
+   frame is needed. */
+.judged__control {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.judged__control b {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.judged__controls .slider {
+  flex: 1 1 12rem;
+  max-width: 22rem;
+}
+
+.exhibit .judged__paper {
+  margin: 0;
+  max-width: none;
+  font-size: var(--text-sm);
+  color: var(--ink-mute);
+}
+
+.judged {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-md);
+}
+
+.judged__structure {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.exhibit .judged__name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.exhibit .judged__total {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}
+
+.judged__parts {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.judged__part {
+  display: grid;
+  gap: var(--space-3xs);
+  font-size: var(--text-xs);
+}
+
+.judged__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-2xs);
+  align-items: baseline;
+}
+
+.judged__label {
+  flex: 1 1 10rem;
+  min-width: 0;
+  color: var(--ink);
+  overflow-wrap: break-word;
+}
+
+.judged__minutes {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mute);
+}
+
+.judged__verdict {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.is-unchecked .judged__verdict {
+  font-weight: 600;
+  color: var(--ink-mute);
+}
+
+.judged__track {
+  position: relative;
+  height: 0.625rem;
+  border-radius: 2px;
+  background: var(--line-soft);
+}
+
+.judged__span {
+  position: absolute;
+  inset-block: 0;
+  border-radius: 2px;
+  background: var(--data-1);
+  box-shadow: inset -1px 0 0 var(--paper);
+}
+
+.is-unchecked .judged__span {
+  background: repeating-linear-gradient(-45deg, var(--hatch) 0 4px, transparent 4px 8px), var(--mist-deep);
+  outline: 1px dashed var(--ink-mute);
+  outline-offset: -1px;
+}
+
+/* The judge's time. Placed inside its bar's track and drawn over it, so at either end of the slider it
+   stays within the track's own width. */
+.judged__edge {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  /* Its right edge on the minute, so at the far end it ends where the track does. */
+  margin-left: -2px;
+  background: var(--ink);
+}

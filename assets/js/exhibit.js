@@ -2846,6 +2846,141 @@
     }
   });
 
+  /* ---- KIND: judges-rewarded -------------------------------------------------------------------
+     Two ways to structure one paper, read by a judge with a limited number of minutes. The table
+     lists every part either structure carries, in reading order, with the minutes a judge needs to
+     check it and one Yes/No column per structure; its footer gives the minutes a judge has, and its
+     caption quotes the paper's title. Columns are found by their headers.
+
+     Each structure is a list of its parts, each with its minutes, a bar on a shared axis of minutes
+     from where it starts to where it ends, and a verdict in words: a part the judge finishes inside
+     the time is checked, and a part that runs past it is not. The judge's time is marked on every
+     bar, set by the shared slider, and each structure counts the parts checked (data-result).
+
+     Refused rather than drawn: a structure cell that is not Yes or No, a part's minutes that are not
+     a whole number above zero, a structure with no parts, fewer than two structures (there would be
+     nothing to compare), a caption with no one quoted title, and a judge's time outside what the
+     slider can set. */
+  register("judges-rewarded", function (fig, stage, data) {
+    var NEED = "Minutes a judge needs", HAS = "Minutes a judge has";
+    function header(prefix) {
+      var found = data.columns.filter(function (c) { return c.indexOf(prefix) === 0; });
+      if (found.length !== 1) throw new Error("judges-rewarded: no one column headed " + JSON.stringify(prefix));
+      return data.columns.indexOf(found[0]) - 1;
+    }
+    var need = header(NEED);
+    var names = data.columns.slice(1).filter(function (c, i) { return i !== need; });
+    if (names.length < 2 || !data.rows.length) throw new Error("judges-rewarded: the table needs parts and two structures");
+    data.rows.forEach(function (r) {
+      var m = r.values[need];
+      if (!(m > 0) || Math.round(m) !== m) {
+        throw new Error("judges-rewarded: " + r.label + " needs " + JSON.stringify(r.cells[need]) +
+                        " minutes; a part takes a whole number of minutes above zero");
+      }
+    });
+    var structures = names.map(function (name) {
+      var col = data.columns.indexOf(name) - 1, spent = 0, parts = [];
+      data.rows.forEach(function (r) {
+        var w = r.cells[col].toLowerCase();
+        if (w !== "yes" && w !== "no") {
+          throw new Error("judges-rewarded: " + r.label + " reads " + JSON.stringify(r.cells[col]) + " for " + name);
+        }
+        if (w === "no") return;
+        parts.push({ label: r.label, minutes: r.values[need], start: spent, end: spent + r.values[need] });
+        spent += r.values[need];
+      });
+      if (!parts.length) throw new Error("judges-rewarded: " + name + " carries no part");
+      return { name: name, parts: parts, total: spent };
+    });
+    var longest = Math.max.apply(null, structures.map(function (s) { return s.total; }));
+
+    var caption = text(fig.querySelector("caption"));
+    var quoted = caption.match(/“[^”]+”/g) || [];
+    if (quoted.length !== 1) throw new Error("judges-rewarded: the caption quotes " + quoted.length + " titles, not one");
+
+    var foot = fig.querySelectorAll("tfoot tr"), has = null;
+    for (var i = 0; i < foot.length; i++) {
+      var cells = foot[i].children;
+      if (text(cells[0]).indexOf(HAS) === 0 && cells[need + 1]) has = number(text(cells[need + 1]));
+    }
+    if (!(has >= 1 && has <= longest) || Math.round(has) !== has) {
+      throw new Error("judges-rewarded: the footer gives a judge " + has + " minutes; the slider runs 1 to " + longest);
+    }
+    var minutes = has;
+
+    var bar = make("div", "exhibit__controls judged__controls", stage);
+    var named = make("p", "judged__control", bar, HAS + ": ");
+    named.setAttribute("aria-hidden", "true");
+    var shownMinutes = make("b", "", named);
+    function minutesWord(n) { return n + (n === 1 ? " minute" : " minutes"); }
+    slider(bar, {
+      min: 1, max: longest, step: 1, value: minutes, label: HAS,
+      valueText: minutesWord,
+      onChange: function (v) { minutes = v; update(); }
+    });
+
+    make("p", "judged__paper", stage, "Two ways to structure " + quoted[0] + ". Every bar sits on one axis " +
+         "of minutes, and the ink tick on it is where the judge\u2019s time ends.");
+
+    var grid = make("div", "judged", stage);
+    var drawn = structures.map(function (s) {
+      var col = make("section", "judged__structure", grid);
+      make("p", "judged__name", col, s.name);
+      var line = make("p", "exhibit__count", col);
+      var count = make("b", "", line);
+      count.setAttribute("data-result", "");
+      line.appendChild(document.createTextNode(" parts checked"));
+      make("p", "judged__total", col, minutesWord(s.total) + " to check every part");
+      var list = make("ol", "judged__parts", col);
+      list.setAttribute("aria-label", s.name);
+      var items = s.parts.map(function (p) {
+        var li = make("li", "judged__part", list);
+        var head = make("span", "judged__head", li);
+        make("span", "judged__label", head, p.label);
+        make("span", "judged__minutes", head, minutesWord(p.minutes));
+        var verdict = make("span", "judged__verdict", head);
+        var track = make("span", "judged__track", li);
+        track.setAttribute("aria-hidden", "true");
+        var span = make("span", "judged__span", track);
+        span.style.left = p.start / longest * 100 + "%";
+        span.style.width = p.minutes / longest * 100 + "%";
+        /* The judge's time, marked on every part's bar at the same place on the axis. */
+        var edge = make("span", "judged__edge", track);
+        return { li: li, verdict: verdict, edge: edge };
+      });
+      return { count: count, items: items };
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var note = make("p", "exhibit__note", readout);
+
+    function update() {
+      shownMinutes.textContent = String(minutes);
+      var through = [], cut = [];
+      structures.forEach(function (s, k) {
+        var d = drawn[k], checked = 0;
+        s.parts.forEach(function (p, j) {
+          var done = p.end <= minutes;
+          if (done) checked++;
+          d.items[j].edge.style.left = minutes / longest * 100 + "%";
+          d.items[j].li.classList.toggle("is-unchecked", !done);
+          d.items[j].verdict.textContent = done ? "Checked" : "Not checked";
+        });
+        d.count.textContent = checked + " of " + s.parts.length;
+        (checked === s.parts.length ? through : cut).push(s);
+      });
+      note.textContent = "With " + minutesWord(minutes) + ", " + [].concat(
+        through.map(function (s) { return "the judge checks every part of the paper " + s.name.toLowerCase(); }),
+        cut.map(function (s) {
+          var first = s.parts.filter(function (p) { return p.end > minutes; })[0];
+          return "in the paper " + s.name.toLowerCase() + ", the time runs out at \u201c" + first.label + "\u201d";
+        })).join("; ") + ".";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
