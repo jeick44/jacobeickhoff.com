@@ -2336,7 +2336,7 @@
      Two tiers. Above, a long axis for the several years a figure would need, with the window a
      sliver at its end; the axis is drawn to no stated scale and says so in the source line, because
      the page names no length for it. Below, the window enlarged, one tick per trading day, with a
-     mark (data-mark) on each day the chosen frequency decides, spread evenly across it and set half
+     mark on each day the chosen frequency decides, spread evenly across it and set half
      a step in, so no rarer frequency decides on the window's first day. A segmented choice picks the
      frequency, opening on the second row: the first is every trading day, a solid bar that makes
      the point by saturation, and the second is the page's own default. The result is the count.
@@ -2345,7 +2345,10 @@
      refused: up to GAPPED ticks keep their 1px gaps; past GAPPED days a tick stands for a week of
      trading days (WEEK), marked when a decision falls in it; past GAPPED weeks the weeks close up,
      and past DENSE weeks a tick would be narrower than a pixel at 320px, which is the one length
-     refused. The enlarged window's label says when a tick is a week.
+     refused. The enlarged window's label says when a tick is a week. Each marked tick's data-mark
+     is the number of decisions it holds (one a day at most, so up to WEEK on a week's tick), and
+     the strip's data-per-tick is the trading days a tick stands for, so the marks always add up to
+     the count read out, however coarse the drawing.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
      no "Decisions in the window" column, found by its header; a count that is not a whole number; a
@@ -2401,6 +2404,7 @@
     make("div", "dwin__label", zoom, "The window, enlarged: " + days + " trading days" + per);
     var strip = make("div", count > GAPPED ? "dwin__days dwin__days--dense" : "dwin__days", zoom);
     strip.setAttribute("role", "img");
+    strip.setAttribute("data-per-tick", String(bin));
     var ticks = [];
     for (var d = 0; d < count; d++) ticks.push(make("span", "dwin__day", strip));
 
@@ -2417,11 +2421,11 @@
       picks.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === pick)); });
       for (var k = 0; k < o.count; k++) {
         var day = Math.floor((k + 0.5) * days / o.count);
-        on[Math.floor(day / bin)] = true;
+        on[Math.floor(day / bin)] = (on[Math.floor(day / bin)] || 0) + 1;
       }
       ticks.forEach(function (t, i) {
         t.classList.toggle("is-decision", !!on[i]);
-        if (on[i]) t.setAttribute("data-mark", "");
+        if (on[i]) t.setAttribute("data-mark", String(on[i]));
         else t.removeAttribute("data-mark");
       });
       strip.setAttribute("aria-label", o.said + " decisions marked across " + days + " trading days" + per);
@@ -2447,9 +2451,10 @@
      where the retrain runs and what runs beside it.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
-     no "Runs" column, found by its header; a rule it cannot read; no job on the first of the month,
-     which leaves nothing to choose; or a job name with a word longer than LANE_WORD letters, which
-     would push its lane label and seven days past a 320px screen. */
+     no "Runs" column, found by its header; a rule it cannot read, or one that reads as more than one
+     (a job runs on one calendar); no job on the first of the month, which leaves nothing to
+     choose; or a job name with a word longer than LANE_WORD letters, which would push its lane
+     label and seven days past a 320px screen. */
   var WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   var TRADING = 5, LANE_WORD = 9;
   register("scheduler-week", function (fig, stage, data) {
@@ -2463,17 +2468,24 @@
           throw new Error("scheduler-week: " + JSON.stringify(w) + " is too long a word for a lane label at 320px");
         }
       });
-      WEEKDAYS.forEach(function (d, i) { if (new RegExp("\\bon " + d.toLowerCase() + "\\b").test(rule)) day = i; });
-      var when = /\beach trading day\b/.test(rule) ? "trading" :
-                 /\bthe first of the month\b/.test(rule) ? "first" : day >= 0 ? "weekday" : null;
-      if (!when) throw new Error("scheduler-week: " + r.label + " runs " + JSON.stringify(r.cells[col - 1]) + ", a rule it cannot draw");
+      var said = JSON.stringify(r.cells[col - 1]), found = [];
+      WEEKDAYS.forEach(function (d, i) {
+        if (new RegExp("\\bon " + d.toLowerCase() + "\\b").test(rule)) { day = i; found.push("weekday"); }
+      });
+      if (/\beach trading day\b/.test(rule)) found.push("trading");
+      if (/\bthe first of the month\b/.test(rule)) found.push("first");
+      if (!found.length) throw new Error("scheduler-week: " + r.label + " runs " + said + ", a rule it cannot draw");
+      if (found.length > 1) {
+        throw new Error("scheduler-week: " + r.label + " runs " + said + ", which reads as more than one rule");
+      }
+      var when = found[0];
       return { name: r.label, when: when, day: day };
     });
     var monthly = jobs.filter(function (j) { return j.when === "first"; });
     if (!monthly.length) throw new Error("scheduler-week: no job runs on the first of the month, so there is nothing to choose");
 
     /* The choice: the weekday the month turns on, or none this week. Opens on Saturday. */
-    var first = 5;
+    var first = WEEKDAYS.indexOf("Saturday");
     var bar = make("div", "exhibit__controls", stage);
     var ask = make("span", "sched__ask", bar, "The first of the month falls on");
     ask.id = fig.id + "-ask";
@@ -2482,6 +2494,7 @@
     group.setAttribute("aria-labelledby", ask.id);
     var picks = WEEKDAYS.concat(["No day this week"]).map(function (d, i) {
       var b = button(group, "seg__option", i < WEEKDAYS.length ? d.slice(0, 3) : d, i === first);
+      if (i < WEEKDAYS.length) b.setAttribute("aria-label", d);
       b.addEventListener("click", function () { first = i; update(); });
       return b;
     });
@@ -2506,9 +2519,11 @@
     readout.setAttribute("aria-live", "polite");
     var read = make("p", "sched__read", readout);
     read.setAttribute("data-result", "");
-    make("p", "exhibit__note", readout, "Saturday and Sunday are not trading days, so no " +
-         jobs.filter(function (j) { return j.when === "trading"; }).map(function (j) { return lower(j.name); })
-             .join(" or ") + " runs on them.");
+    var daily = jobs.filter(function (j) { return j.when === "trading"; });
+    if (daily.length) {
+      make("p", "exhibit__note", readout, "Saturday and Sunday are not trading days, so no " +
+           daily.map(function (j) { return lower(j.name); }).join(" or ") + " runs on them.");
+    }
 
     function lower(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
     function runs(j, i) {
