@@ -2999,6 +2999,96 @@
     update();
   });
 
+  /* ---- KIND: review-cycle ----------------------------------------------------------------------
+     TradeLog's Decision Review Cycle. The table lists the cycle's steps in the order they run, each
+     with what the Illustrative Investor sees at it and the component that carries it (the columns
+     "What the Illustrative Investor sees" and "Carried by", found by header). The drawing is the
+     cycle: its four steps at the corners of a square, read clockwise, an arrow from each to the
+     next and from the last back to the first, because a revised plan is the next commitment. Every
+     step is marked (data-mark "Step N, Name") and writes the component that carries it, so the
+     whole cycle stays in view whichever step is chosen; the chosen one is outlined.
+
+     One control, a segmented choice of step, opens on the first. The readout (data-result) names
+     the chosen step and reads its row: what the Illustrative Investor sees there, and what carries
+     it. suites/run.py reads that under every step. Nothing plays over time, so there is no
+     aria-busy, and there are no hover readouts.
+
+     A table the drawing cannot show is refused: a column it needs missing or repeated, other than
+     four steps (the square has four corners), a step named twice, an empty cell, or a word in a
+     step's name or component too long for a corner of the square at 320px. */
+  var CYCLE_WORD = 14;
+  register("review-cycle", function (fig, stage, data) {
+    function col(name) {
+      var at = data.columns.indexOf(name);
+      if (at < 1 || data.columns.lastIndexOf(name) !== at) {
+        throw new Error("review-cycle: the table needs one " + JSON.stringify(name) + " column");
+      }
+      return at - 1;
+    }
+    var sees = col("What the Illustrative Investor sees"), by = col("Carried by");
+    if (data.rows.length !== 4) {
+      throw new Error("review-cycle: the table has " + data.rows.length + " steps, and the square has four corners");
+    }
+    var named = {};
+    var steps = data.rows.map(function (r) {
+      var s = { name: r.label, sees: r.cells[sees] || "", by: r.cells[by] || "" };
+      if (!s.name || !s.sees || !s.by) throw new Error("review-cycle: a step leaves a cell empty");
+      if (named[s.name]) throw new Error("review-cycle: two steps are named " + JSON.stringify(s.name));
+      named[s.name] = true;
+      (s.name + " " + s.by).split(/\s+/).forEach(function (w) {
+        if (w.length > CYCLE_WORD) {
+          throw new Error("review-cycle: " + JSON.stringify(w) + " is too long a word for a corner at 320px");
+        }
+      });
+      return s;
+    });
+    var onStep = 0;
+
+    var bar = make("div", "exhibit__controls", stage);
+    make("span", "cycle__ask", bar, "Step");
+    var pick = segmented(bar, "Step of the Decision Review Cycle", steps.map(function (s) { return s.name; }),
+                         function (i) { onStep = i; update(); });
+    Array.prototype.forEach.call(bar.querySelectorAll("button"), function (b, i) {
+      b.setAttribute("aria-label", "Step " + (i + 1) + ", " + steps[i].name);
+    });
+
+    var square = make("div", "cycle", stage);
+    square.setAttribute("role", "img");
+    square.setAttribute("aria-label", "The Decision Review Cycle: " + steps.map(function (s, i) {
+      return "step " + (i + 1) + ", " + s.name + ", carried by " + s.by.charAt(0).toLowerCase() + s.by.slice(1);
+    }).join("; ") + "; then back to step 1.");
+    var corners = steps.map(function (s, i) {
+      var c = make("div", "cycle__step", square);
+      c.setAttribute("data-mark", "Step " + (i + 1) + ", " + s.name);
+      make("span", "cycle__num", c, "Step " + (i + 1));
+      make("span", "cycle__name", c, s.name);
+      make("span", "cycle__by", c, s.by);
+      return c;
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var read = make("div", "cycle__read", readout);
+    read.setAttribute("data-result", "");
+    /* Spaces between the parts, so the sentence a screen reader reads (and the harness) does not
+       run one part into the next. */
+    var where = make("b", "cycle__where", read);
+    read.appendChild(document.createTextNode(" "));
+    var seen = make("span", "cycle__sees", read);
+    read.appendChild(document.createTextNode(" "));
+    var carried = make("span", "cycle__carried", read);
+
+    function update() {
+      pick.press(onStep);
+      corners.forEach(function (c, i) { c.classList.toggle("is-on", i === onStep); });
+      where.textContent = "Step " + (onStep + 1) + " of " + steps.length + ", " + steps[onStep].name + ".";
+      seen.textContent = steps[onStep].sees;
+      carried.textContent = "Carried by: " + steps[onStep].by + ".";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
