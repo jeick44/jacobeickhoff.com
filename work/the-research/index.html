@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
         <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
         <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
-        <div><dt>Reading time</dt><dd>11 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>13 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
@@ -167,6 +167,65 @@
               rung is measured afterwards from edit distance and n-gram overlap against its original,
               never inferred from the prompt that asked for it. A prompt is a request; edit intensity is
               what happened.</p>
+            <figure class="exhibit" id="exhibit-prompt-vs-intensity" data-exhibit="edit-intensity"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> One prompt
+                  asking for a light edit can return light, moderate and heavy revisions, once the
+                  change is measured</h3>
+                <p class="exhibit__instruction">Choose a revision to see what it changed and which
+                  measure placed it on its rung.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>An invented footnote passage, and revisions of it each asked for by the
+                      same prompt</caption>
+                    <thead>
+                      <tr><th scope="col">Passage</th><th scope="col">Text</th><th scope="col">Prompt</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Original</th><td>The company leases office space and equipment
+                        under operating leases that expire at various dates over the next several
+                        years. Rent expense is recognized on a straight-line basis over the lease term,
+                        including any periods of free rent.</td><td>&mdash;</td></tr>
+                      <tr><th scope="row">Revision 1</th><td>The company leases office space and
+                        equipment under operating leases that expire at various dates over the next
+                        several years. Rent expense is recognized on a straight-line basis over the
+                        lease term, including any rent-free periods.</td><td>Revise this passage
+                        lightly for clarity.</td></tr>
+                      <tr><th scope="row">Revision 2</th><td>The company rents office space and
+                        equipment under operating leases that end at different dates over the coming
+                        several years. Rent cost is recognized on a straight-line basis across the
+                        lease period, including any periods of free rent.</td><td>Revise this passage
+                        lightly for clarity.</td></tr>
+                      <tr><th scope="row">Revision 3</th><td>The company leases office space and
+                        equipment under operating leases that expire at various dates over the next
+                        several years. Rent expense, including any periods of free rent, is recognized
+                        on a straight-line basis over the lease term.</td><td>Revise this passage
+                        lightly for clarity.</td></tr>
+                      <tr><th scope="row">Revision 4</th><td>Our offices and equipment are held on
+                        operating leases that end at different points in the coming years. We spread
+                        the rent evenly across each lease, free months included.</td><td>Revise this
+                        passage lightly for clarity.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; an invented passage in
+                the style of a lease footnote, and revisions of it written by hand for this Exhibit to
+                show how far one prompt&rsquo;s results can spread. No model wrote them, and none comes
+                from the study&rsquo;s validation set, whose passages, revisions and cut-points are not
+                reproduced here. Words are compared ignoring case and punctuation. Edit distance is the
+                fewest words inserted, deleted or replaced to turn the original into the revision, as a
+                share of the original&rsquo;s words; n-gram overlap is the share of the original&rsquo;s
+                distinct word pairs the revision keeps. A revision is light when its edits come to at
+                most 20% of the original&rsquo;s words and at least 70% of its word pairs survive; heavy
+                when its edits come to more than 50% or fewer than 40% of its word pairs survive;
+                moderate otherwise. These cut-points are this illustration&rsquo;s own.</figcaption>
+            </figure>
             <p><strong>The Gate.</strong> A detector may score real filings only if it reaches an AUC of
               at least 0.70 at the moderate rung and holds its false-positive rate at or below 5%
               against genuine pre-2020 footnotes. Four were named in advance: the detector the withdrawn
@@ -210,7 +269,7 @@
             <figure class="exhibit" id="exhibit-ranking-not-probability" data-exhibit="ranking"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Adding one
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Adding one
                   company moves every score already given, and a quarter are flagged whatever the text
                   says</h3>
                 <p class="exhibit__instruction">Add a company to the sample and watch the scores of the
@@ -266,7 +325,7 @@
             <figure class="exhibit" id="exhibit-placebo-breaks" data-exhibit="placebo-break"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> A break placed
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> A break placed
                   where nothing happened comes back significant in every year, until a time trend is
                   added</h3>
                 <p class="exhibit__instruction">Move the placebo break to any year, then add a time

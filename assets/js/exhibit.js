@@ -3090,6 +3090,187 @@
     update();
   });
 
+  /* ---- KIND: edit-intensity --------------------------------------------------------------------
+     The Research's rule that a revision's rung is measured, never read off the prompt. The table
+     holds one "Original" passage and its revisions ("Revision 1", "Revision 2", … in order), each
+     with its "Text" and the "Prompt" that asked for it (a dash on the original). Every revision
+     must carry the same prompt: the Exhibit is one prompt's.
+
+     Each revision is measured against the original, word by word, ignoring case and punctuation:
+     its edit distance (the fewest words inserted, deleted or replaced to turn the original into it)
+     as a share of the original's words, and the share of the original's distinct word pairs it
+     keeps. A revision is light when both say light, heavy when either says heavy, moderate
+     otherwise, at the cut-points below, which the source line states in words and suites/run.py
+     reads from there.
+
+     The drawing: the prompt, once; the ladder of three rungs with every revision placed on the rung
+     it measured; and, for the revision in hand (a segmented choice), its two measures, its rung,
+     which measure put it there, and the revision itself with the words it struck and added marked.
+
+     Results (data-result): each revision's placement ("Revision 2" and, in hidden words,
+     ", moderate"), the rungs reached ("k of n"), then the revision in hand, "k% of words edited",
+     "k% of word pairs kept" and its rung. Nothing plays, so there is no aria-busy, and there are no
+     hover readouts.
+
+     A table the drawing cannot show is refused: no "Text" or "Prompt" column, no single original,
+     revisions not numbered from 1 in order, fewer than two revisions, revisions carrying different
+     prompts (or none), or a passage with a word that is only punctuation. */
+  register("edit-intensity", function (fig, stage, data) {
+    var RUNGS = ["Light", "Moderate", "Heavy"];
+    var LIGHT_EDITED = 0.2, LIGHT_KEPT = 0.7, HEAVY_EDITED = 0.5, HEAVY_KEPT = 0.4;
+    var col = {};
+    ["Text", "Prompt"].forEach(function (name) {
+      var i = data.columns.indexOf(name);
+      if (i < 1) throw new Error("edit-intensity: the table has no " + JSON.stringify(name) + " column");
+      col[name] = i - 1;
+    });
+    function words(s, who) {
+      var shown = s.split(/\s+/).filter(Boolean);
+      if (!shown.length) throw new Error("edit-intensity: " + who + " has no text");
+      var keys = shown.map(function (w) {
+        var k = w.toLowerCase().replace(/[^a-z0-9-]/g, "");
+        if (!k) throw new Error("edit-intensity: " + who + " has a word that is only punctuation: " + w);
+        return k;
+      });
+      return { shown: shown, keys: keys };
+    }
+    var rows = data.rows;
+    if (!rows.length || !/^original$/i.test(rows[0].label)) {
+      throw new Error("edit-intensity: the table's first row is not the original");
+    }
+    if (rows.length < 3) throw new Error("edit-intensity: one prompt needs at least two revisions to compare");
+    var original = words(rows[0].cells[col["Text"]] || "", "the original");
+    var prompt = (rows[1].cells[col["Prompt"]] || "").trim();
+    if (!prompt || /^[—–-]$/.test(prompt)) throw new Error("edit-intensity: Revision 1 carries no prompt");
+    var revisions = rows.slice(1).map(function (r, i) {
+      if (r.label !== "Revision " + (i + 1)) {
+        throw new Error("edit-intensity: row " + (i + 2) + " is " + JSON.stringify(r.label) +
+                        ", not \"Revision " + (i + 1) + "\"");
+      }
+      if ((r.cells[col["Prompt"]] || "").trim() !== prompt) {
+        throw new Error("edit-intensity: " + r.label + " carries a different prompt; the Exhibit is one prompt's");
+      }
+      return measure(r.label, words(r.cells[col["Text"]] || "", r.label));
+    });
+
+    /* Word-level edit distance with the path that achieves it, and the word pairs kept. */
+    function measure(name, rev) {
+      var a = original.keys, b = rev.keys, d = [];
+      for (var i = 0; i <= a.length; i++) {
+        d.push([i]);
+        for (var j = 1; j <= b.length; j++) {
+          d[i].push(i ? Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)) : j);
+        }
+      }
+      var ops = [];
+      for (var x = a.length, y = b.length; x || y;) {
+        if (x && y && d[x][y] === d[x - 1][y - 1] + (a[x - 1] === b[y - 1] ? 0 : 1)) {
+          if (a[x - 1] === b[y - 1]) ops.unshift({ kept: rev.shown[y - 1] });
+          else ops.unshift({ struck: original.shown[x - 1] }, { added: rev.shown[y - 1] });
+          x--; y--;
+        } else if (x && d[x][y] === d[x - 1][y] + 1) {
+          ops.unshift({ struck: original.shown[x - 1] });
+          x--;
+        } else {
+          ops.unshift({ added: rev.shown[y - 1] });
+          y--;
+        }
+      }
+      function pairs(k) {
+        var s = {};
+        for (var p = 0; p + 1 < k.length; p++) s[k[p] + " " + k[p + 1]] = true;
+        return s;
+      }
+      var mine = pairs(a), theirs = pairs(b), all = Object.keys(mine);
+      var kept = all.filter(function (p) { return theirs[p]; }).length / all.length;
+      var edited = d[a.length][b.length] / a.length;
+      var byEdit = edited <= LIGHT_EDITED ? 0 : edited > HEAVY_EDITED ? 2 : 1;
+      var byPairs = kept >= LIGHT_KEPT ? 0 : kept < HEAVY_KEPT ? 2 : 1;
+      return { name: name, ops: ops, edited: edited, kept: kept,
+               byEdit: byEdit, byPairs: byPairs, rung: Math.max(byEdit, byPairs) };
+    }
+
+    var current = 0;
+    var bar = make("div", "exhibit__controls", stage);
+    var pick = segmented(bar, "Revision", revisions.map(function (r) { return r.name; }), function (i) {
+      current = i;
+      update();
+    });
+
+    var ask = make("div", "intensity__prompt", stage);
+    make("span", "intensity__prompt-label", ask, "The prompt, the same for every revision:");
+    make("q", "", ask, prompt);
+
+    var ladder = make("ol", "intensity__ladder", stage);
+    var placed = [];
+    RUNGS.forEach(function (rung, k) {
+      var li = make("li", "intensity__rung", ladder);
+      make("span", "intensity__rung-name", li, rung);
+      var here = make("span", "intensity__members", li);
+      revisions.forEach(function (r, i) {
+        if (r.rung !== k) return;
+        var chip = make("span", "intensity__member chip chip--plain", here, r.name);
+        chip.setAttribute("data-result", "");
+        make("span", "visually-hidden", chip, ", " + rung.toLowerCase());
+        placed[i] = chip;
+      });
+    });
+
+    var reached = RUNGS.filter(function (_, k) {
+      return revisions.some(function (r) { return r.rung === k; });
+    }).length;
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var count = make("div", "exhibit__count", readout);
+    var tally = make("b", "", count, reached + " of " + RUNGS.length);
+    tally.setAttribute("data-result", "");
+    count.appendChild(document.createTextNode(" rungs reached by one prompt"));
+
+    var detail = make("div", "intensity__detail", readout);
+    var which = make("b", "", detail);
+    which.setAttribute("data-result", "");
+    var editedOut = make("span", "intensity__measure", detail);
+    editedOut.setAttribute("data-result", "");
+    var keptOut = make("span", "intensity__measure", detail);
+    keptOut.setAttribute("data-result", "");
+    var rungChip = make("span", "chip chip--plain", detail);
+    rungChip.setAttribute("data-result", "");
+    var note = make("div", "exhibit__note", readout);
+    var passage = make("div", "intensity__text", stage);
+    var key = make("div", "exhibit__note", stage,
+                   "Struck: words the revision removed from the original. Underlined: words it added.");
+    key.setAttribute("aria-hidden", "true");
+
+    function percent(x) { return Math.round(x * 100) + "%"; }
+
+    function update() {
+      var r = revisions[current];
+      pick.press(current);
+      placed.forEach(function (chip, i) { chip.classList.toggle("is-current", i === current); });
+      which.textContent = r.name;
+      editedOut.textContent = percent(r.edited) + " of words edited";
+      keptOut.textContent = percent(r.kept) + " of word pairs kept";
+      rungChip.textContent = RUNGS[r.rung];
+      var rung = RUNGS[r.rung].toLowerCase();
+      if (r.byEdit === r.byPairs) note.textContent = "Both measures put it on " + rung + ".";
+      else {
+        var by = r.byEdit > r.byPairs ? ["Its edit distance", "the word pairs it kept"]
+                                      : ["The word pairs it broke", "its edit distance"];
+        note.textContent = by[0] + " put it on " + rung + "; " + by[1] + " alone would have said " +
+          RUNGS[Math.min(r.byEdit, r.byPairs)].toLowerCase() + ".";
+      }
+      passage.textContent = "";
+      r.ops.forEach(function (op, i) {
+        if (i) passage.appendChild(document.createTextNode(" "));
+        if (op.kept) passage.appendChild(document.createTextNode(op.kept));
+        else if (op.struck) make("del", "", passage, op.struck);
+        else make("ins", "", passage, op.added);
+      });
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };

@@ -4802,3 +4802,88 @@ button.prep__cell:focus-visible {
     height: var(--space-md);
   }
 }
+
+/* =================================================================================================
+   THE RESEARCH: A PROMPT IS A REQUEST (kind: edit-intensity)
+   The prompt once, then the ladder: three rungs, lightest first, each holding the revisions its
+   measures put there as plain chips; the revision in hand is filled in ink. Beneath the readout,
+   that revision as running text, the words it struck from the original crossed through and the
+   words it added underlined, so the change is read, not only counted. Divs, not p, so the Spine's
+   reading measure does not clip them.
+   ============================================================================================== */
+.intensity__prompt {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.intensity__prompt q {
+  display: block;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.intensity__ladder {
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.intensity__rung {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 2.25rem;
+  padding: var(--space-2xs) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.intensity__rung-name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.intensity__members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.intensity__member.is-current {
+  background: var(--ink);
+  box-shadow: none;
+  color: var(--paper);
+}
+
+.intensity__detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+.intensity__measure {
+  font-variant-numeric: tabular-nums;
+}
+
+.intensity__text {
+  margin: var(--space-sm) 0 var(--space-2xs);
+  padding: var(--space-sm);
+  border-left: 3px solid var(--line);
+  background: var(--mist);
+  line-height: 1.6;
+}
+
+.intensity__text del {
+  color: var(--ink-soft);
+}
+
+.intensity__text ins {
+  text-decoration: underline;
+  text-decoration-color: var(--data-1);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
