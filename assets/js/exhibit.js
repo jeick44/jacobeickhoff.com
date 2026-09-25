@@ -1810,14 +1810,17 @@
   /* ---- helpers shared by The Research's kinds -----------------------------------------------------
      A segmented choice: a named group of pressed-state buttons, the first pressed. Clicking one calls
      onPick with its index; the kind decides what changes, and press(i) shows which option holds.
+     fullNames, when given, names each option in full to a screen reader (its aria-label) where the
+     visible word is short ("Record" is heard as "Step 2, Record"); without it the word is the name.
      svgChild adds a classed child to an SVG parsed from markup, taking the SVG namespace from it
      rather than from a URL written here (suites/run.py reads any URL in a shipped script as a load). */
-  function segmented(bar, label, names, onPick) {
+  function segmented(bar, label, names, onPick, fullNames) {
     var group = make("div", "seg", bar);
     group.setAttribute("role", "group");
     group.setAttribute("aria-label", label);
     var options = names.map(function (name, i) {
       var b = button(group, "seg__option", name, i === 0);
+      if (fullNames) b.setAttribute("aria-label", fullNames[i]);
       b.addEventListener("click", function () { onPick(i); });
       return b;
     });
@@ -3047,10 +3050,8 @@
     var bar = make("div", "exhibit__controls", stage);
     make("span", "cycle__ask", bar, "Step");
     var pick = segmented(bar, "Step of the Decision Review Cycle", steps.map(function (s) { return s.name; }),
-                         function (i) { onStep = i; update(); });
-    Array.prototype.forEach.call(bar.querySelectorAll("button"), function (b, i) {
-      b.setAttribute("aria-label", "Step " + (i + 1) + ", " + steps[i].name);
-    });
+                         function (i) { onStep = i; update(); },
+                         steps.map(function (s, i) { return "Step " + (i + 1) + ", " + s.name; }));
 
     var square = make("div", "cycle", stage);
     square.setAttribute("role", "img");

@@ -145,15 +145,15 @@
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Four steps
                   turn a plan into a record that can be reviewed.</h3>
-                <p class="exhibit__instruction">Choose a step to see what the Illustrative Investor
-                  sees there, and which part of the system carries it.</p>
+                <p class="exhibit__instruction">Step through the cycle to see what the Illustrative
+                  Investor has in front of it at each step, and which part of the system carries it.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
               <details class="exhibit__data">
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>One session of the Illustrative Investor, taken once around the
+                    <caption>One day of the Illustrative Investor, taken once around the
                       cycle</caption>
                     <thead>
                       <tr><th scope="col">Step</th><th scope="col">What the Illustrative Investor
@@ -161,31 +161,31 @@
                     </thead>
                     <tbody>
                       <tr><th scope="row">Commit</th><td>Rule A, position size; Rule B, entries;
-                        Rule C, exits; Rule D, when to stop. All four are written down before the
-                        session opens and saved as version 1.</td><td>The ruleset</td></tr>
-                      <tr><th scope="row">Record</th><td>Every execution in the session, read from
+                        Rule C, exits; Rule D, when to stop. All four are written down in advance
+                        and saved as version 1.</td><td>The ruleset</td></tr>
+                      <tr><th scope="row">Record</th><td>Every execution of the day, read from
                         the broker&rsquo;s export: entry, exit, size, fees and timestamps. Nothing
                         is typed in.</td><td>The integration</td></tr>
                       <tr><th scope="row">Compare</th><td>Verified Adherence, computed from those
                         executions, beside Claimed Adherence, the Illustrative Investor&rsquo;s own
-                        account of the session. The record shows Rule C broken once; the account
-                        says it was kept. The gap is displayed, not averaged away.</td><td>The
-                        evaluator</td></tr>
-                      <tr><th scope="row">Revise</th><td>Rule C is revised and saved as version 2.
-                        The next session is graded under version 2; this one stays graded under
-                        version 1.</td><td>Versioned configuration</td></tr>
+                        account of the day. The record shows Rule C broken once; the account says
+                        it was kept.</td><td>The evaluator</td></tr>
+                      <tr><th scope="row">Revise</th><td>Rule B is revised on review and saved as
+                        version 2. The next day is graded under version 2; this one stays graded
+                        under version 1.</td><td>Versioned configuration</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> illustrative; one session of the
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; one day of the
                 Illustrative Investor, a synthetic account over a synthetic period, taken once
                 around the cycle. The components are the ones this Case Study describes. Rules A to
-                D are named by category only: every threshold and definition behind them is
-                withheld under Methodology Silence, and no figure from a real account appears. A
-                review runs the cycle once per session; one pass is drawn.</figcaption>
+                D and their categories are illustrative, not the real ruleset; every threshold and
+                definition behind the real Rules is withheld under Methodology Silence, and no
+                figure from a real account appears. The cycle repeats whenever the Rules are
+                revised; one pass is drawn.</figcaption>
             </figure>
-            <p>TradeLog computes <strong>Verified Adherence</strong> from that export: Rules the investor
+            <p>TradeLog computes <strong>Verified Adherence</strong> from the broker&rsquo;s export: Rules the investor
               committed to in advance, written as conditions a machine can check, evaluated against
               every execution the broker recorded. Nothing the investor types reaches it.</p>
             <p>The simpler product deletes the self-report at that point, and this one does the
