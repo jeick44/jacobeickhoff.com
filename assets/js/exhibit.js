@@ -3957,6 +3957,152 @@
     sync();
   });
 
+  /* ---- KIND: versioned-rules -------------------------------------------------------------------
+     TradeLog's Versioned Investment Rules. The table follows one Rule, "Rule X, its category",
+     across the Illustrative Investor's week, a row per day: the version the day was recorded under
+     (Version 1, then Version 2 from the revision on), and its grade, Kept or Broken, under each
+     version. Its columns are found by header.
+
+     Saved as version 2 (the opening view, because it is the one that shows the point): the week as
+     a ledger, a day to a row, each naming the version it was recorded under and that version's
+     grade. A rule between the last version-1 day and the first version-2 day marks the revision
+     (data-mark "Rule B revised after Wednesday"); no grade already given changes.
+
+     "Edit in place" is the other choice: the Rule keeps no version, so every day is named with the
+     Rule as edited and graded under version 2. A version-1 day whose grade that changes is ringed
+     and marked (data-mark "Tuesday"), with the grade it had struck through beside the new one; the
+     ring is the Exhibit's, since a record edited in place keeps no trace of the change. Grades and
+     rings change by transition, which the reduced-motion blanket collapses; nothing plays over
+     time, so there is no aria-busy, and no hover readouts.
+
+     The readout (data-result) says when the Rule was revised and which days each version grades;
+     edited in place, that no day records its version and which days changed, from and to.
+
+     A table the drawing cannot show or word is refused: a column it needs missing or repeated, a
+     Rule not written "Rule X, its category" or more than one Rule, a day recorded under anything
+     but Version 1 or Version 2, a grade other than Kept or Broken, a day graded twice, a version-1
+     day after a version-2 day, or a week with no revision in it. */
+  register("versioned-rules", function (fig, stage, data) {
+    function col(name) {
+      var at = data.columns.indexOf(name);
+      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
+        throw new Error("versioned-rules: the table needs one " + JSON.stringify(name) + " column");
+      }
+      return at;
+    }
+    var cols = [col("Day"), col("Rule"), col("Recorded under"), col("Graded under version 1"),
+                col("Graded under version 2")];
+    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var days = [], rule = null;
+    data.rows.forEach(function (r) {
+      var name = cell(r, cols[1]), rec = /^Version ([12])$/.exec(cell(r, cols[2]));
+      var d = { day: cell(r, cols[0]), version: rec ? Number(rec[1]) : 0,
+                grades: [cell(r, cols[3]), cell(r, cols[4])] };
+      if (!d.day || !/^Rule [A-Z], \S/.test(name)) {
+        throw new Error("versioned-rules: a row is not a day and 'Rule X, its category'");
+      }
+      if (rule && name !== rule) throw new Error("versioned-rules: the table follows more than one Rule");
+      rule = name;
+      if (!d.version) {
+        throw new Error("versioned-rules: " + d.day + " is not recorded under Version 1 or Version 2");
+      }
+      if (!GAP_GRADES[d.grades[0]] || !GAP_GRADES[d.grades[1]]) {
+        throw new Error("versioned-rules: " + JSON.stringify(d.grades.join(" / ")) + " is not Kept or Broken");
+      }
+      if (days.some(function (x) { return x.day === d.day; })) {
+        throw new Error("versioned-rules: " + d.day + " is graded twice");
+      }
+      if (days.length && d.version < days[days.length - 1].version) {
+        throw new Error("versioned-rules: " + d.day + " is recorded under version 1 after the revision");
+      }
+      days.push(d);
+    });
+    var before = days.filter(function (d) { return d.version === 1; });
+    var after = days.filter(function (d) { return d.version === 2; });
+    if (!before.length || !after.length) {
+      throw new Error("versioned-rules: the week needs days under version 1, then days under version 2");
+    }
+    var letter = rule.split(",")[0], last = before[before.length - 1].day, edited = false;
+
+    var bar = make("div", "exhibit__controls", stage);
+    make("span", "vers__ask", bar, "Rule change");
+    var pick = segmented(bar, "How " + letter + " is changed", ["Save as version 2", "Edit in place"],
+                         function (i) { edited = i === 1; update(); },
+                         ["Revise " + letter + " and save it as version 2", "Edit " + letter + " in place"]);
+
+    var ledger = make("div", "vers", stage);
+    ledger.setAttribute("role", "group");
+    var cut = null;
+    days.forEach(function (d) {
+      var row = make("div", "vers__day", ledger);
+      row.setAttribute("role", "img");
+      make("span", "vers__name", row, d.day).setAttribute("aria-hidden", "true");
+      d.tag = make("span", "vers__tag chip", row);
+      d.grade = make("span", "vers__grade", row);
+      d.was = make("s", "vers__was", row);
+      [d.tag, d.grade, d.was].forEach(function (x) { x.setAttribute("aria-hidden", "true"); });
+      d.row = row;
+      if (d.day === last) cut = make("div", "vers__cut", ledger);
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var read = make("div", "vers__read", readout);
+    read.setAttribute("data-result", "");
+
+    function mark(g) { return (g === "Kept" ? "✓ " : "✕ ") + GAP_GRADES[g]; }
+    function names(list) {
+      var ds = list.map(function (d) { return d.day; });
+      return ds.length > 1 ? ds.slice(0, -1).join(", ") + " and " + ds[ds.length - 1] : ds[0];
+    }
+
+    function update() {
+      pick.press(edited ? 1 : 0);
+      ledger.setAttribute("aria-label", edited
+        ? "The week under " + letter + " as edited in place, a day to a row"
+        : "The week under " + letter + ", a day to a row, each with the version it was recorded under");
+      var changed = [];
+      days.forEach(function (d) {
+        var g = edited ? d.grades[1] : d.grades[d.version - 1];
+        var rewritten = edited && d.version === 1 && d.grades[0] !== d.grades[1];
+        d.tag.textContent = edited ? "as edited" : "version " + d.version;
+        d.tag.classList.toggle("chip--plain", edited);
+        d.grade.textContent = mark(g);
+        d.grade.className = "vers__grade is-" + GAP_GRADES[g];
+        d.was.textContent = rewritten ? "was " + mark(d.grades[0]) : "";
+        d.row.classList.toggle("is-rewritten", rewritten);
+        d.row.setAttribute("aria-label", d.day + ": " + (edited ? letter + " as edited" : "version " + d.version) +
+                           ", " + GAP_GRADES[g] + (rewritten ? ", graded " + GAP_GRADES[d.grades[0]] + " before the edit" : ""));
+        if (rewritten) {
+          d.row.setAttribute("data-mark", d.day);
+          changed.push(d.day + (changed.length ? "" : " changes") + " from " + GAP_GRADES[d.grades[0]] +
+                       " to " + GAP_GRADES[g]);
+        } else {
+          d.row.removeAttribute("data-mark");
+        }
+      });
+      cut.classList.toggle("is-edited", edited);
+      if (edited) {
+        cut.textContent = letter + " edited in place after " + last + "’s review; no version saved";
+        cut.removeAttribute("data-mark");
+        read.textContent = letter + " was edited in place after " + last + "’s review, so no day records " +
+          "which version graded it; every day is now graded under the edited Rule. " +
+          (changed.length ? changed.join(", and ") + ". The record shows no sign that anything changed; " +
+            "the rings are this Exhibit’s, not the system’s."
+                          : "No grade already given happens to change.");
+        return;
+      }
+      cut.textContent = letter + " revised on review after " + last + "; saved as version 2";
+      cut.setAttribute("data-mark", letter + " revised after " + last);
+      read.textContent = letter + " was revised after " + last + "’s review and saved as version 2. " +
+        names(after) + (after.length > 1 ? " are" : " is") + " graded under version 2. " +
+        names(before) + (before.length > 1 ? " keep" : " keeps") + " version 1 and the grades " +
+        "given under it; no result already graded changed.";
+    }
+
+    update();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };

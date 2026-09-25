@@ -4067,7 +4067,8 @@ button.prep__cell:focus-visible {
 /* ---- The Exhibits' small print ------------------------------------------------------------------
    A control's label, an axis label, a day, a lane name or a step's number: small, bold and muted,
    the same in MacroSense's pipeline, regime vector, decision window and scheduler's week, and in
-   TradeLog's Decision Review Cycle and Recorded and Reported Adherence. */
+   TradeLog's Decision Review Cycle, Recorded and Reported Adherence and Versioned Investment
+   Rules. */
 .regime__ctl,
 .dwin__label,
 .sched__ask,
@@ -4079,7 +4080,8 @@ button.prep__cell:focus-visible {
 .gap__ask,
 .gap__day,
 .gap__cat,
-.gap__key {
+.gap__key,
+.vers__ask {
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--ink-mute);
@@ -5361,6 +5363,98 @@ button.prep__cell:focus-visible {
 }
 
 .gap__read {
+  max-width: var(--measure);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ---- versioned-rules -----------------------------------------------------------------------------
+   Versioned Investment Rules: the week as a ledger, a day to a row, each with the version it was
+   recorded under in a chip and its grade as a tick or a cross with its word, so no grade rests on
+   colour. A dashed rule between two days marks the revision. Edited in place, the chips go plain,
+   the rule goes solid in the trouble colour, and a day whose grade the edit changed is ringed, with
+   the grade it had struck through on a line of its own. The control's label is the Exhibits' small
+   print, set with those above. */
+.vers {
+  display: grid;
+  gap: var(--space-3xs);
+  max-width: 36rem;
+  padding: var(--radius-ring);
+}
+
+.vers__day {
+  display: grid;
+  grid-template-columns: 5.75rem auto 1fr;
+  align-items: center;
+  gap: var(--space-3xs) var(--space-sm);
+  padding: var(--space-2xs) var(--space-sm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: box-shadow 300ms var(--ease), border-color 300ms var(--ease);
+}
+
+.vers__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.vers__tag {
+  justify-self: start;
+  background: var(--blue-wash);
+  color: var(--blue-deep);
+}
+
+.vers__tag.chip--plain {
+  background: transparent;
+  color: var(--ink-mute);
+}
+
+.vers__grade {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: color 300ms var(--ease);
+}
+
+.vers__grade.is-kept {
+  color: var(--data-1);
+}
+
+.vers__grade.is-broken {
+  color: color-mix(in srgb, var(--data-4) 70%, var(--ink));
+}
+
+.vers__was {
+  grid-column: 2 / -1;
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}
+
+.vers__was:empty {
+  display: none;
+}
+
+.vers__day.is-rewritten {
+  border-color: var(--data-4);
+  box-shadow: 0 0 0 var(--radius-ring) var(--data-4);
+}
+
+.vers__cut {
+  padding: var(--space-2xs) 0;
+  border-top: 2px dashed var(--blue);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--blue-deep);
+}
+
+.vers__cut.is-edited {
+  border-top-style: solid;
+  border-top-color: var(--data-4);
+  color: color-mix(in srgb, var(--data-4) 70%, var(--ink));
+}
+
+.vers__read {
   max-width: var(--measure);
   font-size: var(--text-sm);
   line-height: 1.5;
