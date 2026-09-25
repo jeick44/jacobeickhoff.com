@@ -99,6 +99,7 @@
   --radius-photo: 12px;
   --radius-ring: 2px;
   --pill: 999px;
+  --chip-pad: 0.1rem 0.45rem;
 
   /* The sticky chrome, and what has to clear it: the header sits at one layer, the progress rule
      drawn along its lower edge at the next, and anything else sticky stops this far from the top. */
@@ -2512,7 +2513,7 @@ button.prep__cell:focus-visible {
    something is wrong - a defect that would reach figures, a company flagged - in the red categorical
    colour, always with its word. Placed after the chips it overrides. */
 .chip {
-  padding: 0.1rem 0.45rem;
+  padding: var(--chip-pad);
   border-radius: var(--pill);
   font-size: 0.7rem;
   font-weight: 700;
@@ -2522,6 +2523,11 @@ button.prep__cell:focus-visible {
 .chip--trouble {
   background: color-mix(in srgb, var(--data-4) 13%, var(--paper));
   color: color-mix(in srgb, var(--data-4) 70%, var(--ink));
+}
+
+/* A plain chip: the same word in an outlined pill, for the verdict that says nothing is wrong. */
+.chip--plain {
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 
 .exhibit .suite__detail {
@@ -3951,14 +3957,26 @@ button.prep__cell:focus-visible {
 /* =================================================================================================
    THE RESEARCH: BREAKS WHERE NOTHING HAPPENED (kind: placebo-break)
    The series as points, the quarters after the break washed, the break as a dashed rule, and the
-   fitted specification in blue on top. The chart is an SVG scaled to its frame, so it fits any
+   fitted specification in the first data colour on top. The chart is an SVG scaled to its frame, so it fits any
    width; its only words are HTML around it. Beneath, every tested date: a filled mark where it came
    back significant and a hollow one where it did not, so the shape carries the verdict and the
-   colour never does alone. The date in hand is outlined. The readout's p is not held to the
-   Spine's reading measure.
+   colour never does alone. The date in hand is outlined, and written above the slider. The
+   readout's p is not held to the Spine's reading measure.
    ============================================================================================== */
-.placebo__slider {
+.placebo__pick {
   flex: 1 1 12rem;
+}
+
+.exhibit .placebo__caption {
+  max-width: none;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.placebo__caption b {
+  color: var(--ink);
 }
 
 .exhibit .placebo__heading,
@@ -3989,7 +4007,7 @@ button.prep__cell:focus-visible {
 }
 
 .placebo__fit {
-  stroke: var(--blue);
+  stroke: var(--data-1);
   stroke-width: 3;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
@@ -4023,7 +4041,7 @@ button.prep__cell:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--space-3xs);
-  padding: 0.1rem 0.4rem;
+  padding: var(--chip-pad);
   border: 1px solid transparent;
   border-radius: var(--pill);
 }
@@ -4056,6 +4074,6 @@ button.prep__cell:focus-visible {
   color: var(--ink);
 }
 
-.placebo__verdict:not(.chip--trouble) {
-  box-shadow: inset 0 0 0 1px var(--line);
+.placebo__t {
+  white-space: nowrap;
 }

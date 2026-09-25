@@ -1793,6 +1793,34 @@
     update();
   });
 
+  /* ---- helpers shared by The Research's kinds -----------------------------------------------------
+     A segmented choice: a named group of pressed-state buttons, the first pressed. Clicking one calls
+     onPick with its index; the kind decides what changes, and press(i) shows which option holds.
+     svgChild adds a classed child to an SVG parsed from markup, taking the SVG namespace from it
+     rather than from a URL written here (suites/run.py reads any URL in a shipped script as a load). */
+  function segmented(bar, label, names, onPick) {
+    var group = make("div", "seg", bar);
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", label);
+    var options = names.map(function (name, i) {
+      var b = button(group, "seg__option", name, i === 0);
+      b.addEventListener("click", function () { onPick(i); });
+      return b;
+    });
+    return {
+      press: function (at) {
+        options.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === at)); });
+      },
+    };
+  }
+
+  function svgChild(svg, tag, cls) {
+    var e = document.createElementNS(svg.namespaceURI, tag);
+    if (cls) e.setAttribute("class", cls);
+    svg.appendChild(e);
+    return e;
+  }
+
   /* ---- KIND: ranking ---------------------------------------------------------------------------
      The Research's withdrawn score, recomputed in front of the reader. The table lists synthetic
      companies with the detector reading each one's filing received, and when each joins the sample:
@@ -1859,18 +1887,11 @@
 
     var bar = make("div", "exhibit__controls", stage);
     var add = button(bar, "btn btn--solid", "");
-    var group = make("div", "seg", bar);
-    group.setAttribute("role", "group");
-    group.setAttribute("aria-label", "Readings");
-    var readings = ["As filed", "Doubled"].map(function (name, i) {
-      var b = button(group, "seg__option", name, i === 0);
-      b.addEventListener("click", function () {
-        if (doubled === (i === 1)) return;
-        before = score(size);
-        doubled = i === 1;
-        update("doubled");
-      });
-      return b;
+    var readings = segmented(bar, "Readings", ["As filed", "Doubled"], function (i) {
+      if (doubled === (i === 1)) return;
+      before = score(size);
+      doubled = i === 1;
+      update("doubled");
     });
     add.addEventListener("click", function () {
       var was = score(size);
@@ -1925,7 +1946,7 @@
       /* The tally counts the rows the rule flagged, never the quartile it is meant to be. */
       var k = now.filter(function (s) { return s.flagged; }).length;
       add.textContent = size < companies.length ? "Add a company" : "Back to the starting sample";
-      readings.forEach(function (b, i) { b.setAttribute("aria-pressed", String(doubled === (i === 1))); });
+      readings.press(doubled ? 1 : 0);
       rows.forEach(function (r, i) {
         var s = now[i], old = before && i < before.length ? before[i] : null;
         r.li.hidden = !s;
@@ -1977,14 +1998,15 @@
      A break at a quarter is a step that is 0 before it and 1 from it on. Its jump is estimated by
      least squares, on its own (the level alone) or beside a linear time trend, and it is called
      significant where its t-statistic is 1.96 or more either way - the 5% level, two-sided, the
-     same rule for every date. The shared slider moves the break across the tested quarters; a
-     segmented pair adds the trend. The drawing is the series as points, the break as a line, and
+     same rule for every date. The shared slider moves the break across the tested quarters, with the
+     date in hand written above it; a segmented pair adds the trend. The drawing is the series as points, the break as a line, and
      the fitted specification on top: two flat levels without the trend, one sloped line with a step
      in it with the trend. Beneath it every tested date is marked significant or not, so a reader
      sees the whole re-run as well as the date in hand.
 
-     Results (data-result): the placebo tally "k of n", then the date in hand, its jump, its t and
-     the verdict. Nothing plays, so there is no aria-busy, and there are no hover readouts.
+     Results (data-result): each tested date's verdict in the strip, in table order (", significant"
+     or ", not significant"), the placebo tally "k of n", then the date in hand, its jump (always
+     signed), its t ("t = 5.2") and the verdict. Nothing plays, so there is no aria-busy, and there are no hover readouts.
 
      A table the drawing cannot show truthfully is refused: quarters that are not consecutive, a
      score that is not a figure, a mark other than "Tested" or a dash, no tested date, a tested date
@@ -2002,18 +2024,17 @@
     var quarters = data.rows.map(function (r, i) {
       var m = /^(\d{4}) Q([1-4])$/.exec(r.label);
       if (!m) throw new Error("placebo-break: " + JSON.stringify(r.label) + " is not a quarter, such as \"2016 Q1\"");
-      var at = +m[1] * 4 + (+m[2] - 1);
+      var ordinal = +m[1] * 4 + (+m[2] - 1);
       var score = r.values[col["Score"]];
       if (score == null) throw new Error("placebo-break: " + r.label + " has no score");
       var mark = (r.cells[col["Placebo break"]] || "").trim();
       if (!/^(tested|—|-|)$/i.test(mark)) {
         throw new Error("placebo-break: " + r.label + " is marked " + JSON.stringify(mark) + ", not \"Tested\" or a dash");
       }
-      return { label: r.label, year: m[1], at: at, score: score, tested: /^tested$/i.test(mark), i: i };
+      return { label: r.label, year: m[1], ordinal: ordinal, score: score, tested: /^tested$/i.test(mark), i: i };
     });
-    if (quarters.length < 2 * SIDE) throw new Error("placebo-break: the series is too short to break");
     quarters.forEach(function (q, i) {
-      if (i && q.at !== quarters[i - 1].at + 1) {
+      if (i && q.ordinal !== quarters[i - 1].ordinal + 1) {
         throw new Error("placebo-break: " + q.label + " does not follow " + quarters[i - 1].label);
       }
     });
@@ -2068,22 +2089,22 @@
       return { b: b, jump: jump, t: t, significant: Math.abs(t) >= CRITICAL, trend: trend };
     }
 
-    var at = 0, trend = false;
+    var current = 0, trend = false;
 
     var bar = make("div", "exhibit__controls", stage);
-    var slide = slider(bar, {
+    /* The slider's value, written above it for a sighted reader; the slider announces its own. */
+    var pick = make("div", "placebo__pick", bar);
+    var caption = make("p", "placebo__caption", pick, "Placebo break: ");
+    caption.setAttribute("aria-hidden", "true");
+    var dateShown = make("b", "", caption);
+    slider(pick, {
       min: 0, max: dates.length - 1, step: 1, value: 0, label: "Placebo break",
       valueText: function (v) { return "Break at " + dates[v].label; },
-      onChange: function (v) { at = v; update(); },
+      onChange: function (v) { current = v; update(); },
     });
-    slide.el.classList.add("placebo__slider");
-    var group = make("div", "seg", bar);
-    group.setAttribute("role", "group");
-    group.setAttribute("aria-label", "Specification");
-    var specs = ["Level only", "With a time trend"].map(function (name, i) {
-      var b = button(group, "seg__option", name, i === 0);
-      b.addEventListener("click", function () { trend = i === 1; update(); });
-      return b;
+    var specs = segmented(bar, "Specification", ["Level only", "With a time trend"], function (i) {
+      trend = i === 1;
+      update();
     });
 
     /* The chart: points, the break, and the fit. Drawn in its own units and scaled to the frame, so
@@ -2092,29 +2113,21 @@
     var frame = make("div", "exhibit__frame", stage);
     var chart = make("div", "placebo", frame);
     make("p", "placebo__heading", chart, data.columns[1 + col["Score"]] + ", by quarter");
-    /* Parsed from markup, so its children take the SVG namespace from it rather than from a URL
-       written here (suites/run.py reads any URL in a shipped script as a load). */
     chart.insertAdjacentHTML("beforeend", '<svg class="placebo__plot" viewBox="0 0 ' + W + " " + H +
                              '" aria-hidden="true" focusable="false"></svg>');
     var svg = chart.lastChild;
-    function el(tag, cls) {
-      var e = document.createElementNS(svg.namespaceURI, tag);
-      if (cls) e.setAttribute("class", cls);
-      svg.appendChild(e);
-      return e;
-    }
-    var after = el("rect", "placebo__after");
+    var after = svgChild(svg, "rect", "placebo__after");
     var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
     function x(i) { return PAD + i * (W - 2 * PAD) / (n - 1); }
     function y(v) { return H - PAD - (v - lo) / (hi - lo || 1) * (H - 2 * PAD); }
     quarters.forEach(function (q, i) {
-      var c = el("circle", "placebo__point");
+      var c = svgChild(svg, "circle", "placebo__point");
       c.setAttribute("cx", x(i));
       c.setAttribute("cy", y(q.score));
       c.setAttribute("r", 4);
     });
-    var fitBefore = el("line", "placebo__fit"), fitAfter = el("line", "placebo__fit");
-    var rule = el("line", "placebo__break");
+    var fitBefore = svgChild(svg, "line", "placebo__fit"), fitAfter = svgChild(svg, "line", "placebo__fit");
+    var rule = svgChild(svg, "line", "placebo__break");
     var axis = make("p", "placebo__axis", chart);
     axis.setAttribute("aria-hidden", "true");
     make("span", "", axis, quarters[0].year);
@@ -2126,7 +2139,9 @@
       var li = make("li", "placebo__date", strip);
       make("span", "placebo__mark", li).setAttribute("aria-hidden", "true");
       make("span", "", li, q.label);
-      return { li: li, word: make("span", "visually-hidden", li) };
+      var word = make("span", "visually-hidden", li);
+      word.setAttribute("data-result", "");
+      return { li: li, word: word };
     });
 
     var readout = make("div", "exhibit__readout", stage);
@@ -2135,16 +2150,16 @@
     var tally = make("b", "", count);
     tally.setAttribute("data-result", "");
     count.appendChild(document.createTextNode(" placebo dates come back significant"));
-    var line = make("p", "placebo__at", readout);
-    line.appendChild(document.createTextNode("Break at "));
-    var when = make("b", "", line);
-    line.appendChild(document.createTextNode(": a jump of "));
-    var jump = make("span", "", line);
-    line.appendChild(document.createTextNode(", t = "));
-    var tv = make("span", "", line);
-    line.appendChild(document.createTextNode(" "));
-    var verdict = make("span", "chip placebo__verdict", line);
-    [when, jump, tv, verdict].forEach(function (r) { r.setAttribute("data-result", ""); });
+    var atLine = make("p", "placebo__at", readout);
+    atLine.appendChild(document.createTextNode("Break at "));
+    var dateOut = make("b", "", atLine);
+    atLine.appendChild(document.createTextNode(": a jump of "));
+    var jump = make("span", "", atLine);
+    atLine.appendChild(document.createTextNode(", "));
+    var tText = make("span", "placebo__t", atLine);
+    atLine.appendChild(document.createTextNode(" "));
+    var verdict = make("span", "chip placebo__verdict", atLine);
+    [dateOut, jump, tText, verdict].forEach(function (r) { r.setAttribute("data-result", ""); });
     var note = make("p", "exhibit__note", readout);
 
     function signed(v, places) {
@@ -2154,21 +2169,21 @@
 
     function update() {
       var all = dates.map(function (q) { return fit(q.i, trend); });
-      var now = all[at], q = dates[at], b = now.b;
-      specs.forEach(function (s, i) { s.setAttribute("aria-pressed", String(trend === (i === 1))); });
+      var now = all[current], q = dates[current], b = now.b;
+      specs.press(trend ? 1 : 0);
       marks.forEach(function (m, i) {
         m.li.classList.toggle("is-significant", all[i].significant);
-        m.li.classList.toggle("is-current", i === at);
+        m.li.classList.toggle("is-current", i === current);
         m.word.textContent = all[i].significant ? ", significant" : ", not significant";
       });
       /* The fitted line: its value at a quarter, either side of the break. */
       function fitted(i) { return b[0] + (trend ? b[1] * i : 0) + (i >= q.i ? now.jump : 0); }
-      function seg(ln, from, to) {
+      function placeFit(ln, from, to) {
         ln.setAttribute("x1", x(from)); ln.setAttribute("y1", y(fitted(from)));
         ln.setAttribute("x2", x(to)); ln.setAttribute("y2", y(fitted(to)));
       }
-      seg(fitBefore, 0, q.i - 1);
-      seg(fitAfter, q.i, n - 1);
+      placeFit(fitBefore, 0, q.i - 1);
+      placeFit(fitAfter, q.i, n - 1);
       var bx = (x(q.i - 1) + x(q.i)) / 2;
       rule.setAttribute("x1", bx); rule.setAttribute("x2", bx);
       rule.setAttribute("y1", 0); rule.setAttribute("y2", H);
@@ -2176,14 +2191,16 @@
       after.setAttribute("width", W - bx); after.setAttribute("height", H);
 
       tally.textContent = all.filter(function (f) { return f.significant; }).length + " of " + dates.length;
-      when.textContent = q.label;
+      dateShown.textContent = q.label;
+      dateOut.textContent = q.label;
       jump.textContent = signed(now.jump, 1);
-      tv.textContent = signed(now.t, 1).replace(/^\+/, "");
+      tText.textContent = "t = " + signed(now.t, 1).replace(/^\+/, "");
       verdict.textContent = now.significant ? "Significant" : "Not significant";
       verdict.classList.toggle("chip--trouble", now.significant);
+      verdict.classList.toggle("chip--plain", !now.significant);
       note.textContent = trend
         ? "With the drift in the specification, the jump left at each date is noise: what the placebo found was the trend."
-        : "Nothing happened at any of these dates. The score only drifts upward, so the quarters after any date sit higher than the ones before it.";
+        : "Nothing happened at any of these dates. The score drifts upward, so the quarters after any date tend to sit higher than the ones before it.";
     }
 
     update();
