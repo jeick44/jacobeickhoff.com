@@ -4067,7 +4067,7 @@ button.prep__cell:focus-visible {
 /* ---- The Exhibits' small print ------------------------------------------------------------------
    A control's label, an axis label, a day, a lane name or a step's number: small, bold and muted,
    the same in MacroSense's pipeline, regime vector, decision window and scheduler's week, and in
-   TradeLog's Decision Review Cycle. */
+   TradeLog's Decision Review Cycle and Recorded and Reported Adherence. */
 .regime__ctl,
 .dwin__label,
 .sched__ask,
@@ -4075,7 +4075,11 @@ button.prep__cell:focus-visible {
 .sched__job,
 .cycle__ask,
 .cycle__num,
-.pipe__term {
+.pipe__term,
+.gap__ask,
+.gap__day,
+.gap__cat,
+.gap__key {
   font-size: var(--text-xs);
   font-weight: 600;
   color: var(--ink-mute);
@@ -5233,4 +5237,132 @@ button.prep__cell:focus-visible {
 .pipe__said {
   margin: 0;
   color: var(--ink-soft);
+}
+
+/* ---- adherence-gap -------------------------------------------------------------------------------
+   Recorded and Reported Adherence: a Rule to a row and a day to a column, each cell split into the
+   recorded grade (left) and the reported one (right), each a tick or a cross on its own tone, so no
+   grade rests on colour. A cell whose two grades disagree is ringed in the trouble colour. Combined,
+   the grades and rings fade to plain mist, and one count replaces the two above the grid. The kind
+   refuses more days than fit across a phone, and the grid sits in the shared frame. The control's
+   label, the days, the categories and the key are the Exhibits' small print, set with those above. */
+.gap__tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-lg);
+  margin-bottom: var(--space-sm);
+}
+
+.gap__count {
+  display: grid;
+  flex: 1 1 8rem;
+  align-content: start;
+  gap: var(--space-3xs);
+  max-width: 14rem;
+}
+
+.gap__count[hidden],
+.gap__key[hidden] {
+  display: none;
+}
+
+.gap__figure {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-weight: 400;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.gap__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gap__words {
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.gap {
+  display: grid;
+  padding: var(--radius-ring);
+  grid-template-columns: minmax(4.5rem, auto) repeat(var(--gap-days), minmax(2.25rem, 1fr));
+  align-items: center;
+  gap: var(--space-3xs);
+  max-width: 36rem;
+}
+
+.gap__day {
+  text-align: center;
+}
+
+.gap__rule {
+  display: grid;
+  line-height: 1.2;
+  font-size: var(--text-sm);
+  color: var(--ink);
+}
+
+.gap__cell {
+  display: flex;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 300ms var(--ease), border-color 300ms var(--ease);
+}
+
+.gap__half {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  transition: background-color 300ms var(--ease), color 300ms var(--ease);
+}
+
+.gap__half--rec {
+  border-right: 1px solid var(--line);
+}
+
+.gap__half.is-kept {
+  background: var(--blue-wash);
+  color: var(--data-1);
+}
+
+.gap__half.is-broken {
+  background: repeating-linear-gradient(-45deg, var(--hatch) 0 4px, transparent 4px 8px),
+    color-mix(in srgb, var(--data-4) 13%, var(--paper));
+  color: color-mix(in srgb, var(--data-4) 70%, var(--ink));
+}
+
+.gap__cell.is-gap {
+  border-color: var(--data-4);
+  box-shadow: 0 0 0 var(--radius-ring) var(--data-4);
+}
+
+.gap.is-combined .gap__half {
+  background: var(--mist);
+  color: transparent;
+}
+
+.gap.is-combined .gap__half--rec {
+  border-right-color: transparent;
+}
+
+.gap__key {
+  max-width: var(--measure);
+  margin-top: var(--space-sm);
+}
+
+.gap__read {
+  max-width: var(--measure);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink);
 }

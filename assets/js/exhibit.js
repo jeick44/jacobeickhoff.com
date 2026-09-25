@@ -3106,6 +3106,182 @@
     update();
   });
 
+  /* ---- KIND: adherence-gap ---------------------------------------------------------------------
+     TradeLog's Recorded and Reported Adherence. The table grades each Rule for each day of the
+     Illustrative Investor's week twice, Kept or Broken: from the broker's record ("Verified
+     Adherence") and as the investor reported it in review ("Claimed Adherence"). Its columns are
+     found by header; each row is a day and a Rule, "Rule X, its category".
+
+     Side by side (the opening view, because it is the one that shows the point): a grid, a Rule to
+     a row and a day to a column, each cell split into the recorded grade and the reported one. A
+     cell whose two grades disagree is ringed and marked (data-mark "Rule C, Tuesday"); every cell
+     names both its grades to a screen reader. Above the grid, the two counts of Rule-days kept.
+
+     "Report one combined score" is the other choice: the two counts become their average, the
+     cells lose their grades and their rings, and nothing marks where the record and the report
+     disagreed. The grades and rings fade out by transition, which the reduced-motion blanket
+     collapses; nothing plays over time, so there is no aria-busy, and no hover readouts.
+
+     The readout (data-result) gives the counts, then, side by side, how many Rule-days disagree and
+     which, under their direction; combined, the one score and what it no longer shows.
+
+     A table the drawing cannot show or word is refused: a column it needs missing or repeated, a
+     grade other than Kept or Broken, a Rule not written "Rule X, its category" or with two
+     categories, a Rule-day graded twice or missing, fewer than two days or Rules, more days than
+     fit across a phone (GAP_DAYS), or a word in a category too long for the row's label at 320px. */
+  var GAP_DAYS = 5, GAP_WORD = 10, GAP_GRADES = { Kept: "kept", Broken: "broken" };
+  register("adherence-gap", function (fig, stage, data) {
+    function col(name) {
+      var at = data.columns.indexOf(name);
+      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
+        throw new Error("adherence-gap: the table needs one " + JSON.stringify(name) + " column");
+      }
+      return at;
+    }
+    var cols = [col("Day"), col("Rule"), col("Verified Adherence"), col("Claimed Adherence")];
+    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var days = [], rules = [], grade = {};
+    data.rows.forEach(function (r) {
+      var day = cell(r, cols[0]), rule = /^Rule ([A-Z]), (\S.*)$/.exec(cell(r, cols[1]));
+      var rec = cell(r, cols[2]), rep = cell(r, cols[3]);
+      if (!day || !rule) throw new Error("adherence-gap: a row is not a day and 'Rule X, its category'");
+      if (!GAP_GRADES[rec] || !GAP_GRADES[rep]) {
+        throw new Error("adherence-gap: " + JSON.stringify(rec + " / " + rep) + " is not Kept or Broken");
+      }
+      var known = rules.filter(function (x) { return x.letter === rule[1]; })[0];
+      if (!known) rules.push(known = { letter: rule[1], name: "Rule " + rule[1], category: rule[2] });
+      if (known.category !== rule[2]) throw new Error("adherence-gap: " + known.name + " has two categories");
+      rule[2].split(/\s+/).forEach(function (w) {
+        if (w.length > GAP_WORD) {
+          throw new Error("adherence-gap: " + JSON.stringify(w) + " is too long a word for a row's label at 320px");
+        }
+      });
+      if (days.indexOf(day) < 0) days.push(day);
+      var key = known.name + "|" + day;
+      if (grade[key]) throw new Error("adherence-gap: " + known.name + " is graded twice on " + day);
+      grade[key] = { rec: rec, rep: rep };
+    });
+    rules.sort(function (a, b) { return a.letter < b.letter ? -1 : 1; });
+    if (days.length < 2 || rules.length < 2) throw new Error("adherence-gap: a week needs two days and two Rules");
+    if (days.length > GAP_DAYS) {
+      throw new Error("adherence-gap: " + days.length + " days are more than fit across a phone");
+    }
+    var total = days.length * rules.length, kept = [0, 0], gaps = [];
+    rules.forEach(function (x) {
+      days.forEach(function (d) {
+        var g = grade[x.name + "|" + d];
+        if (!g) throw new Error("adherence-gap: " + x.name + " is not graded on " + d);
+        if (g.rec === "Kept") kept[0]++;
+        if (g.rep === "Kept") kept[1]++;
+        if (g.rec !== g.rep) gaps.push({ rule: x.name, day: d, g: g });
+      });
+    });
+    var combined = false;
+
+    var bar = make("div", "exhibit__controls", stage);
+    make("span", "gap__ask", bar, "Adherence");
+    var pick = segmented(bar, "How adherence is reported", ["Side by side", "Report one combined score"],
+                         function (i) { combined = i === 1; update(); },
+                         ["Show Verified Adherence and Claimed Adherence side by side", "Report one combined score"]);
+
+    var tally = make("div", "gap__tally", stage);
+    function count(n) { return (n % 1 ? n.toFixed(1) : String(n)) + " of " + total; }
+    function figure(cls, name, words) {
+      var t = make("div", "gap__count " + cls, tally);
+      make("b", "gap__figure", t);
+      make("span", "gap__name", t, name);
+      make("span", "gap__words", t, words);
+      return t;
+    }
+    var counts = [figure("gap__count--rec", "Recorded", "Verified Adherence, from the broker’s record"),
+                  figure("gap__count--rep", "Reported", "Claimed Adherence, from the review"),
+                  figure("gap__count--one", "One combined score", "both counts averaged")];
+
+    var frame = make("div", "exhibit__frame", stage);
+    var grid = make("div", "gap", frame);
+    grid.setAttribute("role", "group");
+    grid.style.setProperty("--gap-days", String(days.length));
+    make("span", "gap__corner", grid);
+    days.forEach(function (d) {
+      var h = make("span", "gap__day", grid, d.slice(0, 3));
+      h.setAttribute("aria-hidden", "true");
+    });
+    var cells = [];
+    rules.forEach(function (x) {
+      var head = make("span", "gap__rule", grid);
+      make("b", "", head, x.name);
+      make("span", "gap__cat", head, x.category);
+      days.forEach(function (d) {
+        var g = grade[x.name + "|" + d], c = make("span", "gap__cell", grid);
+        [g.rec, g.rep].forEach(function (v, i) {
+          var half = make("span", "gap__half gap__half--" + (i ? "rep" : "rec") + " is-" + GAP_GRADES[v], c,
+                          v === "Kept" ? "✓" : "✕");
+          half.setAttribute("aria-hidden", "true");
+        });
+        cells.push({ el: c, rule: x.name, day: d, g: g });
+      });
+    });
+
+    var key = make("div", "gap__key", stage,
+                   "In each cell, the recorded grade sits left of the reported grade: \u2713 kept, \u2715 broken. " +
+                   "A ring marks a Rule-day where the grades disagree.");
+    key.setAttribute("aria-hidden", "true");
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var read = make("div", "gap__read", readout);
+    read.setAttribute("data-result", "");
+
+    function listed(rec, rep) {
+      return gaps.filter(function (x) { return x.g.rec === rec && x.g.rep === rep; })
+                 .map(function (x) { return x.rule + " on " + x.day; }).join(", ");
+    }
+
+    function update() {
+      pick.press(combined ? 1 : 0);
+      grid.classList.toggle("is-combined", combined);
+      grid.setAttribute("aria-label", combined
+        ? "The week's Rule-days, averaged into one combined score: no grade and no disagreement is shown"
+        : "The week's Rule-days, each Rule by day, recorded beside reported");
+      cells.forEach(function (c) {
+        var gap = c.g.rec !== c.g.rep;
+        c.el.classList.toggle("is-gap", gap && !combined);
+        if (combined) {
+          c.el.removeAttribute("role");
+          c.el.removeAttribute("aria-label");
+          c.el.removeAttribute("data-mark");
+          return;
+        }
+        c.el.setAttribute("role", "img");
+        c.el.setAttribute("aria-label", c.rule + ", " + c.day + ": recorded " + GAP_GRADES[c.g.rec] +
+                          ", reported " + GAP_GRADES[c.g.rep]);
+        if (gap) c.el.setAttribute("data-mark", c.rule + ", " + c.day);
+      });
+      counts[0].hidden = counts[1].hidden = combined;
+      counts[2].hidden = !combined;
+      key.hidden = combined;
+      /* A hidden count is emptied too, so no figure the reader cannot see is left for a reader of
+         the page's words to find. */
+      counts[0].firstChild.textContent = combined ? "" : count(kept[0]);
+      counts[1].firstChild.textContent = combined ? "" : count(kept[1]);
+      counts[2].firstChild.textContent = combined ? count((kept[0] + kept[1]) / 2) : "";
+      if (combined) {
+        read.textContent = "One combined score: " + count((kept[0] + kept[1]) / 2) + " Rule-days kept. " +
+          "No Rule and no day is marked, and nothing shows where the record and the report disagreed.";
+        return;
+      }
+      var parts = ["Verified Adherence: " + count(kept[0]) + " Rule-days kept.",
+                   "Claimed Adherence: " + count(kept[1]) + " kept.",
+                   "They disagree on " + count(gaps.length) + "."];
+      var down = listed("Broken", "Kept"), up = listed("Kept", "Broken");
+      if (down) parts.push("Recorded broken, reported kept: " + down + ".");
+      if (up) parts.push("Recorded kept, reported broken: " + up + ".");
+      read.textContent = parts.join(" ");
+    }
+
+    update();
+  });
+
   /* ---- KIND: edit-intensity --------------------------------------------------------------------
      The Research's rule that a revision's rung is measured, never read off the prompt. The table
      holds one "Original" passage and its revisions ("Revision 1", "Revision 2", … in order), each
