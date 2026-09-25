@@ -262,6 +262,42 @@
               finding, and the bar is not lowered.</p>
             <a class="more" href="/work/the-research/">Read the Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
           </div>
+          <figure class="exhibit" id="exhibit-the-gate" data-exhibit="gate"
+                  data-provenance="illustrative" data-compact>
+            <div class="exhibit__head">
+              <h4 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The Gate: AUC
+                &ge; 0.70 at moderate edit intensity, false positives &le; 5%</h4>
+              <p class="exhibit__instruction">Drag the points, or try a detector profile.</p>
+            </div>
+            <div class="exhibit__stage" data-stage></div>
+            <details class="exhibit__data">
+              <summary class="exhibit__data-toggle">View the data</summary>
+              <div class="exhibit__table">
+                <table>
+                  <caption>Four hypothetical detector profiles, each an AUC at every rung of edit intensity and a false-positive rate; at the foot, the Gate they are judged against</caption>
+                  <thead>
+                    <tr><th scope="col">Hypothetical detector</th><th scope="col">AUC at the light rung</th><th scope="col">AUC at the moderate rung</th><th scope="col">AUC at the heavy rung</th><th scope="col">False-positive rate on genuine pre-2020 footnotes</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><th scope="row">Sees only heavy edits</th><td>0.56</td><td>0.63</td><td>0.90</td><td>2.5%</td></tr>
+                    <tr><th scope="row">Blind</th><td>0.51</td><td>0.53</td><td>0.56</td><td>3.0%</td></tr>
+                    <tr><th scope="row">Noisy</th><td>0.66</td><td>0.80</td><td>0.90</td><td>8.0%</td></tr>
+                    <tr><th scope="row">Clears the bar</th><td>0.67</td><td>0.76</td><td>0.90</td><td>3.5%</td></tr>
+                  </tbody>
+                  <tfoot>
+                    <tr><th scope="col">The Gate</th><th scope="col" colspan="4">What a detector must show before it may score a real filing</th></tr>
+                    <tr><th scope="row">AUC at the moderate rung</th><td colspan="4">At least 0.70</td></tr>
+                    <tr><th scope="row">False-positive rate on genuine pre-2020 footnotes</th><td colspan="4">At most 5%</td></tr>
+                  </tfoot>
+                </table>
+              </div>
+            </details>
+            <figcaption class="exhibit__source"><b>Source:</b> illustrative; the Gate as pre-registered in
+              the Case Study. Every detector shown is hypothetical; no detector&rsquo;s result is plotted
+              here, because none has been judged against the Gate yet. Each profile carries its own
+              false-positive rate. <a href="/work/the-research/#exhibit-the-gate">The full Exhibit</a>,
+              where the false-positive rate can also be moved, is in the Case Study.</figcaption>
+          </figure>
         </article>
 
       </div>

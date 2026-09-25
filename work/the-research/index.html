@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
         <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
         <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
-        <div><dt>Reading time</dt><dd>13 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>14 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
@@ -244,6 +244,45 @@
               detectable with current public methods &mdash; and that is the finding, not a failure to
               find one. The bar is not lowered, the ladder is not re-cut, and the panel is not scored in
               the hope that scale compensates.</p>
+            <figure class="exhibit" id="exhibit-the-gate" data-exhibit="gate"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The Gate: AUC
+                  &ge; 0.70 at moderate edit intensity, false positives &le; 5%</h3>
+                <p class="exhibit__instruction">Drag the points, try a detector profile, or move the
+                  false-positive rate.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Four hypothetical detector profiles, each an AUC at every rung of edit intensity and a false-positive rate; at the foot, the Gate they are judged against</caption>
+                    <thead>
+                      <tr><th scope="col">Hypothetical detector</th><th scope="col">AUC at the light rung</th><th scope="col">AUC at the moderate rung</th><th scope="col">AUC at the heavy rung</th><th scope="col">False-positive rate on genuine pre-2020 footnotes</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Sees only heavy edits</th><td>0.56</td><td>0.63</td><td>0.90</td><td>2.5%</td></tr>
+                      <tr><th scope="row">Blind</th><td>0.51</td><td>0.53</td><td>0.56</td><td>3.0%</td></tr>
+                      <tr><th scope="row">Noisy</th><td>0.66</td><td>0.80</td><td>0.90</td><td>8.0%</td></tr>
+                      <tr><th scope="row">Clears the bar</th><td>0.67</td><td>0.76</td><td>0.90</td><td>3.5%</td></tr>
+                    </tbody>
+                    <tfoot>
+                      <tr><th scope="col">The Gate</th><th scope="col" colspan="4">What a detector must show before it may score a real filing</th></tr>
+                      <tr><th scope="row">AUC at the moderate rung</th><td colspan="4">At least 0.70</td></tr>
+                      <tr><th scope="row">False-positive rate on genuine pre-2020 footnotes</th><td colspan="4">At most 5%</td></tr>
+                    </tfoot>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; the Gate as
+                pre-registered above, with its bar at the foot of the table. Every detector shown is
+                hypothetical, invented for this Exhibit: no detector&rsquo;s result is plotted here, the
+                pilot run&rsquo;s included, because none has yet been judged against the Gate. Each
+                rung is measured afterwards from edit distance and n-gram overlap; the study&rsquo;s
+                cut-points between rungs are not reproduced here while the study is at its validation
+                stage.</figcaption>
+            </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">What a pilot run is allowed to decide</summary>
               <div class="disclosure__body">
@@ -278,7 +317,7 @@
             <figure class="exhibit" id="exhibit-ranking-not-probability" data-exhibit="ranking"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Adding one
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> Adding one
                   company moves every score already given, and a quarter are flagged whatever the text
                   says</h3>
                 <p class="exhibit__instruction">Add a company to the sample and watch the scores of the
@@ -334,7 +373,7 @@
             <figure class="exhibit" id="exhibit-placebo-breaks" data-exhibit="placebo-break"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> A break placed
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> A break placed
                   where nothing happened comes back significant in every year, until a time trend is
                   added</h3>
                 <p class="exhibit__instruction">Move the placebo break to any year, then add a time

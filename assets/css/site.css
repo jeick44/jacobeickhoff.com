@@ -4886,3 +4886,191 @@ button.prep__cell:focus-visible {
   text-decoration-thickness: 0.125em;
   text-underline-offset: 0.22em;
 }
+
+/* ---- gate: The Research's pre-registered pass bar, and its homepage copy -------------------------
+   The Detectability Curve is drawn in its own units and scales to the frame; under a readable width
+   the frame scrolls sideways. Each point is the shared slider on a mark, so it alone claims a
+   touch; the plot leaves panning to the page. */
+.gate__plot {
+  display: block;
+  width: 100%;
+  min-width: 22rem;
+  height: auto;
+  font-family: var(--font-sans);
+}
+
+.gate__grid {
+  stroke: var(--line);
+}
+
+.gate__base {
+  stroke: var(--ink);
+}
+
+.gate__tick,
+.gate__axis-name,
+.gate__chance-name {
+  font-size: 13px;
+  fill: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.gate__axis-name {
+  font-weight: 700;
+  fill: var(--ink-soft);
+}
+
+.gate__axis-name--x {
+  font-weight: 400;
+  fill: var(--ink-mute);
+}
+
+.gate__zone {
+  fill: var(--blue-wash);
+}
+
+.gate__bar {
+  stroke: var(--blue);
+  stroke-width: 2.5;
+}
+
+.gate__bar-name {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--blue-deep);
+}
+
+.gate__chance {
+  stroke: var(--ink-mute);
+  stroke-dasharray: 4 4;
+}
+
+.gate__rung {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.gate__rung--gate {
+  font-weight: 700;
+}
+
+.gate__curve {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.gate__handle {
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.gate__handle:focus-visible {
+  outline: none;
+}
+
+.gate__hit {
+  fill: transparent;
+}
+
+.gate__mark {
+  fill: var(--paper);
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.gate__mark--pass {
+  stroke: var(--good);
+}
+
+.gate__mark--fail {
+  stroke: var(--bad);
+}
+
+.gate__handle:focus-visible .gate__mark {
+  stroke: var(--blue);
+  stroke-width: 3.5;
+}
+
+.gate__value {
+  font-size: 13.5px;
+  font-weight: 700;
+  fill: var(--ink);
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 4px;
+}
+
+.gate__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+@media (min-width: 36rem) {
+  .exhibit:not([data-compact]) .gate__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+}
+
+.gate__fpr-name {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gate__fpr-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.gate__verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition: background-color 220ms var(--ease), color 220ms var(--ease);
+}
+
+.gate__verdict svg {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gate__verdict svg circle {
+  fill: currentColor;
+  fill-opacity: 0.15;
+  stroke: none;
+}
+
+.gate__verdict--pass {
+  background: color-mix(in srgb, var(--good) 12%, var(--paper));
+  color: color-mix(in srgb, var(--good) 70%, var(--ink));
+}
+
+.gate__verdict--fail {
+  background: color-mix(in srgb, var(--bad) 11%, var(--paper));
+  color: color-mix(in srgb, var(--bad) 75%, var(--ink));
+}
+
+.gate__why {
+  margin-top: var(--space-3xs);
+  min-height: 2.6em;
+  font-size: var(--text-xs);
+  color: var(--ink-mute);
+}

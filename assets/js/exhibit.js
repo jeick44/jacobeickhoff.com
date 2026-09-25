@@ -129,14 +129,17 @@
      gesture, and it says so with touch-action: none in the stylesheet.
 
        slider(host, { min, max, step, value, label, valueText: function (v) {…}, onChange,
-                      visibleLabel, showValue })
+                      visibleLabel, showValue, mark, pointerValue })
 
      visibleLabel writes the slider's name before it for a sighted reader, hidden from a screen
      reader (the slider announces its own), and showValue follows it with the current value. A
-     labelled slider takes the shared row layout (.exhibit__slider-label + .slider).  */
+     labelled slider takes the shared row layout (.exhibit__slider-label + .slider).
+     mark makes an element the kind has drawn (a draggable point in a chart) the slider instead of a
+     track: the same role, keys and announcements, with pointerValue(event) saying what value a
+     pointer at that place means, and onChange moving the mark. host is then unused.  */
   function slider(host, o) {
     var min = o.min, max = o.max, step = o.step || 1, value = null, shownValue = null;
-    if (o.visibleLabel) {
+    if (o.visibleLabel && !o.mark) {
       var named = make("span", "exhibit__slider-label", host, o.visibleLabel);
       named.setAttribute("aria-hidden", "true");
       if (o.showValue) {
@@ -144,16 +147,18 @@
         shownValue = make("b", "", named);
       }
     }
-    var el = make("div", "slider", host);
+    var el = o.mark || make("div", "slider", host), track = null, fill = null, thumb = null;
     el.setAttribute("role", "slider");
-    el.tabIndex = 0;
+    el.setAttribute("tabindex", "0");
     el.setAttribute("aria-label", o.label);
     el.setAttribute("aria-valuemin", String(min));
     el.setAttribute("aria-valuemax", String(max));
-    var track = make("span", "slider__track", el);
-    track.setAttribute("aria-hidden", "true");
-    var fill = make("span", "slider__fill", track);
-    var thumb = make("span", "slider__thumb", track);
+    if (!o.mark) {
+      track = make("span", "slider__track", el);
+      track.setAttribute("aria-hidden", "true");
+      fill = make("span", "slider__fill", track);
+      thumb = make("span", "slider__thumb", track);
+    }
 
     function set(v, quiet) {
       v = Math.min(max, Math.max(min, min + Math.round((v - min) / step) * step));
@@ -163,9 +168,11 @@
       el.setAttribute("aria-valuenow", String(v));
       el.setAttribute("aria-valuetext", o.valueText ? o.valueText(v) : String(v));
       if (shownValue) shownValue.textContent = String(v);
-      var pct = max > min ? (v - min) / (max - min) * 100 : 0;
-      fill.style.width = pct + "%";
-      thumb.style.left = pct + "%";
+      if (fill) {
+        var pct = max > min ? (v - min) / (max - min) * 100 : 0;
+        fill.style.width = pct + "%";
+        thumb.style.left = pct + "%";
+      }
       if (!quiet && o.onChange) o.onChange(v);
     }
 
@@ -184,6 +191,11 @@
 
     var dragging = false;
     function fromPointer(e) {
+      if (o.pointerValue) {
+        var at = o.pointerValue(e);
+        if (at !== null) set(at);
+        return;
+      }
       var r = track.getBoundingClientRect();
       if (r.width > 0) set(min + (e.clientX - r.left) / r.width * (max - min));
     }
@@ -3308,6 +3320,216 @@
     }
 
     update();
+  });
+
+  /* ---- KIND: gate ------------------------------------------------------------------------------
+     The Research's pre-registered pass bar, with a hypothetical detector moved against it. The
+     table lists hypothetical detector profiles, one per row: an AUC per rung of edit intensity (a
+     column each, "AUC at the <rung> rung", lightest first) and a false-positive rate on genuine
+     footnotes ("…%"). Its foot states the Gate: the AUC it requires ("At least 0.70") at the rung its
+     header names, and the false-positive rate it allows ("At most 5%"). No bar is typed here.
+
+     The drawing is the Detectability Curve: one point per rung, each a draggable mark (the shared
+     slider, on the point), with the Gate's zone drawn at its rung only. Profiles are a segmented
+     choice; the first is pressed as the Exhibit opens. Pressing one moves the points and the rate to
+     its row, easing there (aria-busy on the stage while it moves; at once under reduced motion);
+     moving a point or the rate by hand leaves no profile pressed. Compact (the homepage's copy)
+     drops the false-positive slider: the rate is the profile's, shown in words.
+
+     Results (data-result): the false-positive rate shown, the verdict ("Clears the Gate…" or
+     "Disqualified…"), and its reason, which names the figure that missed. There are no hover
+     readouts: each point writes its own value. */
+  register("gate", function (fig, stage, data, opts) {
+    var foot = Array.prototype.filter.call(fig.querySelectorAll("tfoot tr"), function (tr) {
+      return tr.querySelector("td");
+    });
+    if (foot.length !== 2) throw new Error("gate: the table's foot does not state the AUC and the false-positive rate");
+    var aucBar = /^at least (\d\.\d+)$/i.exec(text(foot[0].querySelector("td")));
+    var fprBar = /^at most (\d+(?:\.\d+)?)%$/i.exec(text(foot[1].querySelector("td")));
+    if (!aucBar || !fprBar) throw new Error("gate: the table's foot does not state the Gate's bar");
+    var BAR = parseFloat(aucBar[1]), CEILING = parseFloat(fprBar[1]);
+
+    var rungs = [], fprAt = -1;
+    data.columns.forEach(function (c, i) {
+      var m = /^AUC at the (\w+) rung$/i.exec(c);
+      if (m) rungs.push({ name: m[1].toLowerCase(), at: i - 1 });
+      else if (/^false-positive rate/i.test(c)) fprAt = i - 1;
+    });
+    if (rungs.length < 2 || fprAt < 0) throw new Error("gate: the table has no AUC per rung and false-positive rate");
+    var gateRung = -1;
+    rungs.forEach(function (r, i) {
+      if (text(foot[0].children[0]).toLowerCase().indexOf(r.name) >= 0) gateRung = i;
+    });
+    if (gateRung < 0) throw new Error("gate: the foot's AUC names no rung the table has");
+
+    var LO = 0.4, HI = 1, FPR_MAX = 15;
+    var profiles = data.rows.map(function (row) {
+      var p = { name: row.label, auc: rungs.map(function (r) { return row.values[r.at]; }),
+                fpr: parseFloat((/^(\d+(?:\.\d+)?)\s*%$/.exec(row.cells[fprAt]) || [])[1]) };
+      p.auc.forEach(function (a) {
+        if (a === null || a < LO || a > HI) throw new Error("gate: " + p.name + " has an AUC the chart cannot draw");
+      });
+      if (!(p.fpr >= 0 && p.fpr <= FPR_MAX)) throw new Error("gate: " + p.name + " has a false-positive rate the slider cannot hold");
+      return p;
+    });
+    if (!profiles.length) throw new Error("gate: the table has no detector profile");
+    var cap = function (w) { return w.charAt(0).toUpperCase() + w.slice(1); };
+    var gateName = rungs[gateRung].name, lastName = rungs[rungs.length - 1].name;
+
+    var vals = profiles[0].auc.slice(), fpr = profiles[0].fpr;
+
+    var bar = make("div", "exhibit__controls", stage);
+    var choice = segmented(bar, "Hypothetical detector profiles", profiles.map(function (p) { return p.name; }),
+                           function (i) { go(profiles[i]); });
+
+    /* The curve, in its own units and scaled to the frame; under a readable width the frame scrolls. */
+    var W = 560, H = 346, L = 58, R = 540, T = 34, B = 296;
+    var frame = make("div", "exhibit__frame", stage);
+    frame.insertAdjacentHTML("beforeend", '<svg class="gate__plot" viewBox="0 0 ' + W + " " + H +
+                             '" role="group" aria-label="Detectability Curve of a hypothetical detector, ' +
+                             'with the pre-registered Gate at the ' + gateName + ' rung"></svg>');
+    var svg = frame.lastChild;
+    var xs = rungs.map(function (r, i) { return L + (R - L) * (i + 1) / (rungs.length + 1); });
+    function Y(a) { return B - (a - LO) / (HI - LO) * (B - T); }
+    function words(x, y, s, cls, anchor) {
+      var t = svgChild(svg, "text", cls);
+      t.setAttribute("x", x);
+      t.setAttribute("y", y);
+      if (anchor) t.setAttribute("text-anchor", anchor);
+      t.textContent = s;
+      return t;
+    }
+    function line(x1, y1, x2, y2, cls) {
+      var l = svgChild(svg, "line", cls);
+      l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2);
+      return l;
+    }
+    var axis = svgChild(svg, "g", "");
+    axis.setAttribute("aria-hidden", "true");
+    for (var a = 4; a <= 10; a++) {
+      line(L, Y(a / 10), R, Y(a / 10), a === 4 ? "gate__base" : "gate__grid");
+      axis.appendChild(svg.lastChild);
+      axis.appendChild(words(L - 10, Y(a / 10) + 4, (a / 10).toFixed(1), "gate__tick", "end"));
+    }
+    axis.appendChild(words(L - 10, 12, "AUC", "gate__axis-name", "end"));
+    var gx = xs[gateRung];
+    var zone = svgChild(axis, "rect", "gate__zone");
+    zone.setAttribute("x", gx - 46); zone.setAttribute("y", Y(HI));
+    zone.setAttribute("width", 92); zone.setAttribute("height", Y(BAR) - Y(HI)); zone.setAttribute("rx", 4);
+    axis.appendChild(line(gx - 46, Y(BAR), gx + 46, Y(BAR), "gate__bar"));
+    axis.appendChild(words(gx + 52, Y(BAR) + 4, "Gate · " + BAR.toFixed(2), "gate__bar-name"));
+    axis.appendChild(line(L, Y(0.5), R, Y(0.5), "gate__chance"));
+    axis.appendChild(words(R, Y(0.5) - 7, "Chance", "gate__chance-name", "end"));
+    xs.forEach(function (x, i) {
+      axis.appendChild(words(x, B + 24, cap(rungs[i].name), "gate__rung" + (i === gateRung ? " gate__rung--gate" : ""), "middle"));
+    });
+    axis.appendChild(words((L + R) / 2, B + 44, "Edit intensity, measured afterwards from edit distance and n-gram overlap",
+                           "gate__axis-name gate__axis-name--x", "middle"));
+    var curve = svgChild(svg, "polyline", "gate__curve");
+    curve.setAttribute("aria-hidden", "true");
+
+    var handles = xs.map(function (x, i) {
+      var g = svgChild(svg, "g", "gate__handle");
+      var hit = svgChild(g, "circle", "gate__hit");
+      hit.setAttribute("cx", x); hit.setAttribute("cy", 0); hit.setAttribute("r", 20);
+      var mark = svgChild(g, "circle", "gate__mark");
+      mark.setAttribute("cx", x); mark.setAttribute("cy", 0); mark.setAttribute("r", 8);
+      var label = svgChild(g, "text", "gate__value");
+      label.setAttribute("x", x); label.setAttribute("y", -16); label.setAttribute("text-anchor", "middle");
+      label.setAttribute("aria-hidden", "true");
+      var s = slider(null, {
+        mark: g, min: LO, max: HI, step: 0.01, value: vals[i],
+        label: "AUC at the " + rungs[i].name + " rung",
+        valueText: function (v) { return "AUC " + v.toFixed(2) + " at the " + rungs[i].name + " rung"; },
+        pointerValue: function (e) {
+          var box = svg.getBoundingClientRect();
+          return box.height > 0 ? LO + (B - (e.clientY - box.top) / box.height * H) / (B - T) * (HI - LO) : null;
+        },
+        onChange: function (v) { stopEasing(); vals[i] = v; choice.press(-1); draw(); },
+      });
+      return { g: g, mark: mark, label: label, s: s };
+    });
+
+    var row = make("div", "gate__row", stage);
+    var rate = make("div", "gate__fpr", row);
+    var named = make("div", "gate__fpr-name", rate);
+    make("span", "", named, "False-positive rate on genuine pre-2020 footnotes");
+    var fprOut = make("span", "gate__fpr-value", named);
+    fprOut.setAttribute("data-result", "");
+    var fprSlider = opts.compact ? null : slider(rate, {
+      min: 0, max: FPR_MAX, step: 0.5, value: fpr,
+      label: "False-positive rate on genuine pre-2020 footnotes",
+      valueText: function (v) { return v.toFixed(1) + "%"; },
+      onChange: function (v) { stopEasing(); fpr = v; choice.press(-1); draw(); },
+    });
+    var said = make("div", "gate__said", row);
+    said.setAttribute("aria-live", "polite");
+    var verdict = make("div", "gate__verdict", said);
+    verdict.setAttribute("data-result", "");
+    var icon = make("span", "gate__icon", verdict);
+    icon.setAttribute("aria-hidden", "true");
+    var verdictWords = make("span", "", verdict);
+    var why = make("div", "gate__why", said);
+    why.setAttribute("data-result", "");
+
+    var ICON_PASS = '<svg viewBox="0 0 20 20" focusable="false"><circle cx="10" cy="10" r="9"/><path d="M6 10.5l2.6 2.6L14 7.5"/></svg>';
+    var ICON_FAIL = '<svg viewBox="0 0 20 20" focusable="false"><circle cx="10" cy="10" r="9"/><path d="M7 7l6 6M13 7l-6 6"/></svg>';
+
+    function draw() {
+      curve.setAttribute("points", xs.map(function (x, i) { return x + "," + Y(vals[i]); }).join(" "));
+      var aucOk = vals[gateRung] >= BAR - 1e-9, fprOk = fpr <= CEILING + 1e-9;
+      handles.forEach(function (h, i) {
+        h.g.setAttribute("transform", "translate(0 " + Y(vals[i]) + ")");
+        h.label.textContent = vals[i].toFixed(2);
+        h.mark.setAttribute("class", "gate__mark" + (i === gateRung ? (aucOk ? " gate__mark--pass" : " gate__mark--fail") : ""));
+      });
+      var m = "AUC " + vals[gateRung].toFixed(2) + " at " + gateName, f = fpr.toFixed(1) + "%";
+      fprOut.textContent = f;
+      var pass = aucOk && fprOk;
+      verdict.className = "gate__verdict " + (pass ? "gate__verdict--pass" : "gate__verdict--fail");
+      icon.innerHTML = pass ? ICON_PASS : ICON_FAIL;
+      verdictWords.textContent = pass ? "Clears the Gate — may score filings" : "Disqualified — reported as such";
+      why.textContent = pass ? m + ", false positives " + f + " on pre-2020 footnotes."
+        : !aucOk && !fprOk ? "Misses both bars: " + m + " is under " + BAR.toFixed(2) + ", and false positives at " +
+          f + " are over " + CEILING + "%. The bar is not lowered and the ladder is not re-cut."
+        : !aucOk ? m + " is under " + BAR.toFixed(2) + ". " + cap(lastName) + "-edit accuracy does not count toward the Gate."
+        : "False positives at " + f + " flag real human footnotes. The ceiling is " + CEILING + "%.";
+    }
+
+    /* A profile pressed: the points and the rate ease to its row, or stand there at once. */
+    var easing = null;
+    function stopEasing() {
+      if (easing === null) return;
+      window.cancelAnimationFrame(easing);
+      easing = null;
+      stage.removeAttribute("aria-busy");
+    }
+    function settle(p, k) {
+      var e = 1 - Math.pow(1 - k, 3);
+      vals = vals.map(function (v, i) { return k >= 1 ? p.auc[i] : +(from.auc[i] + (p.auc[i] - from.auc[i]) * e).toFixed(2); });
+      fpr = k >= 1 ? p.fpr : from.fpr + (p.fpr - from.fpr) * e;
+      handles.forEach(function (h, i) { h.s.set(vals[i], true); });
+      if (fprSlider) fprSlider.set(k >= 1 ? p.fpr : Math.round(fpr * 2) / 2, true);
+      draw();
+    }
+    var from = null;
+    function go(p) {
+      stopEasing();
+      choice.press(profiles.indexOf(p));
+      from = { auc: vals.slice(), fpr: fpr };
+      if (reduced) return settle(p, 1);
+      var t0 = null;
+      stage.setAttribute("aria-busy", "true");
+      easing = window.requestAnimationFrame(function tick(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / 600);
+        settle(p, k);
+        if (k < 1) easing = window.requestAnimationFrame(tick);
+        else { easing = null; stage.removeAttribute("aria-busy"); }
+      });
+    }
+
+    draw();
   });
 
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
