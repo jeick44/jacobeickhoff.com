@@ -61,7 +61,7 @@
         <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
         <div><dt>Status</dt><dd>In flight &middot; not yet validated</dd></div>
         <div><dt>Governing constraint</dt><dd>Architecture, Not Performance</dd></div>
-        <div><dt>Reading time</dt><dd>11 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>13 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
         end to end and has not been validated, and those are two different sentences. The backtest
@@ -155,6 +155,43 @@
             <h2 class="spine__title">What I Did</h2>
             <p>I built it as separable components, each taking a stated input, returning a stated
               output, and runnable on its own.</p>
+            <figure class="exhibit" id="exhibit-pipeline" data-exhibit="pipeline"
+                    data-provenance="published">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The
+                  components that carry the loop, each with a fixed input and output</h3>
+                <p class="exhibit__instruction">Select a component to see what goes in and what comes
+                  out.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>Each component of the loop, with what it takes in and what it returns in the
+                      words of the paragraphs that state them, and the components its output goes to</caption>
+                    <thead>
+                      <tr><th scope="col">Component</th><th scope="col">In</th><th scope="col">Out</th><th scope="col">Hands its output to</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads, the volatility index and its term structure, and one- and three-month momentum for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimiser</td></tr>
+                      <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov model.</td><td>Portfolio optimiser, Briefing</td></tr>
+                      <tr><th scope="row">Portfolio optimiser</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing, Logger and dashboard</td></tr>
+                      <tr><th scope="row">Sentiment scorer</th><td>Earnings-call transcripts and 10-K and 10-Q filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps between requests to stay inside the published rate limit.</td><td>A score per issuer on four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up that returns to the classifier as one of its features.</td><td>Regime classifier, Briefing</td></tr>
+                      <tr><th scope="row">Scheduler</th><td>The clock and the exchange calendar.</td><td>A completed cycle, logged.</td><td>Logger and dashboard</td></tr>
+                      <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>Logger and dashboard</td></tr>
+                      <tr><th scope="row">Logger and dashboard</th><td>Every rebalance.</td><td>A local database; a dashboard reads it back.</td><td>No other component</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> published; each component&rsquo;s
+                input and output in the words of the paragraphs below, and where its output goes as
+                they describe it. The moving packets show the direction data travels between
+                components, not its volume or its timing. The code, the fitted model and every
+                performance figure are withheld, because this page publishes the architecture and not
+                the results.</figcaption>
+            </figure>
             <p><strong>The data fetcher.</strong> In: public macro series and public market prices
               &mdash; Treasury yields at two and ten years and the spread between them, high-yield and
               investment-grade credit spreads, the volatility index and its term structure, and one- and
@@ -175,7 +212,7 @@
             <figure class="exhibit" id="exhibit-regime-vector" data-exhibit="regime-vector"
                     data-provenance="illustrative">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Why the
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Why the
                   briefing gets the whole vector, not the label</h3>
                 <p class="exhibit__instruction">Pick the leading regime, then drag from a close call
                   to a decisive one.</p>
@@ -224,7 +261,7 @@
             <figure class="exhibit" id="exhibit-scheduler-week" data-exhibit="scheduler-week"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The
                   scheduler&rsquo;s week: three jobs, each on its own calendar</h3>
                 <p class="exhibit__instruction">Pick the day the first of the month falls on, and
                   watch the retrain move while the other jobs stay put.</p>
@@ -302,7 +339,7 @@
             <figure class="exhibit" id="exhibit-no-return-figure" data-exhibit="decision-window"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> Why there is
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> Why there is
                   no return figure: the whole window holds a handful of decisions</h3>
                 <p class="exhibit__instruction">Pick a rebalance frequency to count the decisions the
                   window holds.</p>

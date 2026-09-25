@@ -3532,6 +3532,198 @@
     draw();
   });
 
+  /* ---- KIND: pipeline --------------------------------------------------------------------------
+     MacroSense's components, each with the input it takes and the output it returns, and the data
+     flowing between them. The table has a row per component: its "In" and "Out" in the Case Study's
+     words, and in "Hands its output to" the components its output goes to, by their names in the
+     table, separated by commas, or "No other component". Columns are found by their headers.
+
+     Each component is a button in one group, placed in a column by how many hand-offs lie before it
+     (a component nothing hands to stands in the first) and in a row by table order; the wires
+     between them are drawn from the table's hand-offs, each marked (data-mark "from to to").
+     Pressing a component reads out its In and Out (each data-result) and lights its wires. It opens
+     on the busiest component, the one with the most wires, the first in table order on a tie.
+
+     THE FLOW is the page's one ambient animation: a packet travels every wire, round and round,
+     while the drawing is on screen, and stops while it is off it (an IntersectionObserver). A
+     "Pause the flow" toggle (aria-controls names the drawing) stops it for as long as the reader
+     likes. The drawing states what it is doing in data-flow: "running", "paused" or "still".
+     Nothing a reader reads moves, so nothing is marked aria-busy. Under reduced motion no packet is
+     drawn and the flow stands "still". Compact (a featured copy) plays one pass of PASS_MS, under
+     the five seconds after which moving content must offer a pause, then rests with no packet, so
+     it needs no pause control; its only controls are the components.
+
+     It throws on a table it cannot draw: a missing column, fewer than two components, a hand-off to
+     a name the table does not hold, or hand-offs that loop back. A wide drawing keeps a readable
+     minimum width and scrolls inside its own frame. */
+  var PIPE_NONE = "No other component", LAP_MS = 2400, PASS_MS = 4500;
+  register("pipeline", function (fig, stage, data, opts) {
+    var colIn = data.columns.indexOf("In"), colOut = data.columns.indexOf("Out");
+    var colTo = data.columns.indexOf("Hands its output to");
+    if (colIn < 1 || colOut < 1 || colTo < 1) {
+      throw new Error('pipeline: the table needs "In", "Out" and "Hands its output to" columns');
+    }
+    if (data.rows.length < 2) throw new Error("pipeline: fewer than two components");
+    var names = data.rows.map(function (r) { return r.label; });
+    var wires = [];
+    data.rows.forEach(function (r, i) {
+      var cell = r.cells[colTo - 1];
+      if (cell === PIPE_NONE) return;
+      cell.split(",").forEach(function (to) {
+        var j = names.indexOf(to.trim());
+        if (j < 0) throw new Error("pipeline: " + r.label + " hands its output to " + JSON.stringify(to.trim()) + ", no component in the table");
+        wires.push({ from: i, to: j });
+      });
+    });
+
+    /* Columns: the longest run of hand-offs before each component. More passes than components
+       means the hand-offs loop back, which a left-to-right flow cannot draw. */
+    var rank = names.map(function () { return 0; });
+    for (var pass = 0, moved = true; moved; pass++) {
+      if (pass > names.length) throw new Error("pipeline: the hand-offs loop back on themselves");
+      moved = false;
+      wires.forEach(function (w) {
+        if (rank[w.to] < rank[w.from] + 1) { rank[w.to] = rank[w.from] + 1; moved = true; }
+      });
+    }
+    var cols = Math.max.apply(null, rank) + 1, rowOf = [], filled = [];
+    rank.forEach(function (c, i) { filled[c] = (filled[c] || 0) + 1; rowOf[i] = filled[c]; });
+    var busiest = 0, degree = names.map(function (_, i) {
+      return wires.filter(function (w) { return w.from === i || w.to === i; }).length;
+    });
+    degree.forEach(function (d, i) { if (d > degree[busiest]) busiest = i; });
+
+    var frame = make("div", "exhibit__frame", stage);
+    var plane = make("div", "pipe", frame);
+    plane.id = fig.id + "-flow";
+    plane.style.setProperty("--pipe-cols", cols);
+    plane.insertAdjacentHTML("beforeend", '<svg class="pipe__wires" aria-hidden="true" focusable="false"></svg>');
+    var svg = plane.lastChild;
+    var choice = segmented(plane, "Components", names, pick);
+    var group = plane.lastChild, buttons = Array.prototype.slice.call(group.children);
+    group.classList.add("pipe__board");
+    buttons.forEach(function (b, i) {
+      b.style.gridColumn = String(rank[i] + 1);
+      b.style.gridRow = String(rowOf[i]);
+    });
+
+    /* The pause sits under the drawing, after the components, so a keyboard meets the choice
+       first and a walk that stops at the first control to change the readout never reaches it. */
+    var paused = false;
+    var toggle = null;
+    if (!opts.compact && !reduced) {
+      var bar = make("div", "exhibit__controls pipe__controls", stage);
+      toggle = button(bar, "btn btn--outline pipe__pause", "Pause the flow", false);
+    }
+    var io = make("div", "pipe__io", stage);
+    io.setAttribute("aria-live", "polite");
+    var named = make("div", "pipe__name", io);
+    var dl = make("dl", "pipe__dl", io);
+    make("dt", "pipe__term", dl, "In");
+    var given = make("dd", "pipe__said", dl);
+    make("dt", "pipe__term", dl, "Out");
+    var made = make("dd", "pipe__said", dl);
+    given.setAttribute("data-result", "");
+    made.setAttribute("data-result", "");
+
+    wires.forEach(function (w) {
+      w.path = svgChild(svg, "path", "pipe__wire");
+      w.path.setAttribute("data-mark", names[w.from] + " to " + names[w.to]);
+    });
+
+    var chosen = busiest;
+    function pick(i) {
+      chosen = i;
+      choice.press(i);
+      named.textContent = names[i];
+      given.textContent = data.rows[i].cells[colIn - 1];
+      made.textContent = data.rows[i].cells[colOut - 1];
+      wires.forEach(function (w) {
+        w.path.classList.toggle("is-lit", w.from === i || w.to === i);
+      });
+    }
+
+    /* Each wire runs out of its component's right side into the gutter beside it, and into the
+       next's left side from the gutter before it; a hand-off that skips a column crosses in the
+       gutter under its target's row, so no wire passes through a component. */
+    function route() {
+      var gs = window.getComputedStyle(group);
+      var gx = parseFloat(gs.columnGap) / 2 || 8, gy = parseFloat(gs.rowGap) / 2 || 8;
+      svg.setAttribute("viewBox", "0 0 " + plane.offsetWidth + " " + plane.offsetHeight);
+      wires.forEach(function (w) {
+        var a = buttons[w.from], b = buttons[w.to];
+        var sx = a.offsetLeft + a.offsetWidth, sy = a.offsetTop + a.offsetHeight / 2;
+        var tx = b.offsetLeft, ty = b.offsetTop + b.offsetHeight / 2;
+        var d = "M" + sx + " " + sy + " H" + (sx + gx);
+        if (rank[w.to] === rank[w.from] + 1) d += " V" + ty;
+        else d += " V" + (b.offsetTop + b.offsetHeight + gy) + " H" + (tx - gx) + " V" + ty;
+        w.path.setAttribute("d", d + " H" + tx);
+        w.length = w.path.getTotalLength();
+      });
+    }
+
+    pick(busiest);
+    route();
+    if (window.ResizeObserver) new window.ResizeObserver(route).observe(plane);
+    else window.addEventListener("resize", route);
+
+    /* The flow. Time only counts while it runs, so a pass paused off-screen resumes where it was. */
+    if (reduced) {
+      plane.setAttribute("data-flow", "still");
+      return;
+    }
+    wires.forEach(function (w, k) {
+      w.packet = svgChild(svg, "circle", "pipe__packet");
+      w.packet.setAttribute("r", "3.5");
+      w.packet.setAttribute("data-packet", "");
+      w.offset = k / wires.length;
+    });
+    var seen = !("IntersectionObserver" in window), ran = 0, last = null, frameId = null;
+    function draw() {
+      wires.forEach(function (w) {
+        var f = (ran / LAP_MS + w.offset) % 1, at = w.path.getPointAtLength(f * w.length);
+        w.packet.setAttribute("cx", at.x.toFixed(1));
+        w.packet.setAttribute("cy", at.y.toFixed(1));
+        w.packet.setAttribute("opacity", Math.sin(f * Math.PI).toFixed(2));
+      });
+    }
+    function tick(t) {
+      frameId = null;
+      if (last !== null) ran += t - last;
+      last = t;
+      if (opts.compact && ran >= PASS_MS) {
+        wires.forEach(function (w) { w.packet.remove(); });
+        plane.setAttribute("data-flow", "still");
+        return;
+      }
+      draw();
+      frameId = window.requestAnimationFrame(tick);
+    }
+    function sync() {
+      if (plane.getAttribute("data-flow") === "still") return;
+      var go = seen && !paused;
+      plane.setAttribute("data-flow", go ? "running" : "paused");
+      if (go && frameId === null) { last = null; frameId = window.requestAnimationFrame(tick); }
+      if (!go && frameId !== null) { window.cancelAnimationFrame(frameId); frameId = null; }
+    }
+    if (toggle) {
+      toggle.setAttribute("aria-controls", plane.id);
+      toggle.addEventListener("click", function () {
+        paused = !paused;
+        toggle.setAttribute("aria-pressed", String(paused));
+        sync();
+      });
+    }
+    if (!seen) {
+      new window.IntersectionObserver(function (es) {
+        es.forEach(function (e) { seen = e.isIntersecting; });
+        sync();
+      }).observe(plane);
+    }
+    draw();
+    sync();
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
