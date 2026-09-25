@@ -1688,6 +1688,20 @@ button {
   scrollbar-width: thin;
 }
 
+/* A frame that scrolls says so: a soft shade at whichever edge has more diagram past it. The two
+   paper-coloured covers scroll with the content and hide each shade once its edge is reached, so a
+   diagram that fits shows none. A phone's scrollbar is hidden until touched, and half a chart with
+   no cue reads as the whole of one. */
+.exhibit__frame {
+  background:
+    linear-gradient(to right, var(--paper) 40%, transparent) left / 2rem 100% no-repeat local,
+    linear-gradient(to left, var(--paper) 40%, transparent) right / 2rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent)
+      left / 0.9rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--ink) 22%, transparent), transparent)
+      right / 0.9rem 100% no-repeat scroll;
+}
+
 .exhibit .exhibit__count {
   margin: 0;
   font-size: var(--text-sm);
@@ -1833,6 +1847,26 @@ button {
 .seg__option:hover,
 .seg__option:focus-visible {
   color: var(--ink);
+}
+
+/* Too narrow for a group's options on one line, the options stand as separate pills that wrap
+   as a row, rather than one rounded track broken over two lines. */
+@media (max-width: 30rem) {
+  .seg {
+    padding: 0;
+    border: 0;
+    background: none;
+    gap: var(--space-2xs);
+  }
+
+  .seg__option {
+    border: 1px solid var(--line);
+    background: var(--mist);
+  }
+
+  .seg__option[aria-pressed="true"] {
+    border-color: var(--ink-soft);
+  }
 }
 
 .seg__option[aria-pressed="true"] {
@@ -3735,7 +3769,10 @@ button.prep__cell:focus-visible {
   overflow-wrap: anywhere;
 }
 
+/* The 404's one job is its four routes, so each reads as a link at rest - in the link colour -
+   and not only once a pointer finds it; a touch reader never hovers. */
 .route__link {
+  color: var(--blue-deep);
   text-decoration: none;
 }
 
@@ -4422,8 +4459,6 @@ button.prep__cell:focus-visible {
   transform: translate(-50%, -100%);
   font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--ink-mute);
   white-space: nowrap;
   pointer-events: none;
