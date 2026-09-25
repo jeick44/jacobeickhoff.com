@@ -4102,6 +4102,143 @@
 
     update();
   });
+  /* ---- KIND: broker-integration ----------------------------------------------------------------
+     TradeLog's Read-Only Broker Integration. The table lists the paths between the broker and
+     TradeLog, a row per failure mode: the path's name, where it runs from and to, whether it was
+     Built (Yes or No), and how it fails. Its columns are found by header, and a path's rows sit
+     together.
+
+     Connection working (the opening view, because it is the one that shows the point): the built
+     path, from the broker into TradeLog, is drawn whole and marked (data-mark "Read the execution
+     record, built"); every path not built is drawn struck through and marked ("Place an order, not
+     built"), with each of its failure modes struck under it and marked ("Failure mode: A bug that
+     moves money"), since a path that does not exist cannot fail.
+
+     "Connection failed" is the other choice: the built path breaks, and a stale notice goes up
+     above everything else (data-mark "Stale record"), because a stale count shown as a current one
+     gets believed. The struck paths stay struck: nothing is sent to the broker to recover. The
+     notice and the break change by transition, which the reduced-motion blanket collapses; nothing
+     plays over time, so there is no aria-busy, and no hover readouts.
+
+     Every path and failure mode is role="img", its aria-label naming the path, where it runs from
+     and to, and whether it was built. The readout (data-result) says what is read and that nothing
+     is sent back, naming each failure mode of a path not built; failed, that the record is stale.
+
+     A table the drawing cannot show or word is refused: a column it needs missing or repeated, a
+     Built other than Yes or No, a path whose rows disagree or sit apart, a row with no failure
+     mode, no path not built, or anything but exactly one built path, from the broker to TradeLog -
+     a built path to the broker is an order path, and the system places none. */
+  var INTEG_BROKER = "The broker", INTEG_SYSTEM = "TradeLog";
+  register("broker-integration", function (fig, stage, data) {
+    function col(name) {
+      var at = data.columns.indexOf(name);
+      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
+        throw new Error("broker-integration: the table needs one " + JSON.stringify(name) + " column");
+      }
+      return at;
+    }
+    var cols = [col("Path"), col("From"), col("To"), col("Built"), col("Failure mode")];
+    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var paths = [];
+    data.rows.forEach(function (r) {
+      var p = { name: cell(r, cols[0]), from: cell(r, cols[1]), to: cell(r, cols[2]),
+                built: cell(r, cols[3]), modes: [] };
+      var mode = cell(r, cols[4]), last = paths[paths.length - 1];
+      if (p.built !== "Yes" && p.built !== "No") {
+        throw new Error("broker-integration: " + p.name + " is built " + JSON.stringify(p.built) + "; Yes or No");
+      }
+      if (!p.name || !mode) throw new Error("broker-integration: a row has no path or no failure mode");
+      if (last && last.name === p.name) {
+        if (last.from !== p.from || last.to !== p.to || last.built !== p.built) {
+          throw new Error("broker-integration: " + p.name + "'s rows disagree");
+        }
+        p = last;
+      } else if (paths.some(function (x) { return x.name === p.name; })) {
+        throw new Error("broker-integration: " + p.name + "'s rows sit apart");
+      } else {
+        paths.push(p);
+      }
+      p.modes.push(mode);
+    });
+    var read = paths.filter(function (p) { return p.built === "Yes"; });
+    var struck = paths.filter(function (p) { return p.built === "No"; });
+    if (read.length !== 1 || read[0].from !== INTEG_BROKER || read[0].to !== INTEG_SYSTEM) {
+      throw new Error("broker-integration: exactly one path is built, from the broker to TradeLog");
+    }
+    if (!struck.length) throw new Error("broker-integration: no path was left unbuilt");
+    read = read[0];
+    var failed = false;
+
+    var bar = make("div", "exhibit__controls", stage);
+    make("span", "integ__ask", bar, "Connection");
+    var pick = segmented(bar, "The connection to the broker", ["Connection working", "Connection failed"],
+                         function (i) { failed = i === 1; update(); },
+                         ["Show the connection working", "Show the connection failed"]);
+
+    var board = make("div", "integ", stage);
+    var notice = make("div", "integ__notice", board);
+    function lower(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+    function place(s) { return s === INTEG_BROKER ? lower(s) : s; }
+    function lane(p) {
+      var row = make("div", "integ__path", board);
+      row.setAttribute("role", "img");
+      make(p.built === "Yes" ? "span" : "s", "integ__name", row, p.name);
+      var line = make("span", "integ__line", row);
+      make("span", "integ__end", line, p.from);
+      make("span", "integ__arrow", line, p.built === "Yes" ? "reads into" : "not built");
+      make("span", "integ__end", line, p.to);
+      Array.prototype.forEach.call(row.children, function (x) { x.setAttribute("aria-hidden", "true"); });
+      return row;
+    }
+    read.row = lane(read);
+    struck.forEach(function (p) {
+      p.row = lane(p);
+      p.row.classList.add("is-struck");
+      p.row.setAttribute("data-mark", p.name + ", not built");
+      p.row.setAttribute("aria-label", p.name + ": from " + place(p.from) + " to " + place(p.to) +
+                         ", not built, so nothing can be sent that way");
+      var list = make("div", "integ__modes", board);
+      p.modes.forEach(function (m) {
+        var mode = make("s", "integ__mode", list, m);
+        mode.setAttribute("role", "img");
+        mode.setAttribute("data-mark", "Failure mode: " + m);
+        mode.setAttribute("aria-label", "Failure mode of " + lower(p.name) + ": " + lower(m) +
+                          "; it cannot occur, since the path was not built");
+      });
+    });
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var said = make("div", "integ__read", readout);
+    said.setAttribute("data-result", "");
+
+    function update() {
+      pick.press(failed ? 1 : 0);
+      read.row.classList.toggle("is-failed", failed);
+      read.row.setAttribute("data-mark", read.name + ", built");
+      read.row.setAttribute("aria-label", read.name + ": from " + place(read.from) + " to " + place(read.to) +
+                            ", built" + (failed ? ", connection failed: " + lower(read.modes.join("; "))
+                                                : "; it reads and never writes"));
+      notice.hidden = !failed;
+      if (failed) {
+        notice.textContent = "Connection failed. The record is stale; no count here is current.";
+        notice.setAttribute("data-mark", "Stale record");
+        said.textContent = "The connection failed, so the broker’s record is stale. TradeLog says so " +
+          "above everything else, the last count is not shown as current, and nothing is sent to " +
+          "the broker to recover it: the order path stays struck.";
+        return;
+      }
+      notice.textContent = "";
+      notice.removeAttribute("data-mark");
+      said.textContent = INTEG_SYSTEM + " reads every execution from the broker and sends nothing back. " +
+        struck.map(function (p) {
+          return p.name + " was not built, so none of its failure modes can occur: " +
+            p.modes.map(lower).join(", or ") + ".";
+        }).join(" ");
+    }
+
+    update();
+  });
 
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */

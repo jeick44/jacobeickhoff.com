@@ -60,7 +60,7 @@
         <div><dt>Sponsor</dt><dd>Self-directed &middot; product design and architecture</dd></div>
         <div><dt>Status</dt><dd>Design and architecture published</dd></div>
         <div><dt>Governing constraint</dt><dd>Methodology Silence</dd></div>
-        <div><dt>Reading time</dt><dd>12 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>14 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Design, not dollars</span> The
         figures behind this system are personal, which constrains what the page can say rather
@@ -89,7 +89,7 @@
             <span class="stat__unit">order paths to the broker</span>
           </p>
           <span class="stat__label">Placing an order from the system was rejected outright; the
-            integration reads and never writes.</span>
+            broker integration reads and never writes.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -165,7 +165,7 @@
                         and saved as version 1.</td><td>The ruleset</td></tr>
                       <tr><th scope="row">Record</th><td>Every execution of the day, read from
                         the broker&rsquo;s export: entry, exit, size, fees and timestamps. Nothing
-                        is typed in.</td><td>The integration</td></tr>
+                        is typed in.</td><td>The broker integration</td></tr>
                       <tr><th scope="row">Compare</th><td>Verified Adherence, computed from those
                         executions, beside Claimed Adherence, the Illustrative Investor&rsquo;s own
                         account of the day. The record shows Rule C broken once; the account says
@@ -312,10 +312,44 @@
               merely objecting to it. It was rejected because a gateway enforces only if it cannot be
               bypassed, and the broker&rsquo;s own platform is one keystroke away &mdash; so it buys no
               enforcement while adding two failure modes that did not exist before, a bug that moves
-              money and a failed request that leaves a position open. What is left reads and never
-              writes, server-side, with the key held outside the browser. When the connection fails the
-              system says so loudly: a stale count shown as a current one is worse than no count, because
-              it gets believed.</p>
+              money and a failed request that leaves a position open. What is left is a read-only
+              broker integration: it reads and never writes, server-side, with the key held outside the
+              browser. When the connection fails the system says so loudly: a stale count shown as a
+              current one is worse than no count, because it gets believed.</p>
+            <figure class="exhibit" id="exhibit-read-only-broker-integration" data-exhibit="broker-integration"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> The system
+                  observes every execution and places none.</h3>
+                <p class="exhibit__instruction">Read the paths as built, then press Connection failed
+                  to see what the Illustrative Investor is shown when the record stops arriving.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The paths between the broker and TradeLog for the Illustrative
+                      Investor&rsquo;s account, whether each was built, and how each fails</caption>
+                    <thead>
+                      <tr><th scope="col">Path</th><th scope="col">From</th><th scope="col">To</th><th
+                        scope="col">Built</th><th scope="col">Failure mode</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Read the execution record</th><td>The broker</td><td>TradeLog</td><td>Yes</td><td>The connection fails and the record goes stale</td></tr>
+                      <tr><th scope="row">Place an order</th><td>TradeLog</td><td>The broker</td><td>No</td><td>A bug that moves money</td></tr>
+                      <tr><th scope="row">Place an order</th><td>TradeLog</td><td>The broker</td><td>No</td><td>A failed request that leaves a position open</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative; the paths between the
+                broker and TradeLog for the Illustrative Investor, a synthetic account over a
+                synthetic period. The failure modes of placing an order are those named in the
+                paragraph above; they belong to a path that was not built, so they are drawn struck
+                through. The broker&rsquo;s name, how the system signs in to it, and every detail of
+                the account are withheld, and no figure from a real account appears.</figcaption>
+            </figure>
           </section>
 
           <section class="spine" id="what-changed">
@@ -422,7 +456,7 @@
               quarter&rsquo;s compliance rate silently becomes a statement about this quarter&rsquo;s
               rule, with nobody told. Versioning the rule and recording which version graded each case
               costs almost nothing at design time and cannot be retrofitted afterwards.</p>
-            <p><strong>Refusing a capability is an architecture decision.</strong> The integration is
+            <p><strong>Refusing a capability is an architecture decision.</strong> The broker integration is
               not read-only because writing was hard. It is read-only because the write path added risk
               to a system whose whole purpose was to reduce it &mdash; and a decision recorded with the
               alternative it was chosen over survives the next person to notice the gap, including when
