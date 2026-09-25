@@ -2742,57 +2742,6 @@ button.prep__cell:focus-visible {
   color: var(--ink-mute);
 }
 
-/* A specimen of a tool's own output, or a readout of a measured result, quoted into the page the way
-   a passage of prose would be. One rule governs both: ADR-0001 withholds a number in a picture
-   exactly as it does in a sentence, and there are two ways to satisfy it. Either the figures are
-   synthetic, as in the location readout on Engagement 01, or the readout carries no magnitude at all,
-   as in Engagement 03's spread-direction Exhibit above, because the direction is the finding and the
-   magnitude is the part that is withheld. What is never allowed is a real magnitude here on the
-   grounds that a table reads as evidence rather than as a claim. Either way the caption says which
-   it is, where the reader meets the rows rather than in a note further down. */
-.specimen {
-  margin: var(--space-md) 0;
-  padding: var(--space-sm);
-  border-radius: var(--radius);
-  background: var(--mist);
-}
-
-.specimen__title {
-  margin: 0 0 var(--space-2xs);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  color: var(--ink-soft);
-}
-
-/* Label left, figure right, and the figures share a right edge so that the subtraction reads as a
-   subtraction. `auto` on the second column means the longest figure sets it and the labels wrap
-   instead of the row overflowing a 320px screen. */
-.specimen__rows {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-3xs) var(--space-sm);
-  margin: 0;
-  font-size: var(--text-sm);
-  font-variant-numeric: tabular-nums lining-nums;
-}
-
-.specimen__rows dt {
-  color: var(--ink-soft);
-}
-
-.specimen__rows dd {
-  margin: 0;
-  text-align: right;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.specimen figcaption {
-  margin-top: var(--space-2xs);
-  font-size: var(--text-xs);
-  color: var(--ink-mute);
-}
-
 .case-foot {
   display: flex;
   flex-wrap: wrap;
@@ -3843,7 +3792,8 @@ button.prep__cell:focus-visible {
   color: var(--ink);
 }
 
-/* =================================================================================================
+/* ==========================================================================================}
+
    THE RESEARCH: A RANKING WEARING A PROBABILITY'S CLOTHES (kind: ranking)
    One row per company in the sample, in table order with the newcomer last: its name, its reading,
    a track from nought to one with its score as a dot, the score in figures, and a flag. A ring stays
@@ -4330,4 +4280,276 @@ button.prep__cell:focus-visible {
   .sched__cell {
     min-height: 2.5rem;
   }
+=======
+/* ---- kind: radius-map ----------------------------------------------------------------------------
+   Controls above; the map beside its totals from 40rem, stacked below. The map keeps its table's
+   proportions, and its locations are buttons placed by percentage over the drawing. */
+.rmap__control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  align-items: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rmap__sizer {
+  flex: 1 1 14rem;
+}
+
+.rmap__sizer .slider {
+  flex: 1;
+}
+
+.rmap__control-value {
+  font-weight: 600;
+  color: var(--ink-mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.rmap {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 40rem) {
+  .rmap {
+    grid-template-columns: minmax(0, 1.5fr) minmax(12rem, 1fr);
+  }
+}
+
+.rmap__map {
+  position: relative;
+  aspect-ratio: var(--rmap-ratio);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--mist-deep);
+  cursor: crosshair;
+}
+
+.rmap__map svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rmap__river {
+  fill: none;
+  stroke: var(--blue-wash);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.rmap__road {
+  fill: none;
+  stroke: var(--paper);
+  stroke-width: 4;
+}
+
+.rmap__ring {
+  fill: color-mix(in srgb, var(--blue) 8%, transparent);
+  stroke: var(--blue);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.rmap__pin {
+  fill: var(--blue);
+}
+
+.rmap__area,
+.rmap__hint,
+.rmap__spot {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+}
+
+.rmap__area {
+  transform: translate(-50%, -100%);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.rmap__hint {
+  left: var(--space-xs);
+  top: var(--space-xs);
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--pill);
+  background: var(--paper);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-soft);
+  pointer-events: none;
+  transition: opacity 300ms var(--ease);
+}
+
+.rmap__hint.is-gone {
+  opacity: 0;
+}
+
+/* A location: a small target around a smaller dot, coloured by its net - rose for a loss, blue for a
+   gain, stronger the larger it is - and faded when it sits outside the circle. */
+.rmap__spot {
+  width: 0.9rem;
+  height: 0.9rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.rmap__spot::before {
+  content: "";
+  position: absolute;
+  inset: 0.2rem;
+  border: 1px solid var(--paper);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--dot) calc(var(--k) * 100%), var(--line));
+  opacity: 0.4;
+  transition: inset 200ms var(--ease), opacity 200ms var(--ease);
+}
+
+.rmap__spot.is-gain {
+  --dot: var(--blue);
+}
+
+.rmap__spot.is-loss {
+  --dot: var(--data-4);
+}
+
+.rmap__spot.is-inside::before {
+  inset: 0.1rem;
+  opacity: 1;
+}
+
+.rmap__spot.is-shown::before {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.rmap__panel {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+  font-size: var(--text-sm);
+}
+
+.rmap__sums,
+.rmap__tip-rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: 0;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.rmap__sums dt,
+.rmap__sums dd {
+  padding-block: var(--space-3xs);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.rmap__sums dt,
+.rmap__tip-rows dt {
+  color: var(--ink-soft);
+}
+
+.rmap__sums dd,
+.rmap__tip-rows dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rmap__sums .rmap__where {
+  grid-column: 1 / -1;
+  border-bottom: 0;
+  padding-block: 0;
+  text-align: left;
+}
+
+.rmap__sums dt.rmap__where {
+  font-size: var(--text-xs);
+}
+
+.rmap__sums dd.rmap__count {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.rmap__sums .rmap__net {
+  border-bottom: 2px solid var(--ink);
+  font-size: var(--text-md);
+}
+
+.rmap__sums dd.rmap__net {
+  color: var(--blue-deep);
+}
+
+.rmap__label {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.rmap__ages {
+  display: grid;
+  grid-template-columns: 3.2rem minmax(0, 1fr);
+  gap: var(--space-3xs) var(--space-2xs);
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+.rmap__ages dd {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  margin: 0;
+}
+
+.rmap__bar {
+  flex: 1;
+  height: 10px;
+  background: var(--line-soft);
+}
+
+.rmap__bar i {
+  display: block;
+  height: 100%;
+  background: var(--blue);
+  transition: width 380ms var(--ease);
+}
+
+.rmap__ages b {
+  min-width: 2ch;
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.rmap__tip {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius);
+  background: var(--mist);
+}
+
+.rmap__tip-name {
+  margin: 0 0 var(--space-3xs);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
 }

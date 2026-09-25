@@ -2563,6 +2563,283 @@
     update();
   });
 
+  /* ---- KIND: radius-map ------------------------------------------------------------------------
+     A synthetic map of locations. The table's columns, found by their headers: the location, its
+     Area, where it sits in miles east and north of the map's south-west corner, its Loan income and
+     Deposit expense in dollars a year, the Net of the two, and its holder's Age and Age band. The
+     row marked data-lead is the location the readout shows before a reader points at one.
+
+     A circle is placed by a click or a mouse drag on the map, or by choosing an Area (its centre is
+     the mean of its locations), and sized by the slider. The totals give what the circle holds and
+     what it earns, and the age profile counts it by the table's bands. Every location is a button:
+     hovering, focusing or pressing one shows its subtraction. On first view the circle travels from
+     the first Area to the lead's, so the opening view is the circle holding the location it shows.
+
+     Compact mode (the homepage) drops the choice of Area; the map, the slider and the readouts stay.
+
+     A table the drawing cannot show is refused (the stage stays empty and the table stands alone): a
+     net that is not the loan income less the deposit expense, a negative balance line, an age outside
+     its band, a location off the map's corner, an Area name too long to label a button at 320px, or no
+     lead location. */
+  register("radius-map", function (fig, stage, data, opts) {
+    var LONGEST_NAME = 16, RADIUS = { min: 0.5, max: 6, step: 0.5, open: 1.5, value: 3 }, PLAY_MS = 1600;
+    function col(name) {
+      var i = data.columns.indexOf(name) - 1;
+      if (i < 0) throw new Error("radius-map: the table has no " + name + " column");
+      return i;
+    }
+    var AREA = col("Area"), EAST = col("Miles east"), NORTH = col("Miles north"), LOAN = col("Loan income"),
+        DEPOSIT = col("Deposit expense"), NET = col("Net"), AGE = col("Age"), BAND = col("Age band");
+    function dollars(s) { return number(s.replace(/−/g, "-")); }
+    function money(v) { return (v < 0 ? "−" : "+") + "$" + Math.abs(Math.round(v)).toLocaleString("en-US"); }
+    function miles(v) { return v.toFixed(1) + (v === 1 ? " mile" : " miles"); }
+
+    var trs = fig.querySelectorAll("tbody tr");
+    var bands = [], areas = [];
+    function band(name) {
+      var m = /^(\d+)(?:–(\d+)|\+)$/.exec(name);
+      if (!m) throw new Error("radius-map: " + JSON.stringify(name) + " is not an age band");
+      return { name: name, lo: +m[1], hi: m[2] ? +m[2] : Infinity };
+    }
+    var spots = data.rows.map(function (r, i) {
+      var s = { label: r.label, area: r.cells[AREA], east: r.values[EAST], north: r.values[NORTH],
+                loan: dollars(r.cells[LOAN]), deposit: dollars(r.cells[DEPOSIT]), net: dollars(r.cells[NET]),
+                age: r.values[AGE], band: r.cells[BAND], lead: trs[i].hasAttribute("data-lead") };
+      [["Miles east", s.east], ["Miles north", s.north], ["Loan income", s.loan],
+       ["Deposit expense", s.deposit], ["Net", s.net], ["Age", s.age]].forEach(function (p) {
+        if (p[1] === null) throw new Error("radius-map: " + s.label + " has no figure for " + p[0]);
+      });
+      if (s.east < 0 || s.north < 0) throw new Error("radius-map: " + s.label + " sits off the map's corner");
+      if (s.loan < 0 || s.deposit < 0) throw new Error("radius-map: " + s.label + " has a negative loan income or deposit expense");
+      if (s.net !== s.loan - s.deposit) {
+        throw new Error("radius-map: " + s.label + " nets " + s.net + ", and " + s.loan + " less " + s.deposit +
+                        " is " + (s.loan - s.deposit));
+      }
+      var b = band(s.band);
+      if (s.age < b.lo || s.age > b.hi) throw new Error("radius-map: " + s.label + " is aged " + s.age + ", outside " + s.band);
+      if (!bands.some(function (o) { return o.name === b.name; })) bands.push(b);
+      if (!s.area || s.area.length > LONGEST_NAME) {
+        throw new Error("radius-map: " + JSON.stringify(s.area) + " cannot label a button at 320px");
+      }
+      var a = areas.filter(function (o) { return o.name === s.area; })[0];
+      if (!a) areas.push(a = { name: s.area, members: [] });
+      a.members.push(s);
+      return s;
+    });
+    if (!spots.length) throw new Error("radius-map: the table has no locations");
+    var lead = spots.filter(function (s) { return s.lead; })[0];
+    if (!lead) throw new Error("radius-map: no location is marked data-lead");
+    bands.sort(function (a, b) { return a.lo - b.lo; });
+    areas.forEach(function (a) {
+      a.east = a.members.reduce(function (t, s) { return t + s.east; }, 0) / a.members.length;
+      a.north = a.members.reduce(function (t, s) { return t + s.north; }, 0) / a.members.length;
+    });
+    var home = areas.filter(function (a) { return a.name === lead.area; })[0];
+    var start = areas.filter(function (a) { return a !== home; })[0] || home;
+
+    /* The map runs from its south-west corner to the next whole mile past the furthest location. */
+    var W = Math.ceil(Math.max.apply(null, spots.map(function (s) { return s.east; })) + 0.01);
+    var H = Math.ceil(Math.max.apply(null, spots.map(function (s) { return s.north; })) + 0.01);
+    var circle = { east: home.east, north: home.north, r: RADIUS.value, area: home };
+
+    var bar = make("div", "exhibit__controls rmap__controls", stage);
+    var areaButtons = [];
+    if (!opts.compact) {
+      var pick = make("div", "rmap__control", bar);
+      make("span", "rmap__control-name", pick, "Centre on").setAttribute("aria-hidden", "true");
+      var group = make("div", "seg", pick);
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", "Centre the circle on an area");
+      areaButtons = areas.map(function (a) {
+        var b = button(group, "seg__option", a.name, a === home);
+        b.addEventListener("click", function () { stop(); place(a.east, a.north, a); });
+        return b;
+      });
+    }
+    var sizer = make("div", "rmap__control rmap__sizer", bar);
+    make("span", "rmap__control-name", sizer, "Radius").setAttribute("aria-hidden", "true");
+    var radiusValue = make("span", "rmap__control-value", sizer);
+    radiusValue.setAttribute("aria-hidden", "true");
+    var size = slider(sizer, {
+      min: RADIUS.min, max: RADIUS.max, step: RADIUS.step, value: circle.r, label: "Radius of the circle",
+      valueText: miles,
+      onChange: function (v) { stop(); circle.r = v; update(); },
+    });
+
+    var layout = make("div", "rmap", stage);
+    var map = make("div", "rmap__map", layout);
+    map.style.setProperty("--rmap-ratio", W + " / " + H);
+    /* Parsed as markup so the browser supplies the SVG namespace. The drawing's units are miles, with
+       north up. The river and roads are drawn from fixed proportions of the map and hold no data. */
+    map.innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" aria-hidden="true" focusable="false">' +
+      '<g transform="scale(' + W / 400 + " " + H / 320 + ')">' +
+      '<path class="rmap__river" d="M-10 150 C 60 130, 110 170, 170 150 S 260 110, 300 140 S 370 220, 410 210"/>' +
+      '<path class="rmap__road" d="M0 104 H400 M118 0 V320 M0 250 L400 150 M268 0 V320 M40 320 L330 40"/></g>' +
+      '<circle class="rmap__ring" vector-effect="non-scaling-stroke"/><circle class="rmap__pin"/></svg>';
+    var ring = map.querySelector(".rmap__ring"), pin = map.querySelector(".rmap__pin");
+    function at(el, east, north) {
+      el.style.setProperty("--x", (east / W * 100) + "%");
+      el.style.setProperty("--y", ((H - north) / H * 100) + "%");
+      return el;
+    }
+    /* Each Area's name sits a little north of its centre, clear of the pin, and inside the map. */
+    areas.forEach(function (a) {
+      at(make("span", "rmap__area", map, a.name), a.east, Math.min(H - 1, a.north + 1.2)).setAttribute("aria-hidden", "true");
+    });
+    var hint = make("span", "rmap__hint", map, "Click the map");
+    hint.setAttribute("aria-hidden", "true");
+
+    var panel = make("div", "rmap__panel", layout);
+    var sums = make("dl", "rmap__sums", panel);
+    function result(term, cls) {
+      make("dt", cls, sums, term);
+      var dd = make("dd", cls, sums);
+      dd.setAttribute("data-result", "");
+      return dd;
+    }
+    var whereOut = result("Circle", "rmap__where");
+    var countOut = result("Locations inside", "rmap__count");
+    var loanOut = result("Loan income");
+    var depositOut = result("Deposit expense");
+    var netOut = result("Net annual", "rmap__net");
+    make("p", "rmap__label", panel, "Age profile, inside");
+    var ages = make("dl", "rmap__ages", panel);
+    var bandRows = bands.map(function (b) {
+      make("dt", null, ages, b.name);
+      var dd = make("dd", null, ages);
+      var track = make("span", "rmap__bar", dd);
+      track.setAttribute("aria-hidden", "true");
+      var fill = make("i", null, track);
+      var n = make("b", null, dd);
+      n.setAttribute("data-result", "");
+      return { band: b, fill: fill, n: n };
+    });
+
+    /* The location readout: the lead at first; hovering previews one, and focus or a press chooses it. */
+    var tip = make("div", "rmap__tip", panel);
+    tip.setAttribute("role", "status");
+    var tipName = make("p", "rmap__tip-name", tip);
+    var tipRows = make("dl", "rmap__tip-rows", tip);
+    function tipRow(term) { make("dt", null, tipRows, term); return make("dd", null, tipRows); }
+    var tipLoan = tipRow("Loan income"), tipDeposit = tipRow("Deposit expense"), tipNet = tipRow("Net");
+    var chosen = lead;
+    function show(s) {
+      tipName.textContent = s.label + " · " + s.area;
+      tipLoan.textContent = money(s.loan);
+      tipDeposit.textContent = money(-s.deposit);
+      tipNet.textContent = money(s.net) + "/yr";
+      spots.forEach(function (o) { o.el.classList.toggle("is-shown", o === s); });
+    }
+    function choose(s) { chosen = s; show(s); }
+
+    spots.forEach(function (s) {
+      var b = at(button(map, "rmap__spot " + (s.net < 0 ? "is-loss" : "is-gain")), s.east, s.north);
+      b.setAttribute("aria-label", s.label + ", " + s.area);
+      b.style.setProperty("--k", String(Math.min(1, Math.abs(s.net) / 40000)));
+      b.addEventListener("mouseenter", function () { show(s); });
+      b.addEventListener("mouseleave", function () { show(chosen); });
+      b.addEventListener("focus", function () { choose(s); });
+      b.addEventListener("click", function () { choose(s); });
+      s.el = b;
+    });
+
+    function place(east, north, area) {
+      circle.east = Math.min(W, Math.max(0, east));
+      circle.north = Math.min(H, Math.max(0, north));
+      circle.area = area || null;
+      update();
+    }
+    function update() {
+      var r = circle.r;
+      ring.setAttribute("cx", circle.east);
+      ring.setAttribute("cy", H - circle.north);
+      ring.setAttribute("r", r);
+      pin.setAttribute("cx", circle.east);
+      pin.setAttribute("cy", H - circle.north);
+      pin.setAttribute("r", Math.min(W, H) / 90);
+      radiusValue.textContent = r.toFixed(1) + " mi";
+      size.set(r, true);
+      areaButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(areas[i] === circle.area)); });
+      var inside = spots.filter(function (s) {
+        var hit = Math.hypot(s.east - circle.east, s.north - circle.north) <= r;
+        s.el.classList.toggle("is-inside", hit);
+        return hit;
+      });
+      function total(f) { return inside.reduce(function (t, s) { return t + f(s); }, 0); }
+      whereOut.textContent = r.toFixed(1) + (r === 1 ? " mile" : " miles") + " around " +
+        (circle.area ? "the centre of " + circle.area.name : "a point on the map");
+      countOut.textContent = String(inside.length);
+      loanOut.textContent = money(total(function (s) { return s.loan; }));
+      depositOut.textContent = money(-total(function (s) { return s.deposit; }));
+      netOut.textContent = money(total(function (s) { return s.net; })) + "/yr";
+      var counts = bandRows.map(function (row) {
+        return inside.filter(function (s) { return s.band === row.band.name; }).length;
+      });
+      var most = Math.max.apply(null, counts.concat([1]));
+      bandRows.forEach(function (row, i) {
+        row.fill.style.width = counts[i] / most * 100 + "%";
+        row.n.textContent = String(counts[i]);
+      });
+    }
+
+    /* A click, or a mouse drag, places the circle. A touch is left to scroll the page unless it is a
+       tap: the stage keeps panning, so a moving finger never reaches here as a drag. */
+    var dragging = false;
+    function fromPointer(e) {
+      var box = map.getBoundingClientRect();
+      if (!box.width) return;
+      place((e.clientX - box.left) / box.width * W, H - (e.clientY - box.top) / box.height * H, null);
+    }
+    map.addEventListener("pointerdown", function (e) {
+      stop();
+      dragging = true;
+      hint.classList.add("is-gone");
+      fromPointer(e);
+    });
+    map.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
+    function release() { dragging = false; }
+    map.addEventListener("pointerup", release);
+    map.addEventListener("pointercancel", release);
+    map.addEventListener("pointerleave", release);
+
+    /* First view: the circle travels from the first Area, small, to the lead's, at its size. */
+    var playing = null, seen = null;
+    function stop() {
+      if (seen) { seen.disconnect(); seen = null; }
+      if (playing !== null) window.cancelAnimationFrame(playing);
+      playing = null;
+      stage.removeAttribute("aria-busy");
+    }
+    function play() {
+      var t0 = null;
+      stage.setAttribute("aria-busy", "true");
+      function tick(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / PLAY_MS), e = 1 - Math.pow(1 - k, 3);
+        circle.r = RADIUS.open + (RADIUS.value - RADIUS.open) * e;
+        place(start.east + (home.east - start.east) * e, start.north + (home.north - start.north) * e,
+              k < 1 ? null : home);
+        if (k < 1) playing = window.requestAnimationFrame(tick);
+        else { playing = null; circle.r = RADIUS.value; update(); stage.removeAttribute("aria-busy"); }
+      }
+      playing = window.requestAnimationFrame(tick);
+    }
+
+    choose(lead);
+    update();
+    if (!reduced && "IntersectionObserver" in window) {
+      stage.setAttribute("aria-busy", "true");
+      circle.r = RADIUS.open;
+      place(start.east, start.north, start);
+      seen = new window.IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting && seen) { seen.disconnect(); seen = null; play(); }
+        });
+      }, { threshold: 0.3 });
+      seen.observe(map);
+    }
+  });
+
   /* The one global: the shared slider and the registry, for a kind that lives in its own file later
      and for the harness, which proves the slider on a fixture apart from any one Exhibit that uses it. */
   window.Exhibit = { register: register, slider: slider };
