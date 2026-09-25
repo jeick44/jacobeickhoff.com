@@ -1633,6 +1633,24 @@ button {
   color: var(--ink);
 }
 
+/* A slider's visible name (and its value, where the kind shows it), written before it for a sighted
+   reader; the slider announces its own. The slider after it fills the row up to a readable length. */
+.exhibit__slider-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.exhibit__slider-label b {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.exhibit__controls .exhibit__slider-label + .slider {
+  flex: 1 1 12rem;
+  max-width: 22rem;
+}
+
 /* A diagram that cannot reflow keeps a readable width and scrolls sideways in its own frame, never
    the page's. */
 .exhibit__frame,
@@ -2651,17 +2669,6 @@ button.prep__cell:focus-visible {
 /* MENTIONS AGAINST DEPLOYMENT - the same passages scored two ways. One card per passage, its text
    with every mention of AI marked, then a bar per score on its own scale with the figure in words
    beside it. The cards reflow into one column, so nothing here needs a frame of its own. */
-.mentions__control {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink-soft);
-}
-
-.mentions__controls .slider {
-  flex: 1 1 12rem;
-  max-width: 22rem;
-}
-
 .mentions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
@@ -4563,23 +4570,6 @@ button.prep__cell:focus-visible {
    the judge's time is an ink tick at the same place on every bar. A part the time runs out on is hatched and says
    "Not checked"; the verdict is always in words, never the fill alone. Everything reflows, so no
    frame is needed. */
-.judged__control {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink-soft);
-}
-
-.judged__control b {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-.judged__controls .slider {
-  flex: 1 1 12rem;
-  max-width: 22rem;
-}
-
 .exhibit .judged__paper {
   margin: 0;
   max-width: none;
@@ -4658,14 +4648,14 @@ button.prep__cell:focus-visible {
 .judged__track {
   position: relative;
   height: 0.625rem;
-  border-radius: 2px;
+  border-radius: var(--radius-ring);
   background: var(--line-soft);
 }
 
 .judged__span {
   position: absolute;
   inset-block: 0;
-  border-radius: 2px;
+  border-radius: var(--radius-ring);
   background: var(--data-1);
   box-shadow: inset -1px 0 0 var(--paper);
 }
@@ -4679,11 +4669,12 @@ button.prep__cell:focus-visible {
 /* The judge's time. Placed inside its bar's track and drawn over it, so at either end of the slider it
    stays within the track's own width. */
 .judged__edge {
+  --tick-width: 2px;
+  --tick-overhang: 3px;
   position: absolute;
-  top: -3px;
-  bottom: -3px;
-  width: 2px;
+  inset-block: calc(-1 * var(--tick-overhang));
+  width: var(--tick-width);
   /* Its right edge on the minute, so at the far end it ends where the track does. */
-  margin-left: -2px;
+  margin-left: calc(-1 * var(--tick-width));
   background: var(--ink);
 }

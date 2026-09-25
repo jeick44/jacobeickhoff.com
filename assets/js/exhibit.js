@@ -128,9 +128,22 @@
      pointer can press anywhere on the track and drag. It is the one mark allowed to claim a touch
      gesture, and it says so with touch-action: none in the stylesheet.
 
-       slider(host, { min, max, step, value, label, valueText: function (v) {…}, onChange })  */
+       slider(host, { min, max, step, value, label, valueText: function (v) {…}, onChange,
+                      visibleLabel, showValue })
+
+     visibleLabel writes the slider's name before it for a sighted reader, hidden from a screen
+     reader (the slider announces its own), and showValue follows it with the current value. A
+     labelled slider takes the shared row layout (.exhibit__slider-label + .slider).  */
   function slider(host, o) {
-    var min = o.min, max = o.max, step = o.step || 1, value = null;
+    var min = o.min, max = o.max, step = o.step || 1, value = null, shownValue = null;
+    if (o.visibleLabel) {
+      var named = make("span", "exhibit__slider-label", host, o.visibleLabel);
+      named.setAttribute("aria-hidden", "true");
+      if (o.showValue) {
+        named.appendChild(document.createTextNode(": "));
+        shownValue = make("b", "", named);
+      }
+    }
     var el = make("div", "slider", host);
     el.setAttribute("role", "slider");
     el.tabIndex = 0;
@@ -149,6 +162,7 @@
       value = v;
       el.setAttribute("aria-valuenow", String(v));
       el.setAttribute("aria-valuetext", o.valueText ? o.valueText(v) : String(v));
+      if (shownValue) shownValue.textContent = String(v);
       var pct = max > min ? (v - min) / (max - min) * 100 : 0;
       fill.style.width = pct + "%";
       thumb.style.left = pct + "%";
@@ -1637,9 +1651,9 @@
     var widest = Math.max.apply(null, passages.map(function (p) { return p.mentions; })) + MOST;
     var added = 0;
 
-    var bar = make("div", "exhibit__controls mentions__controls", stage);
-    make("span", "mentions__control", bar, data.columns[2] + " added").setAttribute("aria-hidden", "true");
+    var bar = make("div", "exhibit__controls", stage);
     slider(bar, {
+      visibleLabel: data.columns[2] + " added",
       min: 0, max: MOST, step: 1, value: 0, label: data.columns[2] + " added to every passage",
       valueText: function (v) { return v + (v === 1 ? " mention" : " mentions") + " added to every passage"; },
       onChange: function (v) { added = v; update(); }
@@ -2859,8 +2873,8 @@
 
      Refused rather than drawn: a structure cell that is not Yes or No, a part's minutes that are not
      a whole number above zero, a structure with no parts, fewer than two structures (there would be
-     nothing to compare), a caption with no one quoted title, and a judge's time outside what the
-     slider can set. */
+     nothing to compare), a caption with no one quoted title, two structures under one header (each is
+     found by its header), and a judge's time outside what the slider can set. */
   register("judges-rewarded", function (fig, stage, data) {
     var NEED = "Minutes a judge needs", HAS = "Minutes a judge has";
     function header(prefix) {
@@ -2871,6 +2885,9 @@
     var need = header(NEED);
     var names = data.columns.slice(1).filter(function (c, i) { return i !== need; });
     if (names.length < 2 || !data.rows.length) throw new Error("judges-rewarded: the table needs parts and two structures");
+    names.forEach(function (n, i) {
+      if (names.indexOf(n) !== i) throw new Error("judges-rewarded: two structures are headed " + JSON.stringify(n));
+    });
     data.rows.forEach(function (r) {
       var m = r.values[need];
       if (!(m > 0) || Math.round(m) !== m) {
@@ -2908,12 +2925,10 @@
     }
     var minutes = has;
 
-    var bar = make("div", "exhibit__controls judged__controls", stage);
-    var named = make("p", "judged__control", bar, HAS + ": ");
-    named.setAttribute("aria-hidden", "true");
-    var shownMinutes = make("b", "", named);
+    var bar = make("div", "exhibit__controls", stage);
     function minutesWord(n) { return n + (n === 1 ? " minute" : " minutes"); }
     slider(bar, {
+      visibleLabel: HAS, showValue: true,
       min: 1, max: longest, step: 1, value: minutes, label: HAS,
       valueText: minutesWord,
       onChange: function (v) { minutes = v; update(); }
@@ -2939,13 +2954,17 @@
         make("span", "judged__label", head, p.label);
         make("span", "judged__minutes", head, minutesWord(p.minutes));
         var verdict = make("span", "judged__verdict", head);
+        /* The bar is the axis of minutes (data-axis) and the tick marks the judge's time on it
+           (data-tick), so a reading of the drawing can hold the tick to the minutes it stands for. */
         var track = make("span", "judged__track", li);
         track.setAttribute("aria-hidden", "true");
+        track.setAttribute("data-axis", "");
         var span = make("span", "judged__span", track);
         span.style.left = p.start / longest * 100 + "%";
         span.style.width = p.minutes / longest * 100 + "%";
         /* The judge's time, marked on every part's bar at the same place on the axis. */
         var edge = make("span", "judged__edge", track);
+        edge.setAttribute("data-tick", "");
         return { li: li, verdict: verdict, edge: edge };
       });
       return { count: count, items: items };
@@ -2956,7 +2975,6 @@
     var note = make("p", "exhibit__note", readout);
 
     function update() {
-      shownMinutes.textContent = String(minutes);
       var through = [], cut = [];
       structures.forEach(function (s, k) {
         var d = drawn[k], checked = 0;
