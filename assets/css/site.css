@@ -4388,11 +4388,6 @@ button.prep__cell:focus-visible {
   font-weight: 600;
   color: var(--ink-soft);
   pointer-events: none;
-  transition: opacity 300ms var(--ease);
-}
-
-.rmap__hint.is-gone {
-  opacity: 0;
 }
 
 /* A location: a small target around a smaller dot, coloured by its net - rose for a loss, blue for a

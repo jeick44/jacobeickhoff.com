@@ -2793,7 +2793,7 @@
     map.addEventListener("pointerdown", function (e) {
       stop();
       dragging = true;
-      hint.classList.add("is-gone");
+      if (hint.parentNode) hint.parentNode.removeChild(hint);
       fromPointer(e);
     });
     map.addEventListener("pointermove", function (e) { if (dragging) fromPointer(e); });
