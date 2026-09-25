@@ -181,8 +181,9 @@
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>An invented footnote passage, and revisions of it each asked for by the
-                      same prompt</caption>
+                    <caption>An invented footnote passage, and revisions of it written by hand, as one
+                      prompt might return them; at the foot, the cut-points that place each on a
+                      rung</caption>
                     <thead>
                       <tr><th scope="col">Passage</th><th scope="col">Text</th><th scope="col">Prompt</th></tr>
                     </thead>
@@ -211,6 +212,15 @@
                         the rent evenly across each lease, free months included.</td><td>Revise this
                         passage lightly for clarity.</td></tr>
                     </tbody>
+                    <tfoot>
+                      <tr><th scope="col">Rung</th><th scope="col" colspan="2">Where a revision&rsquo;s
+                        measures place it</th></tr>
+                      <tr><th scope="row">Light</th><td colspan="2">At most 20% of words edited and at
+                        least 70% of word pairs kept</td></tr>
+                      <tr><th scope="row">Moderate</th><td colspan="2">Neither light nor heavy</td></tr>
+                      <tr><th scope="row">Heavy</th><td colspan="2">More than 50% of words edited or
+                        fewer than 40% of word pairs kept</td></tr>
+                    </tfoot>
                   </table>
                 </div>
               </details>
@@ -218,13 +228,12 @@
                 the style of a lease footnote, and revisions of it written by hand for this Exhibit to
                 show how far one prompt&rsquo;s results can spread. No model wrote them, and none comes
                 from the study&rsquo;s validation set, whose passages, revisions and cut-points are not
-                reproduced here. Words are compared ignoring case and punctuation. Edit distance is the
+                reproduced here while the study is at its validation stage. Words are compared ignoring
+                case and punctuation. Edit distance is the
                 fewest words inserted, deleted or replaced to turn the original into the revision, as a
                 share of the original&rsquo;s words; n-gram overlap is the share of the original&rsquo;s
-                distinct word pairs the revision keeps. A revision is light when its edits come to at
-                most 20% of the original&rsquo;s words and at least 70% of its word pairs survive; heavy
-                when its edits come to more than 50% or fewer than 40% of its word pairs survive;
-                moderate otherwise. These cut-points are this illustration&rsquo;s own.</figcaption>
+                distinct word pairs the revision keeps. The cut-points between rungs, at the foot of
+                the table, are this illustration&rsquo;s own.</figcaption>
             </figure>
             <p><strong>The Gate.</strong> A detector may score real filings only if it reaches an AUC of
               at least 0.70 at the moderate rung and holds its false-positive rate at or below 5%

@@ -4872,9 +4872,8 @@ button.prep__cell:focus-visible {
 .intensity__text {
   margin: var(--space-sm) 0 var(--space-2xs);
   padding: var(--space-sm);
-  border-left: 3px solid var(--line);
+  border-left: 2px solid var(--line);
   background: var(--mist);
-  line-height: 1.6;
 }
 
 .intensity__text del {
@@ -4884,6 +4883,6 @@ button.prep__cell:focus-visible {
 .intensity__text ins {
   text-decoration: underline;
   text-decoration-color: var(--data-1);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 2px;
+  text-decoration-thickness: 0.125em;
+  text-underline-offset: 0.22em;
 }

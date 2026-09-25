@@ -3100,12 +3100,16 @@
      its edit distance (the fewest words inserted, deleted or replaced to turn the original into it)
      as a share of the original's words, and the share of the original's distinct word pairs it
      keeps. A revision is light when both say light, heavy when either says heavy, moderate
-     otherwise, at the cut-points below, which the source line states in words and suites/run.py
-     reads from there.
+     otherwise. The rungs and their cut-points are read from the table's foot, one row per rung,
+     lightest first: the light row "at most a% of words edited and at least b% of word pairs kept",
+     the heavy row "more than c% of words edited or fewer than d% of word pairs kept". The foot is
+     the one copy of the rule; suites/run.py reads it too.
 
      The drawing: the prompt, once; the ladder of three rungs with every revision placed on the rung
      it measured; and, for the revision in hand (a segmented choice), its two measures, its rung,
-     which measure put it there, and the revision itself with the words it struck and added marked.
+     which measure put it there, and the revision itself: each change as the words it struck, then
+     the words it added, each run opening with a hidden "removed:" or "added:" for a reader who
+     cannot see the strike or the underline.
 
      Results (data-result): each revision's placement ("Revision 2" and, in hidden words,
      ", moderate"), the rungs reached ("k of n"), then the revision in hand, "k% of words edited",
@@ -3113,11 +3117,23 @@
      hover readouts.
 
      A table the drawing cannot show is refused: no "Text" or "Prompt" column, no single original,
-     revisions not numbered from 1 in order, fewer than two revisions, revisions carrying different
-     prompts (or none), or a passage with a word that is only punctuation. */
+     an original under two words (it has no word pair to keep) or carrying a prompt, revisions not
+     numbered from 1 in order, fewer than two revisions, revisions carrying different prompts (or
+     none), a passage with a word that is only punctuation, or a foot that does not state three
+     rungs' cut-points in those words. */
   register("edit-intensity", function (fig, stage, data) {
-    var RUNGS = ["Light", "Moderate", "Heavy"];
-    var LIGHT_EDITED = 0.2, LIGHT_KEPT = 0.7, HEAVY_EDITED = 0.5, HEAVY_KEPT = 0.4;
+    var foot = Array.prototype.filter.call(fig.querySelectorAll("tfoot tr"), function (tr) {
+      return tr.querySelector("td");
+    });
+    if (foot.length !== 3) throw new Error("edit-intensity: the table's foot does not give three rungs");
+    var RUNGS = foot.map(function (tr) { return text(tr.children[0]); });
+    var light = /^at most (\d+)% of words edited and at least (\d+)% of word pairs kept$/i
+                  .exec(text(foot[0].querySelector("td")));
+    var heavy = /^more than (\d+)% of words edited or fewer than (\d+)% of word pairs kept$/i
+                  .exec(text(foot[2].querySelector("td")));
+    if (!light || !heavy) throw new Error("edit-intensity: the table's foot does not state the cut-points");
+    var cut = { lightEdited: light[1] / 100, lightKept: light[2] / 100,
+                heavyEdited: heavy[1] / 100, heavyKept: heavy[2] / 100 };
     var col = {};
     ["Text", "Prompt"].forEach(function (name) {
       var i = data.columns.indexOf(name);
@@ -3140,6 +3156,10 @@
     }
     if (rows.length < 3) throw new Error("edit-intensity: one prompt needs at least two revisions to compare");
     var original = words(rows[0].cells[col["Text"]] || "", "the original");
+    if (original.keys.length < 2) throw new Error("edit-intensity: the original has no word pair to keep");
+    if (!/^[—–-]?$/.test((rows[0].cells[col["Prompt"]] || "").trim())) {
+      throw new Error("edit-intensity: the original carries a prompt; only a revision is asked for");
+    }
     var prompt = (rows[1].cells[col["Prompt"]] || "").trim();
     if (!prompt || /^[—–-]$/.test(prompt)) throw new Error("edit-intensity: Revision 1 carries no prompt");
     var revisions = rows.slice(1).map(function (r, i) {
@@ -3184,8 +3204,8 @@
       var mine = pairs(a), theirs = pairs(b), all = Object.keys(mine);
       var kept = all.filter(function (p) { return theirs[p]; }).length / all.length;
       var edited = d[a.length][b.length] / a.length;
-      var byEdit = edited <= LIGHT_EDITED ? 0 : edited > HEAVY_EDITED ? 2 : 1;
-      var byPairs = kept >= LIGHT_KEPT ? 0 : kept < HEAVY_KEPT ? 2 : 1;
+      var byEdit = edited <= cut.lightEdited ? 0 : edited > cut.heavyEdited ? 2 : 1;
+      var byPairs = kept >= cut.lightKept ? 0 : kept < cut.heavyKept ? 2 : 1;
       return { name: name, ops: ops, edited: edited, kept: kept,
                byEdit: byEdit, byPairs: byPairs, rung: Math.max(byEdit, byPairs) };
     }
@@ -3198,7 +3218,7 @@
     });
 
     var ask = make("div", "intensity__prompt", stage);
-    make("span", "intensity__prompt-label", ask, "The prompt, the same for every revision:");
+    make("span", "", ask, "The prompt, the same for every revision:");
     make("q", "", ask, prompt);
 
     var ladder = make("ol", "intensity__ladder", stage);
@@ -3237,9 +3257,8 @@
     rungChip.setAttribute("data-result", "");
     var note = make("div", "exhibit__note", readout);
     var passage = make("div", "intensity__text", stage);
-    var key = make("div", "exhibit__note", stage,
-                   "Struck: words the revision removed from the original. Underlined: words it added.");
-    key.setAttribute("aria-hidden", "true");
+    make("div", "exhibit__note", stage,
+         "Struck: words the revision removed from the original. Underlined: words it added.");
 
     function percent(x) { return Math.round(x * 100) + "%"; }
 
@@ -3254,18 +3273,38 @@
       var rung = RUNGS[r.rung].toLowerCase();
       if (r.byEdit === r.byPairs) note.textContent = "Both measures put it on " + rung + ".";
       else {
-        var by = r.byEdit > r.byPairs ? ["Its edit distance", "the word pairs it kept"]
+        var by = r.byEdit > r.byPairs ? ["Its edit distance", "its word pairs"]
                                       : ["The word pairs it broke", "its edit distance"];
         note.textContent = by[0] + " put it on " + rung + "; " + by[1] + " alone would have said " +
           RUNGS[Math.min(r.byEdit, r.byPairs)].toLowerCase() + ".";
       }
+      /* Each run of changes between kept words as one struck run, then one added run. */
       passage.textContent = "";
-      r.ops.forEach(function (op, i) {
-        if (i) passage.appendChild(document.createTextNode(" "));
-        if (op.kept) passage.appendChild(document.createTextNode(op.kept));
-        else if (op.struck) make("del", "", passage, op.struck);
-        else make("ins", "", passage, op.added);
+      var struck = [], added = [];
+      function put(node) {
+        if (passage.firstChild) passage.appendChild(document.createTextNode(" "));
+        passage.appendChild(node);
+      }
+      function flush() {
+        [["del", "removed: ", struck], ["ins", "added: ", added]].forEach(function (m) {
+          if (!m[2].length) return;
+          var el = document.createElement(m[0]);
+          make("span", "visually-hidden", el, m[1]);
+          el.appendChild(document.createTextNode(m[2].join(" ")));
+          put(el);
+        });
+        struck = [];
+        added = [];
+      }
+      r.ops.forEach(function (op) {
+        if (op.struck) struck.push(op.struck);
+        else if (op.added) added.push(op.added);
+        else {
+          flush();
+          put(document.createTextNode(op.kept));
+        }
       });
+      flush();
     }
 
     update();
