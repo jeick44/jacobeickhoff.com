@@ -435,18 +435,11 @@
     var proc = 0, raf = null;
 
     var bar = make("div", "exhibit__controls lanes__controls", stage);
-    var procGroup = make("div", "seg", bar);
-    procGroup.setAttribute("role", "group");
-    procGroup.setAttribute("aria-label", "Process");
     /* Choosing a process plays it from the start - the one already chosen too, as a replay. */
-    var procButtons = orders.map(function (o, i) {
-      var b = button(procGroup, "seg__option", o.name, i === 0);
-      b.addEventListener("click", function () {
-        proc = i;
-        build();
-        play();
-      });
-      return b;
+    var procs = segmented(bar, "Process", orders.map(function (o) { return o.name; }), function (i) {
+      proc = i;
+      build();
+      play();
     });
     var keys = make("div", "lanes__keys", bar);
     var legend = make("ul", "lanes__legend", keys);
@@ -547,7 +540,7 @@
        the playhead has reached it; a switch counts once the playhead has passed both its blocks. */
     function at(pos) {
       var o = orders[proc], x = L + (R - L) * pos, q = 0, called = 0, switched = 0;
-      procButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === proc)); });
+      procs.press(proc);
       head.setAttribute("x1", x);
       head.setAttribute("x2", x);
       headDot.setAttribute("cx", x);
@@ -687,13 +680,9 @@
 
     var prepared = false;
     var bar = make("div", "exhibit__controls", stage);
-    var viewGroup = make("div", "seg", bar);
-    viewGroup.setAttribute("role", "group");
-    viewGroup.setAttribute("aria-label", "Export");
-    var viewButtons = ["Raw export", "Prepared"].map(function (name, i) {
-      var b = button(viewGroup, "seg__option", name, i === 0);
-      b.addEventListener("click", function () { prepared = i === 1; update(); });
-      return b;
+    var views = segmented(bar, "Export", ["Raw export", "Prepared"], function (i) {
+      prepared = i === 1;
+      update();
     });
 
     /* Above the preview: what was detected, what was corrected, what was left empty. */
@@ -775,7 +764,7 @@
 
     function update() {
       var detected = 0, corrected = 0, empty = 0, order = 0;
-      viewButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String((i === 1) === prepared)); });
+      views.press(prepared ? 1 : 0);
       lines.forEach(function (ln) {
         ln.els.forEach(function (e) {
           var c = e.cell;
@@ -1332,13 +1321,9 @@
     var flattering = false;
 
     var bar = make("div", "exhibit__controls", stage);
-    var group = make("div", "seg", bar);
-    group.setAttribute("role", "group");
-    group.setAttribute("aria-label", "Periods shown");
-    var viewButtons = views.map(function (name, i) {
-      var b = button(group, "seg__option", name, i === 0);
-      b.addEventListener("click", function () { flattering = i === 1; update(); });
-      return b;
+    var shownBy = segmented(bar, "Periods shown", views, function (i) {
+      flattering = i === 1;
+      update();
     });
 
     /* The chart itself: a heading, a zero line, and one column per period with an arrow of one
@@ -1374,7 +1359,7 @@
     /* The two charts differ in which periods they show; everything else follows from that. */
     function update() {
       var shown = flattering ? worked : periods, wrong = periods.length - worked.length;
-      viewButtons.forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === (flattering ? 1 : 0))); });
+      shownBy.press(flattering ? 1 : 0);
       columns.forEach(function (li, i) { li.hidden = shown.indexOf(periods[i]) < 0; });
       heading.textContent = data.columns[1] + ": " +
         (flattering ? worked.map(function (p) { return p.label; }).join("; ") : "every period tested");
@@ -1821,7 +1806,7 @@
     update();
   });
 
-  /* ---- helpers shared by The Research's kinds -----------------------------------------------------
+  /* ---- helpers shared by the kinds -----------------------------------------------------------------
      A segmented choice: a named group of pressed-state buttons, the first pressed. Clicking one calls
      onPick with its index; the kind decides what changes, and press(i) shows which option holds.
      fullNames, when given, names each option in full to a screen reader (its aria-label) where the
