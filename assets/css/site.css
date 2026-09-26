@@ -273,9 +273,10 @@ button {
   background: var(--mist);
 }
 
-/* THE LABEL TREATMENT - one rule, every small label on the site. Sentence case: the uppercase
-   eyebrow was v1's, and a label set in capitals above a headline competes with the headline. Each
-   still owns its own colour and spacing; the typography is what makes them one site. */
+/* THE LABEL TREATMENT - one rule, every small label on the site. Sentence case, and never above a
+   heading: the eyebrow was v1's, and a label above a headline competes with the headline, so none
+   ships on any page. `.eyebrow` survives only as the look of the numbers row's own heading. Each
+   label still owns its own colour and spacing; the typography is what makes them one site. */
 .eyebrow,
 .about__facts dt,
 .case-head__flag,
@@ -1140,10 +1141,6 @@ button {
   color: var(--paper);
 }
 
-.contact .eyebrow {
-  color: var(--paper);
-}
-
 .contact__title {
   font-size: var(--text-xl);
   font-weight: 500;
@@ -1692,7 +1689,11 @@ button {
    paper-coloured covers scroll with the content and hide each shade once its edge is reached, so a
    diagram that fits shows none. A phone's scrollbar is hidden until touched, and half a chart with
    no cue reads as the whole of one. */
-.exhibit__frame {
+/* The literals are this one gradient's geometry, not spacing or colour the site reuses: a 2rem
+   cover, wider than the 0.9rem shade so it hides the shade completely at an edge, and ink at 22%, a
+   shadow a reader notices without reading it as a rule. A data table that scrolls gets the same cue. */
+.exhibit__frame,
+.exhibit__table {
   background:
     linear-gradient(to right, var(--paper) 40%, transparent) left / 2rem 100% no-repeat local,
     linear-gradient(to left, var(--paper) 40%, transparent) right / 2rem 100% no-repeat local,
@@ -1849,6 +1850,12 @@ button {
   color: var(--ink);
 }
 
+.seg__option[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line), 0 1px 3px var(--line);
+}
+
 /* Too narrow for a group's options on one line, the options stand as separate pills that wrap
    as a row, rather than one rounded track broken over two lines. */
 @media (max-width: 30rem) {
@@ -1864,15 +1871,12 @@ button {
     background: var(--mist);
   }
 
+  /* After the tray's pressed rule, so it wins: a pill's own border is its outline, and the
+     tray's raised shadow would draw a second one around it. */
   .seg__option[aria-pressed="true"] {
     border-color: var(--ink-soft);
+    box-shadow: none;
   }
-}
-
-.seg__option[aria-pressed="true"] {
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: 0 0 0 1px var(--line), 0 1px 3px var(--line);
 }
 
 /* THE SHARED SLIDER. The one mark that claims a touch gesture, because it is the one that is dragged.
@@ -2886,7 +2890,8 @@ button.prep__cell:focus-visible {
 /* ---- KIND: engagement-overview ------------------------------------------------------------------
    Six Engagements on a 2x2. The ground and the dividing lines are the drawing; every word and every
    mark over it is HTML, placed by percentage, so it keeps the page's own size at any width. Narrower
-   than the names need, the diagram keeps its width and scrolls sideways in its frame. */
+   than the names need, the diagram keeps its width and scrolls sideways in its frame; at phone width
+   it reflows instead (below). */
 .overview {
   position: relative;
   min-width: 28rem;
@@ -3022,6 +3027,31 @@ button.prep__cell:focus-visible {
 
 .overview__mark.is-shown .overview__dot {
   background: var(--blue);
+}
+
+/* At phone width the diagram reflows instead of scrolling: half a 2x2 off-frame reads as the whole
+   of one, and the overview's opaque quadrants cover the frame's edge shade. It draws to the column's
+   width, the quadrant names step aside as they do on the compact copy (the readout's "described as"
+   line and the table carry them), and each name wraps beside its dot. */
+@media (max-width: 30rem) {
+  .overview {
+    min-width: 0;
+  }
+
+  .overview__quadrant {
+    display: none;
+  }
+
+  .overview__mark {
+    --dot: 1.5rem;
+    font-size: var(--text-xs);
+  }
+
+  /* A name keeps to its own quadrant: the room between a dot and the divider is about this wide. */
+  .overview__label {
+    max-width: 4.75rem;
+    white-space: normal;
+  }
 }
 
 /* What a mark leads to, shown when it is hovered, focused or tapped. */
@@ -3185,7 +3215,6 @@ button.prep__cell:focus-visible {
   }
 
   .stats .eyebrow,
-  .contact .eyebrow,
   .site-footer__name,
   .site-footer__heading,
   .site-footer__list a,
@@ -3589,12 +3618,6 @@ button.prep__cell:focus-visible {
   color: var(--ink-soft);
   font-size: var(--text-read);
   margin-bottom: var(--space-sm);
-}
-
-.track .eyebrow {
-  font-size: var(--text-xs);
-  color: var(--ink-mute);
-  margin-bottom: var(--space-2xs);
 }
 
 /* The same shape, twice on one page, deliberately: a Track's standing and the closing list of what
@@ -4455,6 +4478,9 @@ button.prep__cell:focus-visible {
   top: var(--y);
 }
 
+/* An Area's name sits over the drawing, so the circle can pass under it. A halo in the map's own
+   ground knocks the ring out behind the letters, as the Gate's values do with a paper stroke; a
+   text-shadow rather than paint-order, which HTML text does not take in every browser. */
 .rmap__area {
   transform: translate(-50%, -100%);
   font-size: var(--text-xs);
@@ -4462,6 +4488,7 @@ button.prep__cell:focus-visible {
   color: var(--ink-mute);
   white-space: nowrap;
   pointer-events: none;
+  text-shadow: 0 0 2px var(--mist-deep), 0 0 2px var(--mist-deep), 0 0 4px var(--mist-deep);
 }
 
 .rmap__hint {
