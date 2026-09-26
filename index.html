@@ -248,7 +248,7 @@
             <a class="more" href="/work/macrosense/">Read the Case Study <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
           </div>
           <figure class="exhibit" id="exhibit-pipeline" data-exhibit="pipeline"
-                  data-provenance="published" data-compact>
+                  data-provenance="published" data-first-column="Every input free and public" data-compact>
             <div class="exhibit__head">
               <h4 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The components
                 that carry the loop, each with a fixed input and output</h4>
@@ -268,18 +268,17 @@
                   <tbody>
                     <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads, the volatility index and its term structure, and one- and three-month momentum for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimiser</td></tr>
                     <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov model.</td><td>Portfolio optimiser, Briefing</td></tr>
-                    <tr><th scope="row">Portfolio optimiser</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing, Logger and dashboard</td></tr>
+                    <tr><th scope="row">Portfolio optimiser</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing</td></tr>
                     <tr><th scope="row">Sentiment scorer</th><td>Earnings-call transcripts and 10-K and 10-Q filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps between requests to stay inside the published rate limit.</td><td>A score per issuer on four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up that returns to the classifier as one of its features.</td><td>Regime classifier, Briefing</td></tr>
-                    <tr><th scope="row">Scheduler</th><td>The clock and the exchange calendar.</td><td>A completed cycle, logged.</td><td>Logger and dashboard</td></tr>
-                    <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>Logger and dashboard</td></tr>
-                    <tr><th scope="row">Logger and dashboard</th><td>Every rebalance.</td><td>A local database; a dashboard reads it back.</td><td>No other component</td></tr>
+                    <tr><th scope="row">Scheduler</th><td>The clock and the exchange calendar.</td><td>A completed cycle, logged.</td><td>No other component</td></tr>
+                    <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>No other component</td></tr>
                   </tbody>
                 </table>
               </div>
             </details>
             <figcaption class="exhibit__source"><b>Source:</b> published; the components&rsquo; inputs
-              and outputs as the Case Study states them. The packets make one pass to show which way
-              data travels, then rest. No performance figure is shown, because MacroSense is published
+              and outputs as the Case Study states them. The packets move for a few seconds to show
+              which way data travels, then rest; the arrows keep showing it. No performance figure is shown, because MacroSense is published
               as architecture. <a href="/work/macrosense/#exhibit-pipeline">The full Exhibit</a>, where
               the flow keeps running and can be paused, is in the Case Study.</figcaption>
           </figure>
@@ -317,7 +316,7 @@
                   <tbody>
                     <tr><th scope="row">Sees only heavy edits</th><td>0.56</td><td>0.63</td><td>0.90</td><td>2.5%</td></tr>
                     <tr><th scope="row">Blind</th><td>0.51</td><td>0.53</td><td>0.56</td><td>3.0%</td></tr>
-                    <tr><th scope="row">Noisy</th><td>0.66</td><td>0.80</td><td>0.90</td><td>8.0%</td></tr>
+                    <tr><th scope="row">Noisy</th><td>0.66</td><td>0.86</td><td>0.90</td><td>8.0%</td></tr>
                     <tr><th scope="row">Clears the bar</th><td>0.67</td><td>0.76</td><td>0.90</td><td>3.5%</td></tr>
                   </tbody>
                   <tfoot>

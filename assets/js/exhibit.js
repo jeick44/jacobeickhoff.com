@@ -136,8 +136,10 @@
      labelled slider takes the shared row layout (.exhibit__slider-label + .slider).
      mark makes an element the kind has drawn (a draggable point in a chart) the slider instead of a
      track: the same role, keys and announcements, with pointerValue(event) saying what value a
-     pointer at that place means, and onChange moving the mark. host is then unused.  */
+     pointer at that place means, and onChange moving the mark. host is then unused. A mark has no
+     track to measure a pointer against, so it must bring its own pointerValue.  */
   function slider(host, o) {
+    if (o.mark && !o.pointerValue) throw new Error("slider: a mark needs pointerValue to read a pointer");
     var min = o.min, max = o.max, step = o.step || 1, value = null, shownValue = null;
     if (o.visibleLabel && !o.mark) {
       var named = make("span", "exhibit__slider-label", host, o.visibleLabel);
@@ -1826,8 +1828,10 @@
      visible word is short ("Record" is heard as "Step 2, Record"); without it the word is the name.
      svgChild adds a classed child to an SVG parsed from markup, taking the SVG namespace from it
      rather than from a URL written here (suites/run.py reads any URL in a shipped script as a load). */
-  function segmented(bar, label, names, onPick, fullNames) {
-    var group = make("div", "seg", bar);
+  /* cls replaces the pill row's own class for a group laid out another way (the pipeline's grid);
+     its options keep seg__option. */
+  function segmented(bar, label, names, onPick, fullNames, cls) {
+    var group = make("div", cls || "seg", bar);
     group.setAttribute("role", "group");
     group.setAttribute("aria-label", label);
     var options = names.map(function (name, i) {
@@ -3331,8 +3335,8 @@
 
      The drawing is the Detectability Curve: one point per rung, each a draggable mark (the shared
      slider, on the point), with the Gate's zone drawn at its rung only. Profiles are a segmented
-     choice; the first is pressed as the Exhibit opens. Pressing one moves the points and the rate to
-     its row, easing there (aria-busy on the stage while it moves; at once under reduced motion);
+     choice under a visible heading that calls the detector hypothetical; the first is pressed as
+     the Exhibit opens. Pressing one moves the points and the rate to its row, easing there (aria-busy on the stage while it moves; at once under reduced motion);
      moving a point or the rate by hand leaves no profile pressed. Compact (the homepage's copy)
      drops the false-positive slider: the rate is the profile's, shown in words.
 
@@ -3356,10 +3360,8 @@
       else if (/^false-positive rate/i.test(c)) fprAt = i - 1;
     });
     if (rungs.length < 2 || fprAt < 0) throw new Error("gate: the table has no AUC per rung and false-positive rate");
-    var gateRung = -1;
-    rungs.forEach(function (r, i) {
-      if (text(foot[0].children[0]).toLowerCase().indexOf(r.name) >= 0) gateRung = i;
-    });
+    var footRung = /^AUC at the (\w+) rung$/i.exec(text(foot[0].children[0]));
+    var gateRung = footRung ? rungs.map(function (r) { return r.name; }).indexOf(footRung[1].toLowerCase()) : -1;
     if (gateRung < 0) throw new Error("gate: the foot's AUC names no rung the table has");
 
     var LO = 0.4, HI = 1, FPR_MAX = 15;
@@ -3379,11 +3381,13 @@
     var vals = profiles[0].auc.slice(), fpr = profiles[0].fpr;
 
     var bar = make("div", "exhibit__controls", stage);
+    make("span", "exhibit__slider-label", bar, "Hypothetical detector:").setAttribute("aria-hidden", "true");
     var choice = segmented(bar, "Hypothetical detector profiles", profiles.map(function (p) { return p.name; }),
                            function (i) { go(profiles[i]); });
 
-    /* The curve, in its own units and scaled to the frame; under a readable width the frame scrolls. */
-    var W = 560, H = 346, L = 58, R = 540, T = 34, B = 296;
+    /* The curve, in its own units and scaled to the frame; under a readable width (the stylesheet's
+       min-width, which keeps its words at their set size) the frame scrolls. */
+    var W = 560, H = 330, L = 58, R = 540, T = 34, B = 296;
     var frame = make("div", "exhibit__frame", stage);
     frame.insertAdjacentHTML("beforeend", '<svg class="gate__plot" viewBox="0 0 ' + W + " " + H +
                              '" role="group" aria-label="Detectability Curve of a hypothetical detector, ' +
@@ -3423,15 +3427,21 @@
     xs.forEach(function (x, i) {
       axis.appendChild(words(x, B + 24, cap(rungs[i].name), "gate__rung" + (i === gateRung ? " gate__rung--gate" : ""), "middle"));
     });
-    axis.appendChild(words((L + R) / 2, B + 44, "Edit intensity, measured afterwards from edit distance and n-gram overlap",
-                           "gate__axis-name gate__axis-name--x", "middle"));
     var curve = svgChild(svg, "polyline", "gate__curve");
     curve.setAttribute("aria-hidden", "true");
 
+    /* The x-axis's name sits under the frame, not in the drawing, so a phone that scrolls the
+       drawing sideways never cuts it off. */
+    make("div", "gate__x-name", stage, "Edit intensity, measured afterwards from edit distance and n-gram overlap")
+      .setAttribute("aria-hidden", "true");
+
     var handles = xs.map(function (x, i) {
       var g = svgChild(svg, "g", "gate__handle");
+      g.setAttribute("aria-orientation", "vertical");
       var hit = svgChild(g, "circle", "gate__hit");
-      hit.setAttribute("cx", x); hit.setAttribute("cy", 0); hit.setAttribute("r", 20);
+      hit.setAttribute("cx", x); hit.setAttribute("cy", 0); hit.setAttribute("r", 35);
+      var ring = svgChild(g, "circle", "gate__ring");
+      ring.setAttribute("cx", x); ring.setAttribute("cy", 0); ring.setAttribute("r", 14);
       var mark = svgChild(g, "circle", "gate__mark");
       mark.setAttribute("cx", x); mark.setAttribute("cy", 0); mark.setAttribute("r", 8);
       var label = svgChild(g, "text", "gate__value");
@@ -3450,10 +3460,13 @@
       return { g: g, mark: mark, label: label, s: s };
     });
 
+    /* The rate's name and value are written here, not by the slider's visibleLabel and showValue:
+       the compact copy has no slider and still shows the rate, and the value is a result
+       (data-result) the verdict is read against. The hyphen in "pre-2020" does not break. */
     var row = make("div", "gate__row", stage);
     var rate = make("div", "gate__fpr", row);
     var named = make("div", "gate__fpr-name", rate);
-    make("span", "", named, "False-positive rate on genuine pre-2020 footnotes");
+    make("span", "", named, "False-positive rate on genuine pre‑2020 footnotes");
     var fprOut = make("span", "gate__fpr-value", named);
     fprOut.setAttribute("data-result", "");
     var fprSlider = opts.compact ? null : slider(rate, {
@@ -3490,8 +3503,7 @@
       icon.innerHTML = pass ? ICON_PASS : ICON_FAIL;
       verdictWords.textContent = pass ? "Clears the Gate — may score filings" : "Disqualified — reported as such";
       why.textContent = pass ? m + ", false positives " + f + " on pre-2020 footnotes."
-        : !aucOk && !fprOk ? "Misses both bars: " + m + " is under " + BAR.toFixed(2) + ", and false positives at " +
-          f + " are over " + CEILING + "%. The bar is not lowered and the ladder is not re-cut."
+        : !aucOk && !fprOk ? "Misses both bars. The bar is not lowered and the ladder is not re-cut."
         : !aucOk ? m + " is under " + BAR.toFixed(2) + ". " + cap(lastName) + "-edit accuracy does not count toward the Gate."
         : "False positives at " + f + " flag real human footnotes. The ceiling is " + CEILING + "%.";
     }
@@ -3549,13 +3561,17 @@
      "Pause the flow" toggle (aria-controls names the drawing) stops it for as long as the reader
      likes. The drawing states what it is doing in data-flow: "running", "paused" or "still".
      Nothing a reader reads moves, so nothing is marked aria-busy. Under reduced motion no packet is
-     drawn and the flow stands "still". Compact (a featured copy) plays one pass of PASS_MS, under
-     the five seconds after which moving content must offer a pause, then rests with no packet, so
-     it needs no pause control; its only controls are the components.
+     drawn and the flow stands "still". Compact (a featured copy) moves for PASS_MS, under the five
+     seconds after which moving content must offer a pause, then rests with no packet, so it needs
+     no pause control; its only controls are the components. Every wire ends in an arrowhead, so the
+     direction stands when nothing moves.
 
-     It throws on a table it cannot draw: a missing column, fewer than two components, a hand-off to
-     a name the table does not hold, or hand-offs that loop back. A wide drawing keeps a readable
-     minimum width and scrolls inside its own frame. */
+     A figure's data-first-column, where it has one, is a short label set over the first column (the
+     components nothing hands to): MacroSense's "Every input free and public".
+
+     It throws on a table it cannot draw: a missing column, fewer than two components, a component
+     named twice, a hand-off to a name the table does not hold or stated twice, or hand-offs that
+     loop back. A wide drawing keeps a readable minimum width and scrolls inside its own frame. */
   var PIPE_NONE = "No other component", LAP_MS = 2400, PASS_MS = 4500;
   register("pipeline", function (fig, stage, data, opts) {
     var colIn = data.columns.indexOf("In"), colOut = data.columns.indexOf("Out");
@@ -3565,6 +3581,9 @@
     }
     if (data.rows.length < 2) throw new Error("pipeline: fewer than two components");
     var names = data.rows.map(function (r) { return r.label; });
+    names.forEach(function (n, i) {
+      if (names.indexOf(n) !== i) throw new Error("pipeline: " + JSON.stringify(n) + " is named twice");
+    });
     var wires = [];
     data.rows.forEach(function (r, i) {
       var cell = r.cells[colTo - 1];
@@ -3572,6 +3591,9 @@
       cell.split(",").forEach(function (to) {
         var j = names.indexOf(to.trim());
         if (j < 0) throw new Error("pipeline: " + r.label + " hands its output to " + JSON.stringify(to.trim()) + ", no component in the table");
+        if (wires.some(function (w) { return w.from === i && w.to === j; })) {
+          throw new Error("pipeline: " + r.label + " hands its output to " + names[j] + " twice");
+        }
         wires.push({ from: i, to: j });
       });
     });
@@ -3595,13 +3617,28 @@
 
     var frame = make("div", "exhibit__frame", stage);
     var plane = make("div", "pipe", frame);
+    /* On a screen narrower than the drawing, a line under it says the rest is a scroll away. */
+    var hint = make("div", "pipe__hint", stage, "Scroll sideways for every component.");
+    hint.setAttribute("aria-hidden", "true");
     plane.id = fig.id + "-flow";
     plane.style.setProperty("--pipe-cols", cols);
-    plane.insertAdjacentHTML("beforeend", '<svg class="pipe__wires" aria-hidden="true" focusable="false"></svg>');
+    var headed = fig.getAttribute("data-first-column");
+    if (headed) {
+      var head = make("div", "pipe__head", plane, headed);
+      head.setAttribute("aria-hidden", "true");
+    }
+    /* One arrowhead per wire state, each named for this figure, so two copies of the Exhibit on one
+       page would not share a marker. */
+    var arrow = fig.id + "-arrow";
+    plane.insertAdjacentHTML("beforeend", '<svg class="pipe__wires" aria-hidden="true" focusable="false"><defs>' +
+      ["", "-lit"].map(function (k) {
+        return '<marker id="' + arrow + k + '" class="pipe__arrow' + (k ? " pipe__arrow--lit" : "") +
+               '" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" ' +
+               'markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.5 L8 4 L0 7.5z"/></marker>';
+      }).join("") + "</defs></svg>");
     var svg = plane.lastChild;
-    var choice = segmented(plane, "Components", names, pick);
+    var choice = segmented(plane, "Components", names, pick, null, "pipe__board");
     var group = plane.lastChild, buttons = Array.prototype.slice.call(group.children);
-    group.classList.add("pipe__board");
     buttons.forEach(function (b, i) {
       b.style.gridColumn = String(rank[i] + 1);
       b.style.gridRow = String(rowOf[i]);
@@ -3613,7 +3650,7 @@
     var toggle = null;
     if (!opts.compact && !reduced) {
       var bar = make("div", "exhibit__controls pipe__controls", stage);
-      toggle = button(bar, "btn btn--outline pipe__pause", "Pause the flow", false);
+      toggle = button(bar, "btn btn--outline btn--small", "Pause the flow", false);
     }
     var io = make("div", "pipe__io", stage);
     io.setAttribute("aria-live", "polite");
@@ -3639,24 +3676,37 @@
       given.textContent = data.rows[i].cells[colIn - 1];
       made.textContent = data.rows[i].cells[colOut - 1];
       wires.forEach(function (w) {
-        w.path.classList.toggle("is-lit", w.from === i || w.to === i);
+        var lit = w.from === i || w.to === i;
+        w.path.classList.toggle("is-lit", lit);
+        w.path.setAttribute("marker-end", "url(#" + arrow + (lit ? "-lit" : "") + ")");
       });
     }
 
     /* Each wire runs out of its component's right side into the gutter beside it, and into the
-       next's left side from the gutter before it; a hand-off that skips a column crosses in the
-       gutter under its target's row, so no wire passes through a component. */
+       next's left side from the gutter before it, turning at the gutter's middle. A hand-off that
+       skips a column crosses in the gutter under its target's row, and each such wire keeps a lane of
+       its own (by its order among them): it turns down in the left half of its own gutter, runs at
+       its own height under the row, and turns up in the right half of its target's, short of the
+       arrowhead. So no wire passes through a component or runs along another. */
+    var skips = wires.filter(function (w) { return rank[w.to] > rank[w.from] + 1; });
     function route() {
       var gs = window.getComputedStyle(group);
       var gx = parseFloat(gs.columnGap) / 2 || 8, gy = parseFloat(gs.rowGap) / 2 || 8;
+      var n = skips.length, head = 8;
       svg.setAttribute("viewBox", "0 0 " + plane.offsetWidth + " " + plane.offsetHeight);
+      hint.hidden = frame.scrollWidth <= frame.clientWidth + 1;
       wires.forEach(function (w) {
-        var a = buttons[w.from], b = buttons[w.to];
+        var a = buttons[w.from], b = buttons[w.to], k = skips.indexOf(w);
         var sx = a.offsetLeft + a.offsetWidth, sy = a.offsetTop + a.offsetHeight / 2;
         var tx = b.offsetLeft, ty = b.offsetTop + b.offsetHeight / 2;
-        var d = "M" + sx + " " + sy + " H" + (sx + gx);
-        if (rank[w.to] === rank[w.from] + 1) d += " V" + ty;
-        else d += " V" + (b.offsetTop + b.offsetHeight + gy) + " H" + (tx - gx) + " V" + ty;
+        var d;
+        if (k < 0) d = "M" + sx + " " + sy + " H" + (sx + gx) + " V" + ty;
+        else {
+          var down = sx + gx * (k + 1) / (n + 1);
+          var up = tx - head - (gx - head) * k / Math.max(1, n);
+          d = "M" + sx + " " + sy + " H" + down + " V" + (b.offsetTop + b.offsetHeight + 2 * gy * (k + 1) / (n + 1)) +
+              " H" + up + " V" + ty;
+        }
         w.path.setAttribute("d", d + " H" + tx);
         w.length = w.path.getTotalLength();
       });
@@ -3664,7 +3714,11 @@
 
     pick(busiest);
     route();
-    if (window.ResizeObserver) new window.ResizeObserver(route).observe(plane);
+    if (window.ResizeObserver) {
+      var sized = new window.ResizeObserver(route);
+      sized.observe(plane);
+      sized.observe(frame);
+    }
     else window.addEventListener("resize", route);
 
     /* The flow. Time only counts while it runs, so a pass paused off-screen resumes where it was. */
@@ -3687,6 +3741,7 @@
         w.packet.setAttribute("opacity", Math.sin(f * Math.PI).toFixed(2));
       });
     }
+    var watch = null;
     function tick(t) {
       frameId = null;
       if (last !== null) ran += t - last;
@@ -3694,6 +3749,7 @@
       if (opts.compact && ran >= PASS_MS) {
         wires.forEach(function (w) { w.packet.remove(); });
         plane.setAttribute("data-flow", "still");
+        if (watch) watch.disconnect();
         return;
       }
       draw();
@@ -3715,10 +3771,11 @@
       });
     }
     if (!seen) {
-      new window.IntersectionObserver(function (es) {
+      watch = new window.IntersectionObserver(function (es) {
         es.forEach(function (e) { seen = e.isIntersecting; });
         sync();
-      }).observe(plane);
+      });
+      watch.observe(plane);
     }
     draw();
     sync();
