@@ -2527,7 +2527,9 @@
     group.setAttribute("aria-labelledby", ask.id);
     var picks = WEEKDAYS.concat(["No day this week"]).map(function (d, i) {
       var b = button(group, "seg__option", i < WEEKDAYS.length ? d.slice(0, 3) : d, i === first);
-      if (i < WEEKDAYS.length) b.setAttribute("aria-label", d);
+      /* The rest of the day's name is read, not drawn, so the name a screen reader speaks begins
+         with the words a sighted reader sees on the button (label in name). */
+      if (i < WEEKDAYS.length) make("span", "visually-hidden", b, d.slice(3));
       b.addEventListener("click", function () { first = i; update(); });
       return b;
     });
@@ -3018,6 +3020,21 @@
     update();
   });
 
+  /* ---- TradeLog's shared reading -------------------------------------------------------------
+     The TradeLog kinds find their columns by header. column() gives the index of the one column
+     named `name` in the table's columns (0 is the row's header cell), and refuses a table where it
+     is missing or repeated; cell() reads that column of a row. A grade is Kept or Broken, drawn as
+     its sign beside its word, so no grade rests on colour. */
+  function column(data, kind, name) {
+    var at = data.columns.indexOf(name);
+    if (at < 0 || data.columns.lastIndexOf(name) !== at) {
+      throw new Error(kind + ": the table needs one " + JSON.stringify(name) + " column");
+    }
+    return at;
+  }
+  function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+  var GRADES = { Kept: "kept", Broken: "broken" }, GRADE_SIGNS = { Kept: "\u2713", Broken: "\u2715" };
+
   /* ---- KIND: review-cycle ----------------------------------------------------------------------
      TradeLog's Decision Review Cycle. The table lists the cycle's steps in the order they run, each
      with what the Illustrative Investor sees at it and the component that carries it (the columns
@@ -3037,20 +3054,14 @@
      step's name or component too long for a corner of the square at 320px. */
   var CYCLE_WORD = 14;
   register("review-cycle", function (fig, stage, data) {
-    function col(name) {
-      var at = data.columns.indexOf(name);
-      if (at < 1 || data.columns.lastIndexOf(name) !== at) {
-        throw new Error("review-cycle: the table needs one " + JSON.stringify(name) + " column");
-      }
-      return at - 1;
-    }
-    var sees = col("What the Illustrative Investor sees"), by = col("Carried by");
+    var sees = column(data, "review-cycle", "What the Illustrative Investor sees");
+    var by = column(data, "review-cycle", "Carried by");
     if (data.rows.length !== 4) {
       throw new Error("review-cycle: the table has " + data.rows.length + " steps, and the square has four corners");
     }
     var named = {};
     var steps = data.rows.map(function (r) {
-      var s = { name: r.label, sees: r.cells[sees] || "", by: r.cells[by] || "" };
+      var s = { name: r.label, sees: cell(r, sees), by: cell(r, by) };
       if (!s.name || !s.sees || !s.by) throw new Error("review-cycle: a step leaves a cell empty");
       if (named[s.name]) throw new Error("review-cycle: two steps are named " + JSON.stringify(s.name));
       named[s.name] = true;
@@ -3129,23 +3140,17 @@
      grade other than Kept or Broken, a Rule not written "Rule X, its category" or with two
      categories, a Rule-day graded twice or missing, fewer than two days or Rules, more days than
      fit across a phone (GAP_DAYS), or a word in a category too long for the row's label at 320px. */
-  var GAP_DAYS = 5, GAP_WORD = 10, GAP_GRADES = { Kept: "kept", Broken: "broken" };
+  var GAP_DAYS = 5, GAP_WORD = 10;
   register("adherence-gap", function (fig, stage, data) {
-    function col(name) {
-      var at = data.columns.indexOf(name);
-      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
-        throw new Error("adherence-gap: the table needs one " + JSON.stringify(name) + " column");
-      }
-      return at;
-    }
-    var cols = [col("Day"), col("Rule"), col("Verified Adherence"), col("Claimed Adherence")];
-    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var cols = ["Day", "Rule", "Verified Adherence", "Claimed Adherence"].map(function (name) {
+      return column(data, "adherence-gap", name);
+    });
     var days = [], rules = [], grade = {};
     data.rows.forEach(function (r) {
       var day = cell(r, cols[0]), rule = /^Rule ([A-Z]), (\S.*)$/.exec(cell(r, cols[1]));
       var rec = cell(r, cols[2]), rep = cell(r, cols[3]);
       if (!day || !rule) throw new Error("adherence-gap: a row is not a day and 'Rule X, its category'");
-      if (!GAP_GRADES[rec] || !GAP_GRADES[rep]) {
+      if (!GRADES[rec] || !GRADES[rep]) {
         throw new Error("adherence-gap: " + JSON.stringify(rec + " / " + rep) + " is not Kept or Broken");
       }
       var known = rules.filter(function (x) { return x.letter === rule[1]; })[0];
@@ -3214,8 +3219,8 @@
       days.forEach(function (d) {
         var g = grade[x.name + "|" + d], c = make("span", "gap__cell", grid);
         [g.rec, g.rep].forEach(function (v, i) {
-          var half = make("span", "gap__half gap__half--" + (i ? "rep" : "rec") + " is-" + GAP_GRADES[v], c,
-                          v === "Kept" ? "✓" : "✕");
+          var half = make("span", "gap__half gap__half--" + (i ? "rep" : "rec") + " is-" + GRADES[v], c,
+                          GRADE_SIGNS[v]);
           half.setAttribute("aria-hidden", "true");
         });
         cells.push({ el: c, rule: x.name, day: d, g: g });
@@ -3223,7 +3228,8 @@
     });
 
     var key = make("div", "gap__key", stage,
-                   "In each cell, the recorded grade sits left of the reported grade: \u2713 kept, \u2715 broken. " +
+                   "In each cell, the recorded grade sits left of the reported grade: " + GRADE_SIGNS.Kept + " kept, " +
+                   GRADE_SIGNS.Broken + " broken. " +
                    "A ring marks a Rule-day where the grades disagree.");
     key.setAttribute("aria-hidden", "true");
 
@@ -3253,8 +3259,8 @@
           return;
         }
         c.el.setAttribute("role", "img");
-        c.el.setAttribute("aria-label", c.rule + ", " + c.day + ": recorded " + GAP_GRADES[c.g.rec] +
-                          ", reported " + GAP_GRADES[c.g.rep]);
+        c.el.setAttribute("aria-label", c.rule + ", " + c.day + ": recorded " + GRADES[c.g.rec] +
+                          ", reported " + GRADES[c.g.rep]);
         if (gap) c.el.setAttribute("data-mark", c.rule + ", " + c.day);
       });
       counts[0].hidden = counts[1].hidden = combined;
@@ -3966,7 +3972,7 @@
      Saved as version 2 (the opening view, because it is the one that shows the point): the week as
      a ledger, a day to a row, each naming the version it was recorded under and that version's
      grade. A rule between the last version-1 day and the first version-2 day marks the revision
-     (data-mark "Rule B revised after Wednesday"); no grade already given changes.
+     (data-mark "Rule B revised after Thursday"); no grade already given changes.
 
      "Edit in place" is the other choice: the Rule keeps no version, so every day is named with the
      Rule as edited and graded under version 2. A version-1 day whose grade that changes is ringed
@@ -3983,16 +3989,8 @@
      but Version 1 or Version 2, a grade other than Kept or Broken, a day graded twice, a version-1
      day after a version-2 day, or a week with no revision in it. */
   register("versioned-rules", function (fig, stage, data) {
-    function col(name) {
-      var at = data.columns.indexOf(name);
-      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
-        throw new Error("versioned-rules: the table needs one " + JSON.stringify(name) + " column");
-      }
-      return at;
-    }
-    var cols = [col("Day"), col("Rule"), col("Recorded under"), col("Graded under version 1"),
-                col("Graded under version 2")];
-    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var cols = ["Day", "Rule", "Recorded under", "Graded under version 1", "Graded under version 2"]
+      .map(function (name) { return column(data, "versioned-rules", name); });
     var days = [], rule = null;
     data.rows.forEach(function (r) {
       var name = cell(r, cols[1]), rec = /^Version ([12])$/.exec(cell(r, cols[2]));
@@ -4006,7 +4004,7 @@
       if (!d.version) {
         throw new Error("versioned-rules: " + d.day + " is not recorded under Version 1 or Version 2");
       }
-      if (!GAP_GRADES[d.grades[0]] || !GAP_GRADES[d.grades[1]]) {
+      if (!GRADES[d.grades[0]] || !GRADES[d.grades[1]]) {
         throw new Error("versioned-rules: " + JSON.stringify(d.grades.join(" / ")) + " is not Kept or Broken");
       }
       if (days.some(function (x) { return x.day === d.day; })) {
@@ -4022,13 +4020,13 @@
     if (!before.length || !after.length) {
       throw new Error("versioned-rules: the week needs days under version 1, then days under version 2");
     }
-    var letter = rule.split(",")[0], last = before[before.length - 1].day, edited = false;
+    var ruleName = rule.split(",")[0], last = before[before.length - 1].day, edited = false;
 
     var bar = make("div", "exhibit__controls", stage);
     make("span", "vers__ask", bar, "Rule change");
-    var pick = segmented(bar, "How " + letter + " is changed", ["Save as version 2", "Edit in place"],
+    var pick = segmented(bar, "How " + ruleName + " is changed", ["Save as version 2", "Edit in place"],
                          function (i) { edited = i === 1; update(); },
-                         ["Revise " + letter + " and save it as version 2", "Edit " + letter + " in place"]);
+                         ["Revise " + ruleName + " and save as version 2", "Edit in place: " + ruleName]);
 
     var ledger = make("div", "vers", stage);
     ledger.setAttribute("role", "group");
@@ -4050,7 +4048,7 @@
     var read = make("div", "vers__read", readout);
     read.setAttribute("data-result", "");
 
-    function mark(g) { return (g === "Kept" ? "✓ " : "✕ ") + GAP_GRADES[g]; }
+    function mark(g) { return GRADE_SIGNS[g] + " " + GRADES[g]; }
     function names(list) {
       var ds = list.map(function (d) { return d.day; });
       return ds.length > 1 ? ds.slice(0, -1).join(", ") + " and " + ds[ds.length - 1] : ds[0];
@@ -4059,8 +4057,8 @@
     function update() {
       pick.press(edited ? 1 : 0);
       ledger.setAttribute("aria-label", edited
-        ? "The week under " + letter + " as edited in place, a day to a row"
-        : "The week under " + letter + ", a day to a row, each with the version it was recorded under");
+        ? "The week under " + ruleName + " as edited in place, a day to a row"
+        : "The week under " + ruleName + ", a day to a row, each with the version it was recorded under");
       var changed = [];
       days.forEach(function (d) {
         var g = edited ? d.grades[1] : d.grades[d.version - 1];
@@ -4068,33 +4066,33 @@
         d.tag.textContent = edited ? "as edited" : "version " + d.version;
         d.tag.classList.toggle("chip--plain", edited);
         d.grade.textContent = mark(g);
-        d.grade.className = "vers__grade is-" + GAP_GRADES[g];
+        d.grade.className = "vers__grade is-" + GRADES[g];
         d.was.textContent = rewritten ? "was " + mark(d.grades[0]) : "";
         d.row.classList.toggle("is-rewritten", rewritten);
-        d.row.setAttribute("aria-label", d.day + ": " + (edited ? letter + " as edited" : "version " + d.version) +
-                           ", " + GAP_GRADES[g] + (rewritten ? ", graded " + GAP_GRADES[d.grades[0]] + " before the edit" : ""));
+        d.row.setAttribute("aria-label", d.day + ": " + (edited ? ruleName + " as edited" : "version " + d.version) +
+                           ", " + GRADES[g] + (rewritten ? ", graded " + GRADES[d.grades[0]] + " before the edit" : ""));
         if (rewritten) {
           d.row.setAttribute("data-mark", d.day);
-          changed.push(d.day + (changed.length ? "" : " changes") + " from " + GAP_GRADES[d.grades[0]] +
-                       " to " + GAP_GRADES[g]);
+          changed.push(d.day + (changed.length ? "" : " changes") + " from " + GRADES[d.grades[0]] +
+                       " to " + GRADES[g]);
         } else {
           d.row.removeAttribute("data-mark");
         }
       });
       cut.classList.toggle("is-edited", edited);
       if (edited) {
-        cut.textContent = letter + " edited in place after " + last + "’s review; no version saved";
+        cut.textContent = ruleName + " edited in place after " + last + "’s review; no version saved";
         cut.removeAttribute("data-mark");
-        read.textContent = letter + " was edited in place after " + last + "’s review, so no day records " +
+        read.textContent = ruleName + " was edited in place after " + last + "’s review, so no day records " +
           "which version graded it; every day is now graded under the edited Rule. " +
           (changed.length ? changed.join(", and ") + ". The record shows no sign that anything changed; " +
             "the rings are this Exhibit’s, not the system’s."
                           : "No grade already given happens to change.");
         return;
       }
-      cut.textContent = letter + " revised on review after " + last + "; saved as version 2";
-      cut.setAttribute("data-mark", letter + " revised after " + last);
-      read.textContent = letter + " was revised after " + last + "’s review and saved as version 2. " +
+      cut.textContent = ruleName + " revised on review after " + last + "; saved as version 2";
+      cut.setAttribute("data-mark", ruleName + " revised after " + last);
+      read.textContent = ruleName + " was revised after " + last + "’s review and saved as version 2. " +
         names(after) + (after.length > 1 ? " are" : " is") + " graded under version 2. " +
         names(before) + (before.length > 1 ? " keep" : " keeps") + " version 1 and the grades " +
         "given under it; no result already graded changed.";
@@ -4102,6 +4100,7 @@
 
     update();
   });
+
   /* ---- KIND: broker-integration ----------------------------------------------------------------
      TradeLog's Read-Only Broker Integration. The table lists the paths between the broker and
      TradeLog, a row per failure mode: the path's name, where it runs from and to, whether it was
@@ -4114,9 +4113,9 @@
      built"), with each of its failure modes struck under it and marked ("Failure mode: A bug that
      moves money"), since a path that does not exist cannot fail.
 
-     "Connection failed" is the other choice: the built path breaks, and a stale notice goes up
-     above everything else (data-mark "Stale record"), because a stale count shown as a current one
-     gets believed. The struck paths stay struck: nothing is sent to the broker to recover. The
+     "Connection failed" is the other choice: the built path breaks, its line labelled "connection
+     failed" where it read "reads into", and a stale notice goes up above everything else
+     (data-mark "Stale record"), because a stale count shown as a current one gets believed. The struck paths stay struck: nothing is sent to the broker to recover. The
      notice and the break change by transition, which the reduced-motion blanket collapses; nothing
      plays over time, so there is no aria-busy, and no hover readouts.
 
@@ -4130,15 +4129,9 @@
      a built path to the broker is an order path, and the system places none. */
   var INTEG_BROKER = "The broker", INTEG_SYSTEM = "TradeLog";
   register("broker-integration", function (fig, stage, data) {
-    function col(name) {
-      var at = data.columns.indexOf(name);
-      if (at < 0 || data.columns.lastIndexOf(name) !== at) {
-        throw new Error("broker-integration: the table needs one " + JSON.stringify(name) + " column");
-      }
-      return at;
-    }
-    var cols = [col("Path"), col("From"), col("To"), col("Built"), col("Failure mode")];
-    function cell(r, at) { return at === 0 ? r.label : r.cells[at - 1] || ""; }
+    var cols = ["Path", "From", "To", "Built", "Failure mode"].map(function (name) {
+      return column(data, "broker-integration", name);
+    });
     var paths = [];
     data.rows.forEach(function (r) {
       var p = { name: cell(r, cols[0]), from: cell(r, cols[1]), to: cell(r, cols[2]),
@@ -4160,13 +4153,13 @@
       }
       p.modes.push(mode);
     });
-    var read = paths.filter(function (p) { return p.built === "Yes"; });
+    var built = paths.filter(function (p) { return p.built === "Yes"; });
     var struck = paths.filter(function (p) { return p.built === "No"; });
-    if (read.length !== 1 || read[0].from !== INTEG_BROKER || read[0].to !== INTEG_SYSTEM) {
+    if (built.length !== 1 || built[0].from !== INTEG_BROKER || built[0].to !== INTEG_SYSTEM) {
       throw new Error("broker-integration: exactly one path is built, from the broker to TradeLog");
     }
     if (!struck.length) throw new Error("broker-integration: no path was left unbuilt");
-    read = read[0];
+    var inPath = built[0];
     var failed = false;
 
     var bar = make("div", "exhibit__controls", stage);
@@ -4185,12 +4178,12 @@
       make(p.built === "Yes" ? "span" : "s", "integ__name", row, p.name);
       var line = make("span", "integ__line", row);
       make("span", "integ__end", line, p.from);
-      make("span", "integ__arrow", line, p.built === "Yes" ? "reads into" : "not built");
+      p.arrow = make("span", "integ__arrow", line, p.built === "Yes" ? "reads into" : "not built");
       make("span", "integ__end", line, p.to);
       Array.prototype.forEach.call(row.children, function (x) { x.setAttribute("aria-hidden", "true"); });
       return row;
     }
-    read.row = lane(read);
+    inPath.row = lane(inPath);
     struck.forEach(function (p) {
       p.row = lane(p);
       p.row.classList.add("is-struck");
@@ -4214,14 +4207,16 @@
 
     function update() {
       pick.press(failed ? 1 : 0);
-      read.row.classList.toggle("is-failed", failed);
-      read.row.setAttribute("data-mark", read.name + ", built");
-      read.row.setAttribute("aria-label", read.name + ": from " + place(read.from) + " to " + place(read.to) +
-                            ", built" + (failed ? ", connection failed: " + lower(read.modes.join("; "))
-                                                : "; it reads and never writes"));
+      inPath.row.classList.toggle("is-failed", failed);
+      inPath.arrow.textContent = failed ? "connection failed" : "reads into";
+      inPath.row.setAttribute("data-mark", inPath.name + ", built");
+      inPath.row.setAttribute("aria-label", inPath.name + ": from " + place(inPath.from) + " to " +
+                              place(inPath.to) + ", built" +
+                              (failed ? ", connection failed: " + lower(inPath.modes.join("; "))
+                                      : "; it reads and never writes"));
       notice.hidden = !failed;
       if (failed) {
-        notice.textContent = "Connection failed. The record is stale; no count here is current.";
+        notice.textContent = "Connection failed. The record is stale; no count shown is current.";
         notice.setAttribute("data-mark", "Stale record");
         said.textContent = "The connection failed, so the broker’s record is stale. TradeLog says so " +
           "above everything else, the last count is not shown as current, and nothing is sent to " +
@@ -4232,7 +4227,7 @@
       notice.removeAttribute("data-mark");
       said.textContent = INTEG_SYSTEM + " reads every execution from the broker and sends nothing back. " +
         struck.map(function (p) {
-          return p.name + " was not built, so none of its failure modes can occur: " +
+          return "The path to " + lower(p.name) + " was not built, so none of its failure modes can occur: " +
             p.modes.map(lower).join(", or ") + ".";
         }).join(" ");
     }
