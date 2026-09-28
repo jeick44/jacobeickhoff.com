@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MacroSense &mdash; Engagement 06 &mdash; Jacob Eickhoff</title>
-<meta name="description" content="A macro-regime allocation system built and run end to end by one person - regime detection, sentiment scoring, optimisation, scheduling and a generated briefing - published as architecture, with the backtest window named as the reason no performance figure appears.">
+<meta name="description" content="A macro-regime allocation system built and run end to end by one person - regime detection, sentiment scoring, optimization, scheduling and a generated briefing - published as architecture, with the backtest window named as the reason no performance figure appears.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -171,9 +171,9 @@
                       <tr><th scope="col">Component</th><th scope="col">In</th><th scope="col">Out</th><th scope="col">Hands its output to</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads, the volatility index and its term structure, and one- and three-month momentum for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimiser</td></tr>
-                      <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov model.</td><td>Portfolio optimiser, Briefing</td></tr>
-                      <tr><th scope="row">Portfolio optimiser</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing</td></tr>
+                      <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads, the volatility index and its term structure, and one- and three-month momentum for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimizer</td></tr>
+                      <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov model.</td><td>Portfolio optimizer, Briefing</td></tr>
+                      <tr><th scope="row">Portfolio optimizer</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing</td></tr>
                       <tr><th scope="row">Sentiment scorer</th><td>Earnings-call transcripts and 10-K and 10-Q filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps between requests to stay inside the published rate limit.</td><td>A score per issuer on four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up that returns to the classifier as one of its features.</td><td>Regime classifier, Briefing</td></tr>
                       <tr><th scope="row">Scheduler</th><td>The clock and the exchange calendar.</td><td>A completed cycle, logged.</td><td>No other component</td></tr>
                       <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>No other component</td></tr>
@@ -199,11 +199,11 @@
               model. The vector matters more than the label it resolves to &mdash; a regime called at
               0.41 against a runner-up at 0.39 is a different statement from one called at 0.90 &mdash;
               so the briefing is handed all four rather than the winner alone.</p>
-            <p><strong>The portfolio optimiser.</strong> In: the regime and the current signal row. Out:
+            <p><strong>The portfolio optimizer.</strong> In: the regime and the current signal row. Out:
               weights across the same fifteen funds, summing to one. Each regime carries its own
               constraint set rather than its own model &mdash; long only under a per-position cap in the
               two growth regimes; shorts permitted inside tighter bounds in the two stress regimes,
-              defensive holdings favoured and rate-sensitive ones penalised. When the convex solver
+              defensive holdings favored and rate-sensitive ones penalised. When the convex solver
               fails it returns an equal-weight book and logs the reason at error level.</p>
             <figure class="exhibit" id="exhibit-regime-vector" data-exhibit="regime-vector"
                     data-provenance="illustrative">
@@ -230,8 +230,8 @@
                     <tbody>
                       <tr><th scope="row">Calm Growth</th><td>Long only, under a per-position cap</td><td>0.41</td><td>0.90</td></tr>
                       <tr><th scope="row">Turbulent Growth</th><td>Long only, under a per-position cap</td><td>0.39</td><td>0.06</td></tr>
-                      <tr><th scope="row">Rate Stress</th><td>Shorts permitted inside tighter bounds; defensive holdings favoured, rate-sensitive ones penalised</td><td>0.12</td><td>0.02</td></tr>
-                      <tr><th scope="row">Risk Off</th><td>Shorts permitted inside tighter bounds; defensive holdings favoured, rate-sensitive ones penalised</td><td>0.08</td><td>0.02</td></tr>
+                      <tr><th scope="row">Rate Stress</th><td>Shorts permitted inside tighter bounds; defensive holdings favored, rate-sensitive ones penalised</td><td>0.12</td><td>0.02</td></tr>
+                      <tr><th scope="row">Risk Off</th><td>Shorts permitted inside tighter bounds; defensive holdings favored, rate-sensitive ones penalised</td><td>0.08</td><td>0.02</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -298,7 +298,7 @@
               <summary class="disclosure__summary">The rule that kept the components separable</summary>
               <div class="disclosure__body">
                 <p>A short list of interfaces was written down and then treated as fixed: what the
-                  classifier is called with and what it hands back, that the optimiser returns weights
+                  classifier is called with and what it hands back, that the optimizer returns weights
                   keyed by ticker summing to one, the five arguments the briefing takes. Everything
                   behind those signatures was rewritten repeatedly &mdash; the fetcher most of all
                   &mdash; and none of those rewrites reached another module. Where the shapes are not
@@ -313,7 +313,7 @@
             <p>The system works end to end. It fires on schedule, fetches, classifies, allocates,
               explains itself and logs the result, and it has been doing that rather than being
               demonstrated once. That is what I set out to build, and it is done.</p>
-            <p>The backtest harness is built too. It reuses the live classifier and the live optimiser
+            <p>The backtest harness is built too. It reuses the live classifier and the live optimizer
               verbatim rather than reimplementing the strategy, because a backtest that reimplements the
               thing it is testing is testing the reimplementation. It walks the history forward one
               rebalance at a time, classifying on data up to that date and no further, applies real daily
@@ -327,7 +327,7 @@
               Whether MacroSense allocates well is not answered here. The continuous history it has
               accumulated is fifty-six trading days, from 7 January to 27 March 2026. Replayed at the
               backtest&rsquo;s default weekly rebalance that is roughly eleven decisions; monthly, two. Every ratio in the list
-              above would be annualised out of that, a single market environment three months long, and
+              above would be annualized out of that, a single market environment three months long, and
               a figure produced that way describes the window rather than the system. Backfilling the snapshot
               series so the model can be run across several years and several regimes is the current
               work. The numbers go on this page when the window can carry them, and not before.
@@ -382,7 +382,7 @@
             <p>Sample size is not a caveat you attach at the end; it decides whether a number is a
               number at all. Fifty-six daily observations look like a sample and are closer to one
               &mdash; a single market environment, read fifty-six times. The ratios a backtest prints
-              are annualised, which makes that window wear the clothes of a year, and nothing in the
+              are annualized, which makes that window wear the clothes of a year, and nothing in the
               output says so.</p>
             <p>The harder half is that a system which runs is enormously satisfying, and the
               satisfaction is misleading. Every day the scheduler fires, a cycle completes, a briefing is
@@ -414,9 +414,9 @@
               weeks, a test over two, a model checked against one quarter: each produces a point estimate
               whose uncertainty is wide enough to contain the opposite conclusion, and each is routinely
               escalated as a finding. The discipline costs nothing &mdash; the window travels with the
-              number, and nothing is annualised out of a window that cannot support it.</p>
+              number, and nothing is annualized out of a window that cannot support it.</p>
             <p><strong>Make the degraded path announce itself.</strong> Two defects here were the same
-              defect: an optimiser that fell back to equal weight when its import failed, and an alert
+              defect: an optimizer that fell back to equal weight when its import failed, and an alert
               channel built but never configured, which returned quietly every time. Both kept producing
               output after a component had stopped working, which is worse than stopping, because nothing
               downstream can tell. Any monitoring or integration work meets this in some form, and the
@@ -446,10 +446,10 @@
         <ul class="site-footer__list">
           <li><a href="/work/customer-intelligence/">Customer Intelligence</a></li>
           <li><a href="/work/credit-process-rebuild/">Credit Process Rebuild</a></li>
-          <li><a href="/work/the-competition/">The Competition</a></li>
-          <li><a href="/work/the-research/">The Research</a></li>
-          <li><a href="/work/tradelog-and-indy/">TradeLog and Indy</a></li>
-          <li><a href="/work/macrosense/">MacroSense</a></li>
+          <li><a href="/work/the-competition/">Hedge Fund Case Competition</a></li>
+          <li><a href="/work/the-research/">Research</a></li>
+          <li><a href="/work/tradelog-and-indy/">Investment Decision Tools</a></li>
+          <li><a href="/work/macrosense/">Regime &amp; Sentiment Allocator</a></li>
         </ul>
       </div>
       <div class="site-footer__group">
@@ -459,7 +459,7 @@
           <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
         </ul>
       </div>
-      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalised or left out.</p>
+      <p class="site-footer__note">Figures here describe work product &mdash; assertions written, tools shipped, decisions recorded. Figures describing a Sponsor&rsquo;s business are generalized or left out.</p>
     </div>
   </footer>
 <!-- /chrome:footer -->

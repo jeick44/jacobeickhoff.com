@@ -2450,7 +2450,7 @@
       tally.textContent = o.said;
       phrase.nodeValue = o.count === 1 ? " decision in the window" : " decisions in the window";
       note.textContent = "One market environment, read " + (o.count === 2 ? "twice" : o.said + " times") +
-        ": a ratio annualised from it would describe the window, not the system.";
+        ": a ratio annualized from it would describe the window, not the system.";
     }
 
     update();
@@ -2669,8 +2669,8 @@
     var picks = null;
     if (!opts.compact) {
       var pick = make("div", "rmap__control", bar);
-      make("span", "rmap__control-name", pick, "Centre on").setAttribute("aria-hidden", "true");
-      picks = segmented(pick, "Centre the circle on an area", areas.map(function (a) { return a.name; }),
+      make("span", "rmap__control-name", pick, "Center on").setAttribute("aria-hidden", "true");
+      picks = segmented(pick, "Center the circle on an area", areas.map(function (a) { return a.name; }),
         function (i) { var a = areas[i]; stop(); place(a.east, a.north, a); });
     }
     var sizer = make("div", "rmap__control rmap__sizer", bar);
@@ -2787,7 +2787,7 @@
       });
       function total(f) { return inside.reduce(function (t, s) { return t + f(s); }, 0); }
       whereOut.textContent = miles(r) + " around " +
-        (circle.area ? "the centre of " + circle.area.name : "a point on the map");
+        (circle.area ? "the center of " + circle.area.name : "a point on the map");
       countOut.textContent = String(inside.length);
       loanOut.textContent = money(total(function (s) { return s.loan; }));
       depositOut.textContent = money(-total(function (s) { return s.deposit; }));
