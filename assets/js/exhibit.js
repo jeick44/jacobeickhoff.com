@@ -1588,7 +1588,7 @@
       var en = entries[picked], filed = bandOf(en.computed), belongs = bandOf(en.age);
       var misfiled = filed !== belongs;
       bornOut.textContent = words(en.born);
-      serialOut.textContent = grouped(en.serial) + (en.passes ? " — above the floor" : " — not above the floor");
+      serialOut.textContent = grouped(en.serial) + (en.passes ? " (above the floor)" : " (not above the floor)");
       testOut.textContent = en.passes ? "Passes" : "Fails";
       computedOut.textContent = String(en.computed);
       ageOut.textContent = String(en.age);
