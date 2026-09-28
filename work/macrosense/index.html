@@ -171,12 +171,13 @@
                       <tr><th scope="col">Component</th><th scope="col">In</th><th scope="col">Out</th><th scope="col">Hands its output to</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads, the volatility index and its term structure, and one- and three-month momentum for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimizer</td></tr>
-                      <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov model.</td><td>Portfolio optimizer, Briefing</td></tr>
-                      <tr><th scope="row">Portfolio optimizer</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing</td></tr>
-                      <tr><th scope="row">Sentiment scorer</th><td>Earnings-call transcripts and 10-K and 10-Q filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps between requests to stay inside the published rate limit.</td><td>A score per issuer on four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up that returns to the classifier as one of its features.</td><td>Regime classifier, Briefing</td></tr>
+                      <tr><th scope="row">Data fetcher</th><td>Public macro series and public market prices &mdash; Treasury yields at two and ten years and the spread between them, high-yield and investment-grade credit spreads (the extra yield corporate bonds pay over Treasuries), the volatility index and its term structure (how expected volatility differs between the next month and the next three), and one- and three-month momentum (recent price return) for each of fifteen sector and credit exchange-traded funds.</td><td>One dated row, fifty-eight columns wide.</td><td>Regime classifier, Portfolio optimizer</td></tr>
+                      <tr><th scope="row">Regime classifier</th><td>A rolling window of at least twenty of those rows, plus sentiment signals for the energy and healthcare sectors.</td><td>One of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a probability for each.</td><td>Portfolio optimizer, Briefing, Dashboard</td></tr>
+                      <tr><th scope="row">Portfolio optimizer</th><td>The regime and the current signal row.</td><td>Weights across the same fifteen funds, summing to one.</td><td>Briefing, Dashboard</td></tr>
+                      <tr><th scope="row">Sentiment scorer</th><td>Earnings-call transcripts and 10-K and 10-Q filings from the SEC&rsquo;s public archive, collected by a companion updater that waits between requests to stay under the SEC&rsquo;s rate limit.</td><td>A score for each company on four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged language, newly disclosed risk &mdash; a weighted composite of the four, and a sector roll-up that goes back to the classifier as one of its features (the inputs a model learns from).</td><td>Regime classifier, Briefing, Dashboard</td></tr>
                       <tr><th scope="row">Scheduler</th><td>The clock and the exchange calendar.</td><td>A completed cycle, logged.</td><td>No other component</td></tr>
-                      <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>No other component</td></tr>
+                      <tr><th scope="row">Briefing</th><td>The regime name, the probability vector, the previous weights, the new weights, the sentiment signals.</td><td>A few sentences of plain English saying what changed and why.</td><td>Dashboard</td></tr>
+                      <tr><th scope="row">Dashboard</th><td>The regime and its four probabilities, the weights, the sentiment scores, and every past rebalance, which is saved to a local database.</td><td>One page showing where the market stands, what the portfolio holds and why, and how both have changed over time.</td><td>No other component</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -190,21 +191,26 @@
             </figure>
             <p><strong>The data fetcher.</strong> In: public macro series and public market prices
               &mdash; Treasury yields at two and ten years and the spread between them, high-yield and
-              investment-grade credit spreads, the volatility index and its term structure, and one- and
-              three-month momentum for each of fifteen sector and credit exchange-traded funds. Out: one
-              dated row, fifty-eight columns wide.</p>
+              investment-grade credit spreads (the extra yield corporate bonds pay over Treasuries), the
+              volatility index and its term structure (how expected volatility differs between the next
+              month and the next three), and one- and three-month momentum (recent price return) for
+              each of fifteen sector and credit exchange-traded funds. Out: one dated row, fifty-eight
+              columns wide.</p>
             <p><strong>The regime classifier.</strong> In: a rolling window of at least twenty of those
-              rows. Out: one of four regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk
-              Off &mdash; with a probability across all four, from a four-state Gaussian hidden Markov
-              model. The vector matters more than the label it resolves to &mdash; a regime called at
-              0.41 against a runner-up at 0.39 is a different statement from one called at 0.90 &mdash;
-              so the briefing is handed all four rather than the winner alone.</p>
+              rows, plus sentiment signals for the energy and healthcare sectors. Out: one of four
+              regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a
+              probability for each. The model is a four-state Gaussian hidden Markov model: it treats the
+              market&rsquo;s regime as something that can&rsquo;t be seen directly and works out which of
+              four states most likely produced the data. The probabilities matter more than the label:
+              0.41 against a runner-up at 0.39 says something different from 0.90, so the briefing gets
+              all four, not just the winner.</p>
             <p><strong>The portfolio optimizer.</strong> In: the regime and the current signal row. Out:
-              weights across the same fifteen funds, summing to one. Each regime carries its own
-              constraint set rather than its own model &mdash; long only under a per-position cap in the
-              two growth regimes; shorts permitted inside tighter bounds in the two stress regimes,
-              defensive holdings favored and rate-sensitive ones penalised. When the convex solver
-              fails it returns an equal-weight book and logs the reason at error level.</p>
+              weights across the same fifteen funds, summing to one. Each regime changes the constraints
+              (rules the weights must obey), not the model: long only with a cap per position in the two
+              growth regimes; short positions allowed within tighter bounds in the two stress regimes,
+              defensive holdings favored and rate-sensitive ones penalized. A convex solver (a method
+              that finds the single best set of weights under those rules) does the work; when it fails,
+              the optimizer falls back to equal weights and logs the reason as an error.</p>
             <figure class="exhibit" id="exhibit-regime-vector" data-exhibit="regime-vector"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -244,16 +250,17 @@
                 the results.</figcaption>
             </figure>
             <p><strong>The sentiment scorer.</strong> In: earnings-call transcripts and 10-K and 10-Q
-              filings, pulled from the SEC&rsquo;s public archive by a companion updater that sleeps
-              between requests to stay inside the published rate limit. Out: a score per issuer on four
-              dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged
-              language, newly disclosed risk &mdash; a weighted composite of them, and a sector roll-up
-              that returns to the classifier as one of its features.</p>
+              filings from the SEC&rsquo;s public archive, collected by a companion updater that waits
+              between requests to stay under the SEC&rsquo;s rate limit. Out: a score for each company on
+              four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged
+              language, newly disclosed risk &mdash; a weighted composite of the four, and a sector
+              roll-up that goes back to the classifier as one of its features (the inputs a model learns
+              from).</p>
             <p><strong>The scheduler.</strong> In: the clock and the exchange calendar. Out: a completed
-              cycle, logged. Three jobs &mdash; a rebalance after the close on each trading day, a model
-              retrain on the first of the month, a filings pull on Sunday. Every step inside a cycle is
-              independently fault-tolerant, because the point of a scheduler is that it is still running
-              in March.</p>
+              cycle, logged. Three jobs &mdash; a rebalance after each trading day&rsquo;s close, a model
+              retrain on the first of the month, a filings pull on Sunday. Every step is fault-tolerant
+              on its own (one can fail without stopping the rest), because a scheduler is only worth
+              having if it&rsquo;s still running in March.</p>
             <figure class="exhibit" id="exhibit-scheduler-week" data-exhibit="scheduler-week"
                     data-provenance="published">
               <div class="exhibit__head">
@@ -273,7 +280,7 @@
                       <tr><th scope="col">Job</th><th scope="col">Runs</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Rebalance</th><td>After the close on each trading day</td></tr>
+                      <tr><th scope="row">Rebalance</th><td>After each trading day&rsquo;s close</td></tr>
                       <tr><th scope="row">Model retrain</th><td>On the first of the month</td></tr>
                       <tr><th scope="row">Filings pull</th><td>On Sunday</td></tr>
                     </tbody>
@@ -290,10 +297,13 @@
             </figure>
             <p><strong>The briefing.</strong> In: the regime name, the probability vector, the previous
               weights, the new weights, the sentiment signals. Out: a few sentences of plain English
-              saying what changed and why. A language model writes them; with no key available it falls
-              back to a deterministic template, because the record of what the system did should not have
-              holes in it on the days an interface was unreachable. A logger writes every rebalance to a
-              local database; a dashboard reads it back.</p>
+              saying what changed and why. A language model writes them; with no API key available it
+              falls back to a fixed template, so the record has no gaps on days an outside service was
+              unreachable.</p>
+            <p><strong>The dashboard.</strong> In: the regime and its four probabilities, the weights,
+              the sentiment scores, and every past rebalance, which is saved to a local database. Out:
+              one page showing where the market stands, what the portfolio holds and why, and how both
+              have changed over time.</p>
             <details class="disclosure">
               <summary class="disclosure__summary">The rule that kept the components separable</summary>
               <div class="disclosure__body">
