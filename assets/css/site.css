@@ -5196,18 +5196,17 @@ button.prep__cell:focus-visible {
 
 /* =================================================================================================
    MACROSENSE: THE PIPELINE
-   Components on a grid whose columns count the hand-offs before each, the wires behind them in one
-   SVG the size of the grid (drawn in pixels, one unit to one), and the chosen component's input and
-   output below. The grid keeps a readable minimum width and scrolls inside its frame on a phone.
+   The components stand in the slots of Jacob's sketch on a sheet of fixed proportions, the wires
+   behind them in one SVG in the sheet's own units, and the chosen component's input and output
+   below. The sheet keeps a readable minimum width and scrolls inside its frame on a phone.
    ============================================================================================== */
 .pipe__controls {
   margin-top: var(--space-xs);
 }
 
-/* 6.5rem a column holds a two-word component name on two lines at the small print's size. */
+/* 38rem holds "Portfolio optimizer" on two lines inside its box at the small print's size. */
 .pipe {
-  position: relative;
-  min-width: calc(var(--pipe-cols) * 6.5rem);
+  min-width: 38rem;
   padding-block: var(--space-sm);
 }
 
@@ -5224,6 +5223,11 @@ button.prep__cell:focus-visible {
   color: var(--ink-mute);
 }
 
+.pipe__sheet {
+  position: relative;
+}
+
+/* Visible overflow: the Scheduler's ring, spreading from the top edge, is not cut at the sheet. */
 .pipe__wires {
   position: absolute;
   inset: 0;
@@ -5237,52 +5241,71 @@ button.prep__cell:focus-visible {
   fill: none;
   stroke: var(--ink-mute);
   stroke-width: 1.25;
-  stroke-linejoin: round;
-  transition: stroke 200ms var(--ease);
-}
-
-.pipe__wire.is-lit {
-  stroke: var(--data-1);
-  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 .pipe__arrow {
   fill: var(--ink-mute);
 }
 
-.pipe__arrow--lit {
-  fill: var(--data-1);
-}
-
 .pipe__packet {
   fill: var(--data-1);
 }
 
-/* The components are one segmented group (segmented() with its own class), laid out as the grid
-   rather than a row of pills. The gutters are wide enough for a lane per wire that skips a column. */
-.pipe__board {
-  display: grid;
-  grid-template-columns: repeat(var(--pipe-cols), minmax(0, 1fr));
-  column-gap: var(--space-lg);
-  row-gap: var(--space-md);
+.pipe__pulse {
+  fill: none;
+  stroke: var(--data-1);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
 
-/* 3.25rem: two lines of a component's name, so the nodes in a column stand the same height. */
+/* The components are one segmented group (segmented() with its own class), each option placed
+   by the script in its slot, in percent of the sheet. */
+.pipe__board {
+  position: absolute;
+  inset: 0;
+}
+
 .pipe__board .seg__option {
-  position: relative;
-  min-height: 3.25rem;
-  padding: var(--space-2xs);
+  position: absolute;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3xs);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--paper);
-  line-height: 1.25;
-  overflow-wrap: anywhere;
+  font-size: var(--text-sm);
+  line-height: 1.2;
+  text-align: center;
+  transition: background-color 200ms var(--ease), border-color 200ms var(--ease);
 }
 
+/* Lit: the flow has just reached it. Chosen: its input and output are the ones read out below. */
+.pipe__board .seg__option.is-lit,
 .pipe__board .seg__option[aria-pressed="true"] {
   background: var(--blue-wash);
   border-color: var(--data-1);
+}
+
+.pipe__board .seg__option[aria-pressed="true"] {
   box-shadow: 0 0 0 1px var(--data-1);
+}
+
+/* Under reduced motion, each component's step in the order, on its top-left corner. */
+.pipe__step {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  translate: -40% -40%;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .pipe__io {

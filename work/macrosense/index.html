@@ -153,6 +153,7 @@
             <p>I built it as separable components, each taking a stated input, returning a stated
               output, and runnable on its own.</p>
             <figure class="exhibit" id="exhibit-pipeline" data-exhibit="pipeline"
+                    data-layout="Sentiment scorer: top-left; Regime classifier: top-center; Scheduler: top-right; Data fetcher: middle-left; Portfolio optimizer: middle-right; Dashboard: lower-right; Briefing: bottom-center"
                     data-provenance="published" data-first-column="Every input free and public">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The
@@ -184,8 +185,10 @@
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> published; each component&rsquo;s
                 input and output in the words of the paragraphs below, and where its output goes as
-                they describe it. The moving packets show the direction data travels between
-                components, not its volume or its timing. The code, the fitted model and every
+                they describe it. A ring from the Scheduler starts each cycle, then
+                packets carry the data from component to component, and each component lights as its
+                input arrives. The packets show which way data travels between
+                components, not how much or when. The code, the fitted model and every
                 performance figure are withheld, because this page publishes the architecture and not
                 the results.</figcaption>
             </figure>

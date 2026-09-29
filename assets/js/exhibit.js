@@ -3717,29 +3717,75 @@
      words, and in "Hands its output to" the components its output goes to, by their names in the
      table, separated by commas, or "No other component". Columns are found by their headers.
 
-     Each component is a button in one group, placed in a column by how many hand-offs lie before it
-     (a component nothing hands to stands in the first) and in a row by table order; the wires
-     between them are drawn from the table's hand-offs, each marked (data-mark "from to to").
-     Pressing a component reads out its In and Out (each data-result) and lights its wires. It opens
-     on the busiest component, the one with the most wires, the first in table order on a tie.
+     WHERE EACH COMPONENT STANDS is the figure's data-layout, not the table's: "Name: slot; …", each
+     slot one of PIPE_SLOTS, the places in Jacob's sketch of the loop. Every component has a slot and
+     no two share one. Each is a button in one group, and the wires between them are drawn from the
+     table's hand-offs, each marked (data-mark "from to to"), along PIPE_ROUTES: the curve drawn
+     between those two slots, laid so that no wire passes through a component. A component with no
+     hand-offs in or out (the Scheduler) has no wire at all, and the table must hold one: the cycle
+     starts from it. Pressing a
+     component reads out its In and Out (each data-result). It opens on the busiest component, the
+     one with the most wires, the first in table order on a tie.
 
-     THE FLOW is the page's one ambient animation: a packet travels every wire, round and round,
-     while the drawing is on screen, and stops while it is off it (an IntersectionObserver). A
-     "Pause the flow" toggle (aria-controls names the drawing) stops it for as long as the reader
-     likes. The drawing states what it is doing in data-flow: "running", "paused" or "still".
-     Nothing a reader reads moves, so nothing is marked aria-busy. Under reduced motion no packet is
-     drawn and the flow stands "still". Compact (a featured copy) moves for PASS_MS, under the five
+     THE FLOW is the page's one ambient animation, one cycle of the loop: a ripple (data-packet, its
+     radius moving) spreads from the component with no wires and reaches the first stage, the
+     components nothing hands to, which light. The data then moves stage by stage, a stage being
+     the longest run of hand-offs before a component: a packet (data-packet) travels each wire so as
+     to arrive as its target lights, STAGE_MS a stage. Only the ripple, the packets and a lit or
+     chosen component take the accent; the wires stay gray, each ending in an arrowhead, so the
+     direction stands when nothing moves. The flow stops while the drawing is off screen (an
+     IntersectionObserver), and its time only counts while it runs, so a cycle resumes where it was.
+     The drawing states what it is doing in data-flow: "running", "paused" or "still". Nothing a
+     reader reads moves, so nothing is marked aria-busy.
+
+     Full (the Case Study) loops: the last stage stays lit HOLD_MS, a rest of about a second in
+     which nothing else moves, and the next ripple starts as it goes out. A "Pause the flow" toggle
+     (aria-controls names the drawing) holds it for as long as the reader likes. Compact (a featured copy) plays the one cycle, PASS_MS, which is under the five
      seconds after which moving content must offer a pause, then rests with no packet, so it needs
-     no pause control; its only controls are the components. Every wire ends in an arrowhead, so the
-     direction stands when nothing moves.
+     no pause control; its only controls are the components. Under reduced motion nothing moves:
+     the flow stands "still" from the start, and each component carries its step in the order
+     instead (data-step: 1 the Scheduler, then each stage after it).
 
-     A figure's data-first-column, where it has one, is a short label set over the first column (the
-     components nothing hands to): MacroSense's "Every input free and public".
+     A figure's data-first-column, where it has one, is a short label set over the drawing:
+     MacroSense's "Every input free and public".
 
-     It throws on a table it cannot draw: a missing column, fewer than two components, a component
-     named twice, a hand-off to a name the table does not hold or stated twice, or hand-offs that
-     loop back. A wide drawing keeps a readable minimum width and scrolls inside its own frame. */
-  var PIPE_NONE = "No other component", LAP_MS = 2400, PASS_MS = 4500;
+     It throws on a table or layout it cannot draw: a missing column, fewer than two components, a
+     component named twice, a hand-off to a name the table does not hold or stated twice, hand-offs
+     that loop back, no component without hand-offs to start the cycle, a component with no slot or
+     a slot it does not know, two components in one slot, or a hand-off between two slots with no
+     route. The drawing keeps a readable minimum width
+     and scrolls inside its own frame. */
+  var PIPE_NONE = "No other component", STAGE_MS = 800, PASS_MS = 4800;
+  /* A component stays lit a stage and a little after its input arrives; looping, the last one's
+     light is also the rest before the next cycle. */
+  var HOLD_MS = STAGE_MS + 200;
+  /* The drawing's own units: a PIPE_W by PIPE_H plane, a component a PIPE_BOX box centered on its
+     slot. The routes run from one box's edge to the other's, in the same units. */
+  var PIPE_W = 720, PIPE_H = 450, PIPE_BOX = [124, 50];
+  var PIPE_SLOTS = {
+    "top-left": [148, 132], "top-center": [340, 118], "top-right": [560, 62],
+    "middle-left": [250, 262], "middle-right": [500, 260],
+    "lower-right": [618, 346], "bottom-center": [340, 384],
+  };
+  /* Keyed "from-slot to-slot". The two that leave the top-left for the bottom sweep round the left
+     of the middle-left box, the one to the lower-right outside the other and under the
+     bottom-center box; the top-center's to the lower-right passes under the top-right slot and down
+     beside the middle-right box. The top-center's to the bottom-center curves down the middle and
+     crosses the middle-left's to the middle-right, the one crossing, which the sketch left out and
+     the spec keeps (every true hand-off is drawn). */
+  var PIPE_ROUTES = {
+    "middle-left top-center": "M262 237 C270 205 295 170 318 143",
+    "middle-left middle-right": "M312 262 C360 262 400 261 438 261",
+    "top-left top-center": "M210 130 C235 127 255 123 278 121",
+    "top-left bottom-center": "M130 157 C60 280 90 395 278 390",
+    "top-left lower-right": "M105 157 C25 330 90 436 340 436 C520 436 600 420 640 371",
+    "top-center middle-right": "M402 125 C440 140 480 190 490 235",
+    "top-center bottom-center": "M345 143 C375 215 378 300 345 359",
+    "top-center lower-right": "M402 105 C540 105 690 160 650 321",
+    "middle-right bottom-center": "M495 285 C495 340 460 372 402 380",
+    "middle-right lower-right": "M545 285 C560 300 575 310 590 321",
+    "bottom-center lower-right": "M402 400 C470 398 520 385 556 356",
+  };
   register("pipeline", function (fig, stage, data, opts) {
     var colIn = data.columns.indexOf("In"), colOut = data.columns.indexOf("Out");
     var colTo = data.columns.indexOf("Hands its output to");
@@ -3765,8 +3811,8 @@
       });
     });
 
-    /* Columns: the longest run of hand-offs before each component. More passes than components
-       means the hand-offs loop back, which a left-to-right flow cannot draw. */
+    /* Stages: the longest run of hand-offs before each component. More passes than components
+       means the hand-offs loop back, and a flow that loops back has no order to play. */
     var rank = names.map(function () { return 0; });
     for (var pass = 0, moved = true; moved; pass++) {
       if (pass > names.length) throw new Error("pipeline: the hand-offs loop back on themselves");
@@ -3775,12 +3821,40 @@
         if (rank[w.to] < rank[w.from] + 1) { rank[w.to] = rank[w.from] + 1; moved = true; }
       });
     }
-    var cols = Math.max.apply(null, rank) + 1, rowOf = [], filled = [];
-    rank.forEach(function (c, i) { filled[c] = (filled[c] || 0) + 1; rowOf[i] = filled[c]; });
-    var busiest = 0, degree = names.map(function (_, i) {
+    var degree = names.map(function (_, i) {
       return wires.filter(function (w) { return w.from === i || w.to === i; }).length;
     });
+    var busiest = 0;
     degree.forEach(function (d, i) { if (d > degree[busiest]) busiest = i; });
+    var clocks = names.map(function (_, i) { return i; }).filter(function (i) { return !degree[i]; });
+    if (!clocks.length) {
+      throw new Error("pipeline: every component has hand-offs, so none starts the cycle");
+    }
+    /* When each component lights, in ms into a cycle: a clock (no wires) at once, stage k after k + 1
+       stages. Its step in the order is the same count, from 1. */
+    var litAt = rank.map(function (r, i) { return degree[i] ? (r + 1) * STAGE_MS : 0; });
+
+    var slotOf = {};
+    (fig.getAttribute("data-layout") || "").split(";").forEach(function (part) {
+      if (!part.trim()) return;
+      var at = part.lastIndexOf(":"), name = part.slice(0, at).trim(), slot = part.slice(at + 1).trim();
+      if (at < 0 || names.indexOf(name) < 0) throw new Error("pipeline: the layout places " + JSON.stringify(part.trim()) + ", no component in the table");
+      if (!PIPE_SLOTS[slot]) throw new Error("pipeline: the layout puts " + name + " in " + JSON.stringify(slot) + ", no slot the drawing has");
+      Object.keys(slotOf).forEach(function (n) {
+        if (slotOf[n] === slot) throw new Error("pipeline: " + n + " and " + name + " share the slot " + slot);
+      });
+      slotOf[name] = slot;
+    });
+    names.forEach(function (n) {
+      if (!slotOf[n]) throw new Error("pipeline: " + n + " has no slot in the figure's data-layout");
+    });
+    wires.forEach(function (w) {
+      w.route = PIPE_ROUTES[slotOf[names[w.from]] + " " + slotOf[names[w.to]]];
+      if (!w.route) {
+        throw new Error("pipeline: no route is drawn from " + slotOf[names[w.from]] + " to " + slotOf[names[w.to]] +
+                        " (" + names[w.from] + " to " + names[w.to] + ")");
+      }
+    });
 
     var frame = make("div", "exhibit__frame", stage);
     var plane = make("div", "pipe", frame);
@@ -3788,27 +3862,32 @@
     var hint = make("div", "pipe__hint", stage, "Scroll sideways for every component.");
     hint.setAttribute("aria-hidden", "true");
     plane.id = fig.id + "-flow";
-    plane.style.setProperty("--pipe-cols", cols);
     var headed = fig.getAttribute("data-first-column");
     if (headed) {
       var head = make("div", "pipe__head", plane, headed);
       head.setAttribute("aria-hidden", "true");
     }
-    /* One arrowhead per wire state, each named for this figure, so two copies of the Exhibit on one
-       page would not share a marker. */
+    var sheet = make("div", "pipe__sheet", plane);
+    sheet.style.aspectRatio = PIPE_W + " / " + PIPE_H;
+    /* One arrowhead, named for this figure, so two copies of the Exhibit on one page would not share
+       a marker. */
     var arrow = fig.id + "-arrow";
-    plane.insertAdjacentHTML("beforeend", '<svg class="pipe__wires" aria-hidden="true" focusable="false"><defs>' +
-      ["", "-lit"].map(function (k) {
-        return '<marker id="' + arrow + k + '" class="pipe__arrow' + (k ? " pipe__arrow--lit" : "") +
-               '" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" ' +
-               'markerUnits="userSpaceOnUse" orient="auto"><path d="M0 0.5 L8 4 L0 7.5z"/></marker>';
-      }).join("") + "</defs></svg>");
-    var svg = plane.lastChild;
-    var choice = segmented(plane, "Components", names, pick, null, "pipe__board");
-    var group = plane.lastChild, buttons = Array.prototype.slice.call(group.children);
+    sheet.insertAdjacentHTML("beforeend", '<svg class="pipe__wires" viewBox="0 0 ' + PIPE_W + " " + PIPE_H +
+      '" aria-hidden="true" focusable="false"><defs><marker id="' + arrow + '" class="pipe__arrow" ' +
+      'viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" ' +
+      'orient="auto"><path d="M0 0.5 L8 4 L0 7.5z"/></marker></defs></svg>');
+    var svg = sheet.lastChild;
+    var choice = segmented(sheet, "Components", names, pick, null, "pipe__board");
+    var group = sheet.lastChild, buttons = Array.prototype.slice.call(group.children);
+    function place(el, i) {
+      var c = PIPE_SLOTS[slotOf[names[i]]];
+      el.style.left = (100 * (c[0] - PIPE_BOX[0] / 2) / PIPE_W) + "%";
+      el.style.top = (100 * (c[1] - PIPE_BOX[1] / 2) / PIPE_H) + "%";
+    }
     buttons.forEach(function (b, i) {
-      b.style.gridColumn = String(rank[i] + 1);
-      b.style.gridRow = String(rowOf[i]);
+      place(b, i);
+      b.style.width = (100 * PIPE_BOX[0] / PIPE_W) + "%";
+      b.style.height = (100 * PIPE_BOX[1] / PIPE_H) + "%";
     });
 
     /* The pause sits under the drawing, after the components, so a keyboard meets the choice
@@ -3833,79 +3912,76 @@
     wires.forEach(function (w) {
       w.path = svgChild(svg, "path", "pipe__wire");
       w.path.setAttribute("data-mark", names[w.from] + " to " + names[w.to]);
+      w.path.setAttribute("d", w.route);
+      w.path.setAttribute("marker-end", "url(#" + arrow + ")");
+      w.length = w.path.getTotalLength();
     });
 
-    var chosen = busiest;
     function pick(i) {
-      chosen = i;
       choice.press(i);
       named.textContent = names[i];
       given.textContent = data.rows[i].cells[colIn - 1];
       made.textContent = data.rows[i].cells[colOut - 1];
-      wires.forEach(function (w) {
-        var lit = w.from === i || w.to === i;
-        w.path.classList.toggle("is-lit", lit);
-        w.path.setAttribute("marker-end", "url(#" + arrow + (lit ? "-lit" : "") + ")");
-      });
     }
-
-    /* Each wire runs out of its component's right side into the gutter beside it, and into the
-       next's left side from the gutter before it, turning at the gutter's middle. A hand-off that
-       skips a column crosses in the gutter under its target's row, and each such wire keeps a lane of
-       its own (by its order among them): it turns down in the left half of its own gutter, runs at
-       its own height under the row, and turns up in the right half of its target's, short of the
-       arrowhead. So no wire passes through a component or runs along another. */
-    var skips = wires.filter(function (w) { return rank[w.to] > rank[w.from] + 1; });
-    function route() {
-      var gs = window.getComputedStyle(group);
-      var gx = parseFloat(gs.columnGap) / 2 || 8, gy = parseFloat(gs.rowGap) / 2 || 8;
-      var n = skips.length, head = 8;
-      svg.setAttribute("viewBox", "0 0 " + plane.offsetWidth + " " + plane.offsetHeight);
-      hint.hidden = frame.scrollWidth <= frame.clientWidth + 1;
-      wires.forEach(function (w) {
-        var a = buttons[w.from], b = buttons[w.to], k = skips.indexOf(w);
-        var sx = a.offsetLeft + a.offsetWidth, sy = a.offsetTop + a.offsetHeight / 2;
-        var tx = b.offsetLeft, ty = b.offsetTop + b.offsetHeight / 2;
-        var d;
-        if (k < 0) d = "M" + sx + " " + sy + " H" + (sx + gx) + " V" + ty;
-        else {
-          var down = sx + gx * (k + 1) / (n + 1);
-          var up = tx - head - (gx - head) * k / Math.max(1, n);
-          d = "M" + sx + " " + sy + " H" + down + " V" + (b.offsetTop + b.offsetHeight + 2 * gy * (k + 1) / (n + 1)) +
-              " H" + up + " V" + ty;
-        }
-        w.path.setAttribute("d", d + " H" + tx);
-        w.length = w.path.getTotalLength();
-      });
-    }
-
     pick(busiest);
-    route();
-    if (window.ResizeObserver) {
-      var sized = new window.ResizeObserver(route);
-      sized.observe(plane);
-      sized.observe(frame);
-    }
-    else window.addEventListener("resize", route);
 
-    /* The flow. Time only counts while it runs, so a pass paused off-screen resumes where it was. */
+    function fits() { hint.hidden = frame.scrollWidth <= frame.clientWidth + 1; }
+    fits();
+    if (window.ResizeObserver) new window.ResizeObserver(fits).observe(frame);
+    else window.addEventListener("resize", fits);
+
+    /* Under reduced motion the order is told by number, on a badge at each component's corner. */
     if (reduced) {
       plane.setAttribute("data-flow", "still");
+      names.forEach(function (_, i) {
+        var step = make("span", "pipe__step", sheet, String(litAt[i] / STAGE_MS + 1));
+        step.setAttribute("aria-hidden", "true");
+        step.setAttribute("data-step", "");
+        place(step, i);
+      });
       return;
     }
-    wires.forEach(function (w, k) {
+    var ripples = clocks.map(function (i) {
+      var c = PIPE_SLOTS[slotOf[names[i]]], reach = 0;
+      rank.forEach(function (r, j) {
+        if (degree[j] && r === 0) {
+          var d = PIPE_SLOTS[slotOf[names[j]]];
+          reach = Math.max(reach, Math.hypot(d[0] - c[0], d[1] - c[1]));
+        }
+      });
+      var ring = svgChild(svg, "circle", "pipe__pulse");
+      ring.setAttribute("cx", c[0]);
+      ring.setAttribute("cy", c[1]);
+      ring.setAttribute("data-packet", "");
+      return { ring: ring, from: PIPE_BOX[1] / 2, reach: reach };
+    });
+    wires.forEach(function (w) {
       w.packet = svgChild(svg, "circle", "pipe__packet");
       w.packet.setAttribute("r", "3.5");
       w.packet.setAttribute("data-packet", "");
-      w.offset = k / wires.length;
+      w.leaves = litAt[w.to] - STAGE_MS;
     });
+    /* A lap, looping: the last component lights, and the next ripple starts as its light goes
+       out. */
+    var lap = Math.max.apply(null, litAt) + HOLD_MS;
     var seen = !("IntersectionObserver" in window), ran = 0, last = null, frameId = null;
     function draw() {
+      var t = opts.compact ? ran : ran % lap;
+      ripples.forEach(function (p) {
+        var k = Math.min(1, t / STAGE_MS);
+        p.ring.setAttribute("r", (p.from + k * (p.reach - p.from)).toFixed(1));
+        p.ring.setAttribute("opacity", (0.7 * (1 - k)).toFixed(2));
+      });
+      buttons.forEach(function (b, i) {
+        b.classList.toggle("is-lit", t >= litAt[i] && t < litAt[i] + HOLD_MS);
+      });
       wires.forEach(function (w) {
-        var f = (ran / LAP_MS + w.offset) % 1, at = w.path.getPointAtLength(f * w.length);
+        var f = (t - w.leaves) / STAGE_MS;
+        if (f < 0 || f > 1) { w.packet.setAttribute("opacity", "0"); return; }
+        var at = w.path.getPointAtLength(f * w.length);
         w.packet.setAttribute("cx", at.x.toFixed(1));
         w.packet.setAttribute("cy", at.y.toFixed(1));
-        w.packet.setAttribute("opacity", Math.sin(f * Math.PI).toFixed(2));
+        w.packet.setAttribute("opacity", Math.min(1, 8 * f, 8 * (1 - f)).toFixed(2));
       });
     }
     var watch = null;
@@ -3915,6 +3991,8 @@
       last = t;
       if (opts.compact && ran >= PASS_MS) {
         wires.forEach(function (w) { w.packet.remove(); });
+        ripples.forEach(function (p) { p.ring.remove(); });
+        buttons.forEach(function (b) { b.classList.remove("is-lit"); });
         plane.setAttribute("data-flow", "still");
         if (watch) watch.disconnect();
         return;
