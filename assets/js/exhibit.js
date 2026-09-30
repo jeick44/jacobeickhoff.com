@@ -3094,7 +3094,7 @@
     square.setAttribute("role", "img");
     square.setAttribute("aria-label", "The Decision Review Cycle: " + steps.map(function (s, i) {
       return "step " + (i + 1) + ", " + s.name + ", carried by " + s.by.charAt(0).toLowerCase() + s.by.slice(1);
-    }).join("; ") + "; then back to step 1.");
+    }).join(", then ") + ", then back to step 1.");
     var corners = steps.map(function (s, i) {
       var c = make("div", "cycle__step", square);
       c.setAttribute("data-mark", "Step " + (i + 1) + ", " + s.name);
@@ -3257,7 +3257,7 @@
       pick.press(combined ? 1 : 0);
       grid.classList.toggle("is-combined", combined);
       grid.setAttribute("aria-label", combined
-        ? "The week's Rule-days, averaged into one combined score: no grade and no disagreement is shown"
+        ? "The week's Rule-days, averaged into one combined score, so no grade and no disagreement is shown"
         : "The week's Rule-days, each Rule by day, recorded beside reported");
       cells.forEach(function (c) {
         var gap = c.g.rec !== c.g.rep;
@@ -4169,21 +4169,21 @@
       });
       cut.classList.toggle("is-edited", edited);
       if (edited) {
-        cut.textContent = ruleName + " edited in place after " + last + "’s review; no version saved";
+        cut.textContent = ruleName + " edited in place after " + last + "’s review, with no version saved";
         cut.removeAttribute("data-mark");
         read.textContent = ruleName + " was edited in place after " + last + "’s review, so no day records " +
-          "which version graded it; every day is now graded under the edited Rule. " +
-          (changed.length ? changed.join(", and ") + ". The record shows no sign that anything changed; " +
+          "which version graded it, and every day is now graded under the edited Rule. " +
+          (changed.length ? changed.join(", and ") + ". The record shows no sign that anything changed, and " +
             "the rings are this Exhibit’s, not the system’s."
                           : "No grade already given happens to change.");
         return;
       }
-      cut.textContent = ruleName + " revised on review after " + last + "; saved as version 2";
+      cut.textContent = ruleName + " revised on review after " + last + " and saved as version 2";
       cut.setAttribute("data-mark", ruleName + " revised after " + last);
       read.textContent = ruleName + " was revised after " + last + "’s review and saved as version 2. " +
         names(after) + (after.length > 1 ? " are" : " is") + " graded under version 2. " +
         names(before) + (before.length > 1 ? " keep" : " keeps") + " version 1 and the grades " +
-        "given under it; no result already graded changed.";
+        "given under it, so no result already graded changed.";
     }
 
     update();
@@ -4284,7 +4284,7 @@
         mode.setAttribute("role", "img");
         mode.setAttribute("data-mark", "Failure mode: " + m);
         mode.setAttribute("aria-label", "Failure mode of " + lower(p.name) + ": " + lower(m) +
-                          "; it cannot occur, since the path was not built");
+                          ", which cannot occur, since the path was not built");
       });
     });
 
@@ -4300,15 +4300,15 @@
       inPath.row.setAttribute("data-mark", inPath.name + ", built");
       inPath.row.setAttribute("aria-label", inPath.name + ": from " + place(inPath.from) + " to " +
                               place(inPath.to) + ", built" +
-                              (failed ? ", connection failed: " + lower(inPath.modes.join("; "))
-                                      : "; it reads and never writes"));
+                              (failed ? ", connection failed: " + lower(inPath.modes.join(", and "))
+                                      : ", and it reads and never writes"));
       notice.hidden = !failed;
       if (failed) {
-        notice.textContent = "Connection failed. The record is stale; no count shown is current.";
+        notice.textContent = "Connection failed. The record is stale, so no count shown is current.";
         notice.setAttribute("data-mark", "Stale record");
         said.textContent = "The connection failed, so the broker’s record is stale. TradeLog says so " +
           "above everything else, the last count is not shown as current, and nothing is sent to " +
-          "the broker to recover it: the order path stays struck.";
+          "the broker to recover it, since the order path stays struck.";
         return;
       }
       notice.textContent = "";
