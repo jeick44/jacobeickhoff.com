@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Research — Engagement 04 — Jacob Eickhoff</title>
-<meta name="description" content="A faculty-advised study of whether AI-generated language in SEC filings predicts abnormal returns, rebuilt after I withdrew my own published result — with the pass bar fixed in advance and the three defects named.">
+<meta name="description" content="A faculty-advised study of whether AI-generated language in SEC filings predicts abnormal returns, rebuilt after I withdrew my own published result, with the pass bar fixed in advance and the three defects named.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -64,7 +64,7 @@
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
         validation set, and nothing below has been revised in light of a number. The work is at the
-        validation stage: the corpus is extracted and the detectors are being measured. No panel
+        validation stage, with the corpus extracted and the detectors being measured. No panel
         result exists yet, and the page says so where one would otherwise go.</p>
     </div>
   </section>
@@ -86,8 +86,8 @@
             <span class="stat__value" data-stat-final="3">3</span>
             <span class="stat__unit">edit intensities</span>
           </p>
-          <span class="stat__label">The Detectability Curve: accuracy at light, moderate and heavy
-            revision, rather than one number standing for all three.</span>
+          <span class="stat__label">The Detectability Curve gives accuracy at light, moderate and heavy
+            revision rather than one number for all three.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -121,15 +121,15 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>Finance research reads corporate disclosure as text &mdash; tone, hedging, readability,
-              how much a filing changed since last year. All of it rests on an assumption that used to
-              be free: that a person wrote the words. If a language model revised them, the measure is
+            <p>Finance research reads corporate disclosure as text, looking at tone, hedging, readability
+              and how much a filing changed since last year. All of it rests on an assumption, which
+              used to be free, that a person wrote the words. If a language model revised them, the measure is
               reading the model&rsquo;s style, and a company that looks newly cautious may be a company
               that started running its footnotes through an assistant.</p>
-            <p>Nobody can say how often that happens, for a narrow reason: no published detector has
-              been validated on financial disclosure. The ones that exist were trained to separate web
+            <p>Nobody can say how often that happens, for the narrow reason that no published detector
+              has been validated on financial disclosure. The ones that exist were trained to separate web
               prose from model output, and a footnote is neither. So the first question is not whether
-              AI-generated language predicts returns. It is whether it can be seen at all in this kind
+              AI-generated language predicts returns but whether it can be seen at all in this kind
               of writing, and that has to be settled against labeled data before a filing is scored.</p>
             <details class="disclosure">
               <summary class="disclosure__summary">Why the thing being detected is an edit and not a
@@ -138,8 +138,8 @@
                 <p>An issuer does not hand a model a blank page and file what comes back. What a drafter
                   plausibly does is write the paragraph and ask for it to be tightened with the facts
                   kept, so the positive class here is a human passage a model revised rather than one a
-                  model produced from nothing. That is what AI-generated language means on this page and
-                  in the study: an edit, not a draft. Wholly generated text is kept only as an upper bound: a
+                  model produced from nothing. So on this page and in the study, AI-generated language
+                  means an edit, not a draft. Wholly generated text is kept only as an upper bound, because a
                   detector that cannot separate that from human writing is blind, and a null result from
                   a blind instrument says nothing.</p>
               </div>
@@ -148,23 +148,23 @@
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>I rebuilt the measurement instrument. It has four parts.</p>
+            <p>I rebuilt the measurement instrument, which has four parts.</p>
             <p><strong>Passages are located by the filer&rsquo;s own tags.</strong> The first version
               found the notes to the financial statements with a regular expression over the document
               text. The extractor now reads the index the filer publishes alongside the filing and takes
-              the sections the filer tagged as notes &mdash; 4,653 passages from 1,324 notes across 74
+              the sections the filer tagged as notes, which came to 4,653 passages from 1,324 notes across 74
               filings, drawn from a 40-company sample of which 37 had filings in the window. All of them
               are dated before 2020, so the human labels are certain by construction.</p>
-            <p><strong>The labels are built, not assumed.</strong> A validation set of 200 human
-              passages, 600 model-revised versions of them, and 50 wholly generated for the upper bound.
+            <p><strong>The labels are built, not assumed.</strong> The validation set holds 200 human
+              passages, 600 model-revised versions of them and 50 wholly generated passages for the upper
+              bound.
               Every revision is paired with its own original, so a detector can be asked whether it
               scores a passage as more machine-like than the text it came from.</p>
             <p><strong>The instrument reports a Detectability Curve, not a score.</strong> Accuracy is
-              measured at three rungs of edit intensity &mdash; light, moderate, heavy &mdash; and a
-              passage&rsquo;s
+              measured at three rungs of edit intensity (light, moderate, heavy), and a passage&rsquo;s
               rung is measured afterwards from edit distance and n-gram overlap against its original,
-              never inferred from the prompt that asked for it. A prompt is a request; edit intensity is
-              what happened.</p>
+              never inferred from the prompt that asked for it, because a prompt is a request and edit
+              intensity is what happened.</p>
             <figure class="exhibit" id="exhibit-prompt-vs-intensity" data-exhibit="edit-intensity"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -179,9 +179,9 @@
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>An invented footnote passage, and revisions of it written by hand, as one
-                      prompt might return them; at the foot, the cut-points that place each on a
-                      rung</caption>
+                    <caption>An invented footnote passage and revisions of it written by hand, as one
+                      prompt might return them, with the cut-points that place each on a rung at the
+                      foot</caption>
                     <thead>
                       <tr><th scope="col">Passage</th><th scope="col">Text</th><th scope="col">Prompt</th></tr>
                     </thead>
@@ -222,31 +222,31 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> illustrative; an invented passage in
-                the style of a lease footnote, and revisions of it written by hand for this Exhibit to
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, an invented passage in
+                the style of a lease footnote with revisions of it written by hand for this Exhibit to
                 show how far one prompt&rsquo;s results can spread. No model wrote them, and none comes
                 from the study&rsquo;s validation set, whose passages, revisions and cut-points are not
                 reproduced here while the study is at its validation stage. Words are compared ignoring
                 case and punctuation. Edit distance is the
                 fewest words inserted, deleted or replaced to turn the original into the revision, as a
-                share of the original&rsquo;s words; n-gram overlap is the share of the original&rsquo;s
+                share of the original&rsquo;s words, and n-gram overlap is the share of the original&rsquo;s
                 distinct word pairs the revision keeps. The cut-points between rungs, at the foot of
                 the table, are this illustration&rsquo;s own.</figcaption>
             </figure>
             <p><strong>The Gate.</strong> A detector may score real filings only if it reaches an AUC of
               at least 0.70 at the moderate rung and holds its false-positive rate at or below 5%
-              against genuine pre-2020 footnotes. Four were named in advance: the detector the withdrawn
-              pipeline scored with, kept as the incumbent baseline; Fast-DetectGPT; Binoculars; and a
-              stylometric floor with no neural weights behind it. If none clears the bar, the study
+              against genuine pre-2020 footnotes. Four were named in advance: Fast-DetectGPT, Binoculars, a
+              stylometric floor with no neural weights behind it, and the detector the withdrawn
+              pipeline scored with, kept as the incumbent baseline. If none clears the bar, the study
               stops at the validation stage and reports that LLM editing of filing footnotes is not
-              detectable with current public methods &mdash; and that is the finding, not a failure to
+              detectable with current public methods, and that is the finding rather than a failure to
               find one. The bar is not lowered, the ladder is not re-cut, and the panel is not scored in
               the hope that scale compensates.</p>
             <figure class="exhibit" id="exhibit-the-gate" data-exhibit="gate"
                     data-provenance="illustrative">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The Gate: AUC
-                  &ge; 0.70 at moderate edit intensity, false positives &le; 5%</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> The Gate asks for
+                  AUC &ge; 0.70 at moderate edit intensity and false positives &le; 5%</h3>
                 <p class="exhibit__instruction">Drag the points, try a detector profile, or move the
                   false-positive rate.</p>
               </div>
@@ -255,7 +255,7 @@
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>Four hypothetical detector profiles, each an AUC at every rung of edit intensity and a false-positive rate; at the foot, the Gate they are judged against</caption>
+                    <caption>Four hypothetical detector profiles, each with an AUC at every rung of edit intensity and a false-positive rate, and at the foot the Gate they are judged against</caption>
                     <thead>
                       <tr><th scope="col">Hypothetical detector</th><th scope="col">AUC at the light rung</th><th scope="col">AUC at the moderate rung</th><th scope="col">AUC at the heavy rung</th><th scope="col">False-positive rate on genuine pre-2020 footnotes</th></tr>
                     </thead>
@@ -273,11 +273,11 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> illustrative; the Gate as
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, the Gate as
                 pre-registered above, with its bar at the foot of the table. Every detector shown is
-                hypothetical, invented for this Exhibit: no detector&rsquo;s result is plotted here, the
+                hypothetical, invented for this Exhibit, and no detector&rsquo;s result is plotted here, the
                 pilot run&rsquo;s included, because none has yet been judged against the Gate. Each
-                rung is measured afterwards from edit distance and n-gram overlap; the study&rsquo;s
+                rung is measured afterwards from edit distance and n-gram overlap, and the study&rsquo;s
                 cut-points between rungs are not reproduced here while the study is at its validation
                 stage.</figcaption>
             </figure>
@@ -289,10 +289,10 @@
                   generator the stylometric floor separated revisions from their own originals at an AUC
                   of 0.781 at the moderate rung, rising at every rung and surviving where the revision
                   lost no length at all. The two neural detectors sat at or below chance on its edited
-                  text; against wholly generated text both did better, and one of them almost
+                  text but did better against wholly generated text, one of them almost
                   perfectly.</p>
-                <p>None of that is a result, and the run file says so on its first line: an 8B model has
-                  a strong stylistic signature, a stylometric index measures exactly that, and the pilot
+                <p>The run file says on its first line that none of that is a result, since an 8B model
+                  has a strong stylistic signature, a stylometric index measures exactly that, and the pilot
                   may therefore be detecting one model rather than detecting editing. I wrote that
                   down before the paid run rather than after. The one thing it decided is that the paid
                   run is worth making.</p>
@@ -302,13 +302,13 @@
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>What changed is the thing I would lead with in an interview: I withdrew my own published
-              result. A report I compiled in June 2026 carried three headline findings. I re-examined it
+            <p>What changed is the thing I would lead with in an interview, which is that I withdrew my own
+              published result. A report I compiled in June 2026 carried three headline findings. I re-examined it
               against the source data and against live filings, found three defects, and superseded
               it.</p>
             <p><strong>The score was a ranking wearing a probability&rsquo;s clothes.</strong> The final
               quantity was a within-sample z-score through a sigmoid, and a filing was flagged if it
-              landed in the top quartile &mdash; which flags exactly a quarter of any sample by
+              landed in the top quartile. That flags exactly a quarter of any sample by
               construction, whatever the text says, and means adding one company changes the score of
               every company already scored. It was reported as though it were the probability that a
               filing was machine-written.</p>
@@ -348,10 +348,10 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> synthetic; invented companies
-                with invented detector readings on an arbitrary scale, scored the way the withdrawn
-                report scored them: each reading&rsquo;s z-score within the sample, put through a
-                sigmoid, with the top quartile by rank flagged (rounded down when the sample does not
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic, invented companies
+                with invented detector readings on an arbitrary scale. They are scored the way the
+                withdrawn report scored them, with each reading&rsquo;s z-score within the sample put
+                through a sigmoid and the top quartile by rank flagged (rounded down when the sample does not
                 divide by four). No company, reading or score from the withdrawn report is reproduced,
                 because that report is superseded and should not be cited.</figcaption>
             </figure>
@@ -359,7 +359,7 @@
               filings, five landed on a cross-reference or a table-of-contents line rather than on the
               notes. One company ranked near the top for AI language had been scored on 4,109 characters
               of exhibit index and signature page. The heading pattern the extractor searched for
-              matched zero times in all six: a modern filing renders a note heading as &ldquo;1.
+              matched zero times in all six, because a modern filing renders a note heading as &ldquo;1.
               Significant Accounting Policies&rdquo;, never as &ldquo;Note 1 &mdash;&rdquo;.</p>
             <p><strong>The trend appeared at dates where nothing had happened.</strong> I re-ran the
               specification with a fabricated break in November of every year from 2017 to 2024, and
@@ -432,21 +432,21 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> synthetic; an invented score on an
-                arbitrary scale, drifting upward with noise and with no break anywhere in it. Each
-                placebo break starts in the fourth quarter, the quarter holding November; the re-run&rsquo;s
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic, an invented score on an
+                arbitrary scale that drifts upward with noise and has no break anywhere in it. Each
+                placebo break starts in the fourth quarter, the quarter holding November, while the re-run&rsquo;s
                 break was in November itself. The jump at the break is estimated by least squares, first
                 on its own and then beside a linear time trend, and called significant where its
                 t-statistic is 1.96 or more either way. The standard errors treat quarters as independent
-                and use the normal 5% bar: it shows the mechanism, not an inference. The page&rsquo;s
+                and use the normal 5% bar, so what it shows is the mechanism, not an inference. The page&rsquo;s
                 other remedy, firm fixed effects, needs firms, and one series has none, so it is not
                 drawn. No series, date or figure from the withdrawn report is reproduced, because that
                 report is superseded and should not be cited.</figcaption>
             </figure>
             <p>So I wrote a correction, dated it, said the report was superseded and should not be
               cited, and recorded that it go to anyone who had received it. The pipeline was then
-              rebuilt from scratch, with a provenance record on every passage &mdash; accession number,
-              source URL, note, character offsets. Any number in the write-up now traces back to text a
+              rebuilt from scratch, with a provenance record on every passage giving its accession
+              number, source URL, note and character offsets. Any number in the write-up now traces back to text a
               reader can open, which is the discipline whose absence let a signature page be reported as
               a finding.</p>
             <p class="pending-result">
@@ -458,22 +458,22 @@
               &ldquo;filers are not doing this&rdquo; stays distinguishable from &ldquo;this instrument
               cannot see it&rdquo;.
             </p>
-            <p>Where the rest of it stands. The study is faculty-advised, and that is a working
+            <p>As for where the rest of it stands, the study is faculty-advised, and that is a working
               relationship rather than a name on a cover page. An application for research funding has
-              been submitted; it has not been decided and it has not been awarded. A conference is the
+              been submitted but has not been decided, and it has not been awarded. A conference is the
               intended venue, whichever way the Gate falls. None of the three is an outcome.</p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>That the defects were not carelessness, which is the uncomfortable part. Each one was a
-              choice &mdash; which break date, which heading pattern, which cut-off counted as high
-              &mdash; made with the answer already on the screen, and none was recorded as a choice
+            <p>The uncomfortable part is that the defects were not carelessness, since each one was a
+              choice made with the answer already on the screen (which break date, which heading pattern, which cut-off
+              counted as high), and none was recorded as a choice
               because at the time none of them felt like one.</p>
-            <p>So the remedy is not more care: care is what produced it, aimed in the direction of the
-              result I expected. It is to commit to the decisions before the numbers exist, in a file
-              with a date on it &mdash; which is why The Gate can disqualify a detector I would rather
-              keep. The narrower version of the lesson: a result that has survived no placebo is not a
+            <p>So the remedy is not more care, because care is what produced it, aimed in the direction
+              of the result I expected. The remedy is to commit to the decisions before the numbers
+              exist, in a file with a date on it, which is why The Gate can disqualify a detector I
+              would rather keep. The narrower version of the lesson is that a result that has survived no placebo is not a
               result. The check that cost me the finding took an afternoon, and I had not run it because
               the finding agreed with what I expected.</p>
             <details class="disclosure">
@@ -481,10 +481,10 @@
                 quietly replacing the work</summary>
               <div class="disclosure__body">
                 <p>The tempting version is to rebuild, publish the better study, and let the first one
-                  disappear. Nobody had cited it; it would have cost nothing visible. What decided it is
+                  disappear. Nobody had cited it, so it would have cost nothing visible. What decided it is
                   that I cannot be sure where the report went, and deleting my copy leaves the claim
                   alive in anyone else&rsquo;s with nothing attached to it. Naming the three defects is also
-                  the only thing that lets a reader judge the rebuild &mdash; without them it is a set
+                  the only thing that lets a reader judge the rebuild, since without them it is a set
                   of answers to no stated question.</p>
               </div>
             </details>
@@ -492,18 +492,18 @@
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
-            <p><strong>A score defined by a ranking is not a measurement.</strong> Vendor risk tiers,
-              performance bands, lead scores, accounts flagged for review &mdash; anything defined as
-              the top quartile identifies that share of the population whatever the population does, and
+            <p><strong>A score defined by a ranking is not a measurement.</strong> Anything defined as
+              the top quartile, such as vendor risk tiers, performance bands, lead scores or accounts
+              flagged for review, identifies that share of the population whatever the population does, and
               adding a case changes the score of every case already in it. The damage comes when a
               sorting rule is escalated as a probability.</p>
             <p><strong>Check what the extractor actually read.</strong> Any process pulling fields out
-              of documents &mdash; diligence, compliance review, invoice and contract automation &mdash;
+              of documents, whether for diligence, compliance review or invoice and contract automation,
               reports what it found and almost never what it read instead. The cheapest check in this
               study was opening six documents and looking at the characters that had been scored.</p>
             <p><strong>Fix the pass bar before the measurement.</strong> Pilot evaluations, model
-              selection and vendor bake-offs reach the same fork: the success criteria are written down
-              before the numbers arrive, or afterwards, in which case they are a description of the
+              selection and vendor bake-offs reach the same fork, where the success criteria are written
+              down either before the numbers arrive or afterwards, in which case they are a description of the
               numbers. Fixing it first is what makes a negative result reportable rather than
               embarrassing, and a negative result nobody can report is a budget that keeps getting
               spent.</p>
