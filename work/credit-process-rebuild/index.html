@@ -82,8 +82,8 @@
             <span class="stat__value" data-stat-final="3,923">3,923</span>
             <span class="stat__unit">assertions</span>
           </p>
-          <span class="stat__label">Automated checks over the approval-presentation tool alone.
-            None of them failing.</span>
+          <span class="stat__label">Automated checks over the approval-presentation tool alone,
+            none of them failing.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -117,12 +117,13 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>A lender submits a request for a new loan, a renewal or a modification. An analyst turns
-              it into the presentation a credit committee decides from. Everything in between moves
-              through a chain of spreadsheets and a shared drive, and none of it is written down &mdash;
-              so one concept can carry two definitions in one workbook and nothing notices.</p>
-            <p>The constraint arrives before any design does: no customer data reaches a cloud service,
-              and no tool requires a server. I treat that as the starting point rather than an obstacle
+            <p>When a lender submits a request for a new loan, a renewal or a modification, an analyst
+              turns it into the presentation a credit committee decides from. Everything in between
+              moves through a chain of spreadsheets and a shared drive, and because none of it is
+              written down, one concept can carry two definitions in one workbook and nothing
+              notices.</p>
+            <p>The constraint arrives before any design does, and it says that no customer data reaches a
+              cloud service and no tool requires a server. I treat that as the starting point rather than an obstacle
               to route around, because the reasoning behind it is a threat model and not an IT
               preference.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-blast-radius" data-exhibit="blast-radius"
@@ -155,8 +156,8 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> illustrative; six analysts and
-                forty-eight files are a diagram, not the Sponsor&rsquo;s headcount or book. The decision
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, because the six analysts
+                and forty-eight files are a diagram, not the Sponsor&rsquo;s headcount or book. The decision
                 is recorded with the conditions that would reverse it: outside access, routine
                 concurrent editing, or access control finer than the share can express.</figcaption>
             </figure>
@@ -164,7 +165,7 @@
               <summary class="disclosure__summary">Why the constraint is about concentration, not
                 connectivity</summary>
               <div class="disclosure__body">
-                <p>The case for a server is convenience; the case against it is concentration. A
+                <p>The case for a server is convenience, while the case against it is concentration. A
                   compromised workstation yields only what that analyst could already open from the
                   share. A compromised server yields every customer, because its service account has to
                   read all of them and bypasses the share&rsquo;s permissions by design.</p>
@@ -179,21 +180,21 @@
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>Origination is being rebuilt as nine browser tools. Each is a single HTML file opened
-              from the shared drive, reading and writing customer files through the browser&rsquo;s file
-              access API &mdash; no server, no database, no network call. That is the primary security
-              control, so it is not left to discipline: a check fails the build if a network call or an
-              external resource ever reaches a shipped file.</p>
-            <p>Two pieces of the rebuild are process design rather than software. The first is the
+            <p>Origination is being rebuilt as nine browser tools, each a single HTML file opened from
+              the shared drive that reads and writes customer files through the browser&rsquo;s file
+              access API with no server, no database and no network call. That is the primary security
+              control, so it is not left to discipline, and a check fails the build if a network call or
+              an external resource ever reaches a shipped file.</p>
+            <p>Two pieces of the rebuild are process design rather than software, and the first is the
               Three-Stage Review. The approval presentation used to be produced by doing three things at
               once: filling in the figures, working out why they look the way they do, and checking the
-              result. Interleaved, every question the analyst cannot answer becomes an interruption
-              &mdash; a call to the lender who wrote the deal, mid-analysis.</p>
+              result. With the three interleaved, every question the analyst cannot answer interrupts the
+              analysis with a call to the lender who wrote the deal.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-three-stage-review" data-exhibit="three-stage"
                     data-provenance="synthetic">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Same file, same
-                  five questions: one phone call instead of five</h3>
+                  five questions, one phone call instead of five</h3>
                 <p class="exhibit__instruction">Play one file through each process.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
@@ -223,10 +224,10 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> synthetic; one synthetic file with five
-                open questions, whose four parts are placeholders, not the Sponsor&rsquo;s presentation. The measured change in
-                lender callbacks is a Pending Result and is not shown: there is no before-and-after
-                measurement yet.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic, one invented file with five
+                open questions whose four parts are placeholders and not the Sponsor&rsquo;s presentation. The
+                measured change in lender callbacks is a Pending Result and is not shown, because there is
+                no before-and-after measurement yet.</figcaption>
             </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">The Three-Stage Review, and the cost it is
@@ -236,14 +237,14 @@
                   question only the originating lender can answer is marked where it arises and
                   re-listed in one place at the end, so a phone call is one phone call rather than a
                   running string of interruptions.</p>
-                <p>The rationale is stakeholder cost: the scarce resource is somebody else&rsquo;s
+                <p>The rationale is stakeholder cost, because the scarce resource is somebody else&rsquo;s
                   attention, and a redesign that saves the analyst an hour by spending two of the
                   lender&rsquo;s has made things worse while looking better.</p>
               </div>
             </details>
             <p>The tax-document tool reads a return and produces a per-customer income statement with
-              debt-service coverage. The rule underneath it: in a credit file a wrong number costs more
-              than a missing one, because a missing number is visibly missing and a wrong one is what
+              debt-service coverage. The rule underneath it is that in a credit file a wrong number
+              costs more than a missing one, because a missing number is visibly missing and a wrong one is what
               everybody works from.</p>
             <figure class="exhibit" id="exhibit-extraction-triage" data-exhibit="triage"
                     data-provenance="synthetic">
@@ -267,7 +268,7 @@
                       <tr><th scope="row">Answer</th><td>Extracted</td><td>Refused, by name</td><td>Extracted, one line held</td></tr>
                       <tr><th scope="row">Gross receipts</th><td>$412,300</td><td>Not read</td><td>$412,300</td></tr>
                       <tr><th scope="row">Cost of goods sold</th><td>&minus;$171,900</td><td>Not read</td><td>&minus;$171,900</td></tr>
-                      <tr><th scope="row">Repairs and maintenance</th><td>&minus;$18,450</td><td>Not read</td><td>Line 19 &mdash; description unreadable: $18,450, held for review</td></tr>
+                      <tr><th scope="row">Repairs and maintenance</th><td>&minus;$18,450</td><td>Not read</td><td>Line 19 (description unreadable): $18,450, held for review</td></tr>
                       <tr><th scope="row">Depreciation (added back)</th><td>+$22,100</td><td>Not read</td><td>+$22,100</td></tr>
                       <tr><th scope="row">Cash available for debt service</th><td>$244,050</td><td>Not computed</td><td>Pending</td></tr>
                       <tr><th scope="row">Debt-service coverage</th><td>1.38&times;</td><td>Not computed</td><td>Not computed</td></tr>
@@ -275,9 +276,10 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> synthetic; behavior as described in the
-                Case Study. Every dollar figure and the coverage ratio are synthetic: a real return is one
-                of the Sponsor&rsquo;s customers&rsquo; tax records, so no real return is shown.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic, with behavior as described in
+                the Case Study. Every dollar figure and the coverage ratio are synthetic because a real
+                return is one of the Sponsor&rsquo;s customers&rsquo; tax records, so no real return is
+                shown.</figcaption>
             </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">Extraction that refuses rather than guesses</summary>
@@ -292,10 +294,11 @@
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>Measured, and mine to state: nine tools shipped; 3,923 automated assertions
-              over the approval-presentation tool alone, none failing, with a second harness that proves
-              them capable of failing by injecting the faults they exist to catch; nine architecture
-              decisions written down, each with the alternative it was chosen over.</p>
+            <p>What I have measured and can state is that nine tools have shipped, that 3,923 automated
+              assertions cover the approval-presentation tool alone with none failing and a second
+              harness proving them capable of failing by injecting the faults they exist to catch, and
+              that nine architecture decisions are written down, each with the alternative it was chosen
+              over.</p>
             <p class="pending-result">
               <span class="pending-result__flag">Pending Results</span>
               Time from request to committee, lender callbacks per file, and the rate of corrected
@@ -307,10 +310,10 @@
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>That a green test suite tells you the tests passed, and nothing else.</p>
-            <p>One change generalized part of the spreads import so a new kind of financial tab could
-              share machinery the existing ones used. It worked, and the suite was green. A code review
-              of that same change found six defects, two of which would have corrupted figures on their
+            <p>A green test suite tells you the tests passed and nothing else. I learned that from one
+              change that generalized part of the spreads import so a new kind of financial tab could
+              share machinery the existing ones used. It worked and the suite was green, and a code
+              review of that same change still found six defects, two of which would have corrupted figures on their
               way into a credit decision.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-green-suite" data-exhibit="green-suite"
                     data-provenance="published">
@@ -332,19 +335,19 @@
                       <tr><th scope="col">Defect</th><th scope="col">Would reach figures</th><th scope="col">Assertions failing on it</th><th scope="col">What review found</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Sheet-type test read the whole sheet, not the header band</th><td>Yes</td><td>0 of 3,923</td><td>A block of round four-figure expense amounts reads to it as a row of years; two properties would land on one key, one silently overwriting the other.</td></tr>
-                      <tr><th scope="row">Migration verified the carry by comparing an object with itself</th><td>Yes</td><td>0 of 3,923</td><td>A comparison that could not fail &mdash; and the only gate on deleting the analyst&rsquo;s hand-entered grid.</td></tr>
+                      <tr><th scope="row">Sheet-type test read the whole sheet, not the header band</th><td>Yes</td><td>0 of 3,923</td><td>A block of round four-figure expense amounts reads to it as a row of years, so two properties would land on one key, one silently overwriting the other.</td></tr>
+                      <tr><th scope="row">Migration verified the carry by comparing an object with itself</th><td>Yes</td><td>0 of 3,923</td><td>A comparison that could not fail was the only gate on deleting the analyst&rsquo;s hand-entered grid.</td></tr>
                       <tr><th scope="row">A refusal with nowhere on screen to be said</th><td>No</td><td>0 of 3,923</td><td>The tool declined, and the analyst would never have seen why.</td></tr>
                       <tr><th scope="row">A rule that had quietly stopped being true for one sheet type</th><td>No</td><td>0 of 3,923</td><td>It went on reading correctly while the predicate underneath had changed meaning.</td></tr>
                       <tr><th scope="row">A predicate rewritten into a form that read the same</th><td>No</td><td>0 of 3,923</td><td>It changed behavior under cover of fixing a fifth case.</td></tr>
-                      <tr><th scope="row">Three analyst-facing messages printing an internal key</th><td>No</td><td>0 of 3,923</td><td>A name was expected; an identifier was shown.</td></tr>
+                      <tr><th scope="row">Three analyst-facing messages printing an internal key</th><td>No</td><td>0 of 3,923</td><td>An identifier was shown where a name was expected.</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> published; assertion count and defect
-                descriptions as published in the Case Study. All six sit in code that generalized an
-                existing rule: the rule goes on reading correctly while the predicate underneath it has
+              <figcaption class="exhibit__source"><b>Source:</b> published, with the assertion count and
+                defect descriptions as published in the Case Study. All six sit in code that generalized
+                an existing rule, where the rule goes on reading correctly while the predicate underneath it has
                 changed meaning.</figcaption>
             </figure>
             <details class="disclosure">
@@ -356,11 +359,11 @@
                   year, so two properties would land on one key, one silently overwriting the other, and
                   the survivor would merge into that company&rsquo;s genuine multi-year trend. And the
                   migration that carries old data into the new shape verified the carry before deleting
-                  the original by comparing an object with itself &mdash; a comparison that could not
-                  fail, and the only gate on deleting the analyst&rsquo;s hand-entered grid.</p>
+                  the original by comparing an object with itself, which is a comparison that could not
+                  fail and was the only gate on deleting the analyst&rsquo;s hand-entered grid.</p>
               </div>
             </details>
-            <p>The useful part is not the six. It is that the suite, the mutation harness and I were
+            <p>What matters more than the six is that the suite, the mutation harness and I were
               all satisfied, and reading the change as prose was what was left. I write the tests and I
               still need the review.</p>
           </section>
@@ -374,8 +377,8 @@
             <p><strong>Separating a process by whose attention it spends.</strong> Any workflow where
               one role waits on another&rsquo;s answers has the interleaving problem, and the measure of
               a redesign is total interruption, not hours saved by whoever redesigned it.</p>
-            <p><strong>The refusal rule.</strong> Any pipeline turning documents into figures somebody
-              decides from &mdash; claims, invoices, applications, filings &mdash; chooses between
+            <p><strong>The refusal rule.</strong> Any pipeline turning documents such as claims,
+              invoices, applications and filings into figures somebody decides from chooses between
               producing a number and admitting it cannot. A system that guesses reads exactly like one
               that knows, until someone checks an output it has already been acted on.</p>
           </section>

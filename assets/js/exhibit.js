@@ -310,7 +310,7 @@
       }
     });
     make("p", "blast__shelf", diagram,
-         "Customer files on the shared drive; each analyst can open their own group");
+         "Customer files on the shared drive, where each analyst can open their own group");
 
     var readout = make("div", "exhibit__readout", stage);
     readout.setAttribute("aria-live", "polite");
@@ -804,7 +804,7 @@
      cash available for debt service and the debt-service coverage it produces; every row between is
      one line of the income statement. A line's cell is its amount ("−$171,900"), "Not read", or an
      amount held for review under the words the tool could read instead of a label
-     ("Line 19 — description unreadable: $18,450, held for review").
+     ("Line 19 (description unreadable): $18,450, held for review").
 
      The tool's rule is that a wrong number costs more than a missing one, and the kind reads it back
      from each column, refusing a table that breaks it (the stage stays empty and the table stands
@@ -876,7 +876,7 @@
        sentence, and a note in small type. */
     var SAYS = {
       extracted: { body: "A per-customer income statement with debt-service coverage, every figure traced to its line on the return." },
-      held: { body: "The export scrambled one line’s description. Its amount is flagged for review instead of attached to the nearest plausible label — and coverage waits for it." },
+      held: { body: "The export scrambled one line’s description. Its amount is flagged for review instead of attached to the nearest plausible label, and coverage waits for it." },
       refused: { lead: "This return is an image-only scan.",
                  body: " No figures were read from it. Request the electronically filed copy, or key the schedule into the spreads template.",
                  aside: "Character recognition would produce numbers that look like figures. In a credit file a wrong number costs more than a missing one." }
