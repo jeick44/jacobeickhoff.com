@@ -1313,36 +1313,42 @@
     }
   });
 
-  /* ---- KIND: spread-direction ------------------------------------------------------------------
-     A result reported by direction only. The table lists each period the signal was tested over,
-     oldest first, and the direction the spread took in it, in words: Positive or Negative. Every
-     arrow is drawn one length, because on this site a direction may be published where its
-     magnitude is withheld (Self-Computed in CONTEXT.md).
+  /* ---- KIND: quartile-spread -------------------------------------------------------------------
+     A result reported with its size. The table lists each period the score was tested over, oldest
+     first, then the top-minus-bottom quartile spread in it as a signed percentage (+11.4%, or with a
+     minus sign), then which quartile came out ahead, in words: Top quartile ahead or Top quartile
+     behind. Each bar's length is its spread, on one scale shared by every period, so a short window
+     that worked cannot be drawn bigger than a full year that did not.
 
-     Two charts from the one table: every period, and the one a less careful paper would have
-     published - only the periods that pointed the right way, with nothing on it saying the others
-     were left out. The count of periods shown that pointed the right way is the result, so leaving
-     the others out changes it from one of three to one of one.
+     Two charts from the one table: every period, and the one a paper showing only the periods where
+     the top quartile came out ahead would have published, with nothing on it saying the others were
+     left out. The count of periods shown with the top quartile ahead is the result, so leaving the
+     others out changes it from one of three to one of one.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
-     a direction that is not one of the two words - a figure above all, since a figure there is the
-     magnitude this Exhibit exists to withhold - or no period that pointed the right way, which
-     leaves the flattering chart nothing to flatter with. */
-  register("spread-direction", function (fig, stage, data) {
-    var UP = "positive", DOWN = "negative";
-    if (data.columns.length < 2 || !data.rows.length) throw new Error("spread-direction: the table has no periods");
+     a spread that is not a signed percentage, words that are not one of the two, words that
+     disagree with the sign of their own figure (two copies of one fact that have drifted), or no
+     period with the top quartile ahead, which leaves the one-period chart nothing to show. */
+  register("quartile-spread", function (fig, stage, data) {
+    var AHEAD = "top quartile ahead", BEHIND = "top quartile behind";
+    if (data.columns.length < 3 || !data.rows.length) throw new Error("quartile-spread: the table has no periods");
     var periods = data.rows.map(function (r) {
-      var d = (r.cells[0] || "").toLowerCase();
-      if (d !== UP && d !== DOWN) {
-        throw new Error("spread-direction: " + r.label + " reads " + JSON.stringify(r.cells[0]) +
-                        "; a direction is Positive or Negative, and never a figure");
+      var t = (r.cells[0] || "").replace(/−/g, "-"), m = /^([+-]?\d+(?:\.\d+)?)%$/.exec(t);
+      if (!m) throw new Error("quartile-spread: " + r.label + " reads " + JSON.stringify(r.cells[0]) + ", not a signed percentage");
+      var v = parseFloat(m[1]), d = (r.cells[1] || "").toLowerCase();
+      if (d !== AHEAD && d !== BEHIND) {
+        throw new Error("quartile-spread: " + r.label + " reads " + JSON.stringify(r.cells[1]) + " for its direction");
       }
-      return { label: r.label, words: r.cells[0], up: d === UP };
+      if ((d === AHEAD) !== (v > 0)) {
+        throw new Error("quartile-spread: " + r.label + " is " + r.cells[0] + " but reads " + JSON.stringify(r.cells[1]));
+      }
+      return { label: r.label, words: r.cells[0], value: v, up: v > 0 };
     });
     var worked = periods.filter(function (p) { return p.up; });
-    if (!worked.length) throw new Error("spread-direction: no period pointed the right way");
+    if (!worked.length) throw new Error("quartile-spread: no period has the top quartile ahead");
     var one = worked.length === 1;
-    var views = ["Every period tested", one ? "Only the period that worked" : "Only the periods that worked"];
+    var widest = Math.max.apply(null, periods.map(function (p) { return Math.abs(p.value); }));
+    var views = ["Every period tested", one ? "Only the period it led in" : "Only the periods it led in"];
     var flattering = false;
 
     var bar = make("div", "exhibit__controls", stage);
@@ -1351,8 +1357,8 @@
       update();
     });
 
-    /* The chart itself: a heading, a zero line, and one column per period with an arrow of one
-       length above or below it, its direction in words and the period it was measured over. The
+    /* The chart itself: a heading, a zero line, and one column per period with a bar above or below
+       it as long as its spread, the spread in figures and the period it was measured over. The
        heading is the table's own name for the measure. */
     var frame = make("div", "exhibit__frame", stage);
     var chart = make("div", "spread", frame);
@@ -1362,14 +1368,12 @@
       var li = make("li", "spread__period" + (p.up ? " is-up" : " is-down"), plot);
       var mark = make("span", "spread__mark", li);
       mark.setAttribute("aria-hidden", "true");
-      mark.innerHTML = '<svg viewBox="0 0 24 96" focusable="false">' +
-        (p.up ? '<path d="M12 48 V10 M4 20 L12 8 L20 20"/>' : '<path d="M12 48 V86 M4 76 L12 88 L20 76"/>') +
-        "</svg>";
-      make("span", "spread__direction", li, p.words);
+      make("span", "spread__bar", mark).style.height = Math.abs(p.value) / widest * 50 + "%";
+      make("span", "spread__value", li, p.words);
       make("span", "spread__label", li, p.label);
       return li;
     });
-    make("p", "spread__scale", chart, "Every arrow is one length, because this chart shows direction only and has no scale.");
+    make("p", "spread__scale", chart, "Every bar is drawn to one scale, so its length is its spread.");
 
     var readout = make("div", "exhibit__readout", stage);
     readout.setAttribute("aria-live", "polite");
@@ -1383,19 +1387,20 @@
 
     /* The two charts differ in which periods they show; everything else follows from that. */
     function update() {
-      var shown = flattering ? worked : periods, wrong = periods.length - worked.length;
+      var shown = flattering ? worked : periods, behind = periods.length - worked.length;
       shownBy.press(flattering ? 1 : 0);
       columns.forEach(function (li, i) { li.hidden = shown.indexOf(periods[i]) < 0; });
-      heading.textContent = data.columns[1] + ": " +
-        (flattering ? worked.map(function (p) { return p.label; }).join("; ") : "every period tested");
+      heading.textContent = data.columns[1] + ", " +
+        (flattering ? worked.map(function (p) { return p.label; }).join(" and ") : "every period tested");
       tally.textContent = worked.length + " of " + shown.length;
-      phrase.nodeValue = " " + periodsWord(shown.length) + " shown pointed the right way";
+      phrase.nodeValue = " " + periodsWord(shown.length) + " shown had the top quartile ahead";
       note.textContent = flattering
-        ? (wrong === 1 ? "The period it pointed the wrong way in is left out"
-                       : "The " + wrong + " periods it pointed the wrong way in are left out") +
-          ", and nothing on this chart says so."
-        : wrong + " of " + periods.length + " pointed the wrong way, so the " + periodsWord(worked.length) +
-          " that worked " + (one ? "reads" : "read") + " as a window rather than a signal.";
+        ? "The " + (behind === 1 ? "period" : behind + " periods") + " the top quartile trailed in " +
+          (behind === 1 ? "is" : "are") + " left out, and nothing on this chart says so. The paper reports all " +
+          periods.length + "."
+        : "The top quartile trailed in the other " + (behind === 1 ? "period" : behind + " periods") +
+          ". The paper reads that as the lag and not a failure: the companies that put AI to work " +
+          "early had been rewarded before its documents begin, so they scored low while their stock did well.";
     }
 
     update();
@@ -1637,56 +1642,58 @@
     update();
   });
 
-  /* ---- KIND: mentions-deployment ----------------------------------------------------------------
-     Two ways of scoring the same passages. The table's columns, in order: the passage, its text, how
-     many times that text mentions the term (the column's header names it), and then one column per
-     sign of deployment, each Yes or No. The frequency score
-     is the mentions; the deployment score is the signs a passage carries. The one slider writes
-     more mentions into every passage: the frequency scores climb with it, and the deployment
-     scores cannot move, because nothing the slider writes is a sign of deployment.
+  /* ---- KIND: mentions-rubric -------------------------------------------------------------------
+     A simplified version of how the Competition's pipeline scored a sentence. The table's columns,
+     in order: the sentence, its text, how many times that text mentions the term (the column's
+     header names it), what the AI it describes is for (Its own operations, or A product it sells),
+     whether it gives a dollar or percentage result (Yes or No), and its score on the paper's 0 to 6
+     rubric. The one slider writes more mentions into every sentence: the mention counts climb with
+     it, and no score can move, because nothing the slider writes is evidence of deployment.
 
      A table the drawing cannot show is refused (the stage stays empty and the table stands alone):
-     a mention count that is not the number of times its own text says AI, since the count is read
-     off the text and a figure that disagrees with it is a second copy of the data, or a sign cell
-     that is not Yes or No. */
-  register("mentions-deployment", function (fig, stage, data) {
-    /* The term counted, written once: the passages' text is split on it, and a count is its matches. */
-    var WORD = "AI", TERM = new RegExp("\\b(" + WORD + ")\\b"), MOST = 10;
-    var signs = data.columns.slice(3);
-    if (!data.rows.length || !signs.length) throw new Error("mentions-deployment: the table has no passages or no signs");
-    var passages = data.rows.map(function (r) {
+     a mention count that is not the number of times its own text says AI, or a Yes or No for a
+     figure that its own text does not bear out, since both are read off the text and a cell that
+     disagrees with it is a second copy of the data. So is a use that is not one of the two, or a
+     score that is not a whole number from 0 to 6. */
+  register("mentions-rubric", function (fig, stage, data) {
+    /* The term counted, written once: the text is split on it, and a count is its matches. */
+    var WORD = "AI", TERM = new RegExp("\\b(" + WORD + ")\\b"), MOST = 10, TOP = 6;
+    var OWN = "its own operations", SOLD = "a product it sells";
+    var FIGURE = /\$\s?\d|\d\s?%|\d percent\b/;
+    if (!data.rows.length || data.columns.length < 6) throw new Error("mentions-rubric: the table has no sentences or too few columns");
+    var sentences = data.rows.map(function (r) {
       var said = (r.cells[0].split(TERM).length - 1) / 2;
       if (r.values[1] !== said) {
-        throw new Error("mentions-deployment: " + r.label + " is counted " + JSON.stringify(r.cells[1]) +
+        throw new Error("mentions-rubric: " + r.label + " is counted " + JSON.stringify(r.cells[1]) +
                         " but its text mentions AI " + said + " times");
       }
-      var carries = r.cells.slice(2).map(function (c, i) {
-        var w = c.toLowerCase();
-        if (w !== "yes" && w !== "no") {
-          throw new Error("mentions-deployment: " + r.label + " reads " + JSON.stringify(c) + " for " + signs[i]);
-        }
-        return w === "yes";
-      });
-      return {
-        label: r.label, text: r.cells[0], mentions: said,
-        signs: signs.filter(function (s, i) { return carries[i]; })
-      };
+      var use = r.cells[2].toLowerCase(), figure = r.cells[3].toLowerCase(), score = r.values[4];
+      if (use !== OWN && use !== SOLD) throw new Error("mentions-rubric: " + r.label + " reads " + JSON.stringify(r.cells[2]) + " for its use");
+      if ((figure !== "yes" && figure !== "no") || (figure === "yes") !== FIGURE.test(r.cells[0])) {
+        throw new Error("mentions-rubric: " + r.label + " reads " + JSON.stringify(r.cells[3]) + " for a figure its text does not bear out");
+      }
+      if (score === null || score < 0 || score > TOP || score % 1) {
+        throw new Error("mentions-rubric: " + r.label + " is scored " + JSON.stringify(r.cells[4]));
+      }
+      return { label: r.label, text: r.cells[0], mentions: said, use: r.cells[2], sold: use === SOLD,
+               figure: figure === "yes", score: score };
     });
-    var widest = Math.max.apply(null, passages.map(function (p) { return p.mentions; })) + MOST;
+    var widest = Math.max.apply(null, sentences.map(function (p) { return p.mentions; })) + MOST;
     var added = 0;
 
     var bar = make("div", "exhibit__controls", stage);
     slider(bar, {
       visibleLabel: data.columns[2] + " added",
-      min: 0, max: MOST, step: 1, value: 0, label: data.columns[2] + " added to every passage",
-      valueText: function (v) { return v + (v === 1 ? " mention" : " mentions") + " added to every passage"; },
+      min: 0, max: MOST, step: 1, value: 0, label: data.columns[2] + " added to every sentence",
+      valueText: function (v) { return v + (v === 1 ? " mention" : " mentions") + " added to every sentence"; },
       onChange: function (v) { added = v; update(); }
     });
 
-    /* One card per passage: its text with every mention marked and the added ones after it, then
-       the two scores as bars on their own scales, each with its figure in words beside it. */
+    /* One card per sentence: its text with every mention marked and the added ones after it, what
+       it was read as, then its mentions and its score as bars on their own scales, each with its
+       figure in words beside it. */
     var list = make("ol", "mentions", stage);
-    var cards = passages.map(function (p) {
+    var cards = sentences.map(function (p) {
       var li = make("li", "mentions__passage", list);
       make("p", "mentions__label", li, p.label);
       var quote = make("p", "mentions__text", li);
@@ -1695,9 +1702,11 @@
         else if (part) quote.appendChild(document.createTextNode(part));
       });
       /* The added mentions are shown, not read out: a run of the same word tells a screen reader
-         nothing the slider's value text and the frequency figure do not. */
+         nothing the slider's value text and the mention count do not. */
       var extra = make("span", "", quote);
       extra.setAttribute("aria-hidden", "true");
+      make("p", "mentions__signs", li, "AI for " + p.use.charAt(0).toLowerCase() + p.use.slice(1) + " · " +
+        (p.figure ? "Gives a dollar or percentage result" : "No dollar or percentage result"));
       function score(name, cls) {
         var row = make("div", "mentions__score " + cls, li);
         make("span", "mentions__name", row, name);
@@ -1707,11 +1716,10 @@
         var value = make("span", "mentions__value", row);
         return { fill: fill, value: value };
       }
-      var freq = score("Frequency", "is-frequency");
-      var dep = score("Deployment", "is-deployment");
-      dep.fill.style.width = p.signs.length / signs.length * 100 + "%";
-      dep.value.textContent = p.signs.length + " of " + signs.length + " signs";
-      make("p", "mentions__signs", li, p.signs.length ? p.signs.join(" · ") : "No sign of deployment");
+      var freq = score("Mentions", "is-frequency");
+      var rubric = score("Score", "is-score");
+      rubric.fill.style.width = p.score / TOP * 100 + "%";
+      rubric.value.textContent = p.score + " of " + TOP;
       return { extra: extra, freq: freq };
     });
 
@@ -1724,22 +1732,21 @@
       p.appendChild(document.createTextNode(words));
       return b;
     }
-    var mentioned = line(" mentions of " + WORD + " across the passages, which is what frequency scores count");
-    var shown = line(" signs of deployment across them, which is what deployment scores count");
+    var mentioned = line(" mentions of " + WORD + " across the sentences");
+    var scored = line(" rubric points across them, out of " + TOP * sentences.length);
     var note = make("p", "exhibit__note", readout);
 
-    function sum(f) { return passages.reduce(function (t, p) { return t + f(p); }, 0); }
+    function sum(f) { return sentences.reduce(function (t, p) { return t + f(p); }, 0); }
     function leader(f) {
-      return passages.reduce(function (best, p) { return f(p) > f(best) ? p : best; });
+      return sentences.reduce(function (best, p) { return f(p) > f(best) ? p : best; });
     }
-    var byDeployment = leader(function (p) { return p.signs.length; });
-    var byFrequency = leader(function (p) { return p.mentions; });
-    var lastByFrequency = leader(function (p) { return -p.mentions; });
-    shown.textContent = sum(function (p) { return p.signs.length; });
+    var byScore = leader(function (p) { return p.score; });
+    var byMentions = leader(function (p) { return p.mentions; });
+    scored.textContent = sum(function (p) { return p.score; });
 
     function update() {
       cards.forEach(function (c, i) {
-        var n = passages[i].mentions + added;
+        var n = sentences[i].mentions + added;
         c.extra.textContent = "";
         for (var k = 0; k < added; k++) {
           c.extra.appendChild(document.createTextNode(" "));
@@ -1748,11 +1755,13 @@
         c.freq.fill.style.width = n / widest * 100 + "%";
         c.freq.value.textContent = n + (n === 1 ? " mention" : " mentions");
       });
-      mentioned.textContent = sum(function (p) { return p.mentions; }) + added * passages.length;
+      mentioned.textContent = sum(function (p) { return p.mentions; }) + added * sentences.length;
       note.textContent = (added
-        ? "Every frequency score rose by " + added + ", and no deployment score moved. "
-        : "") + "A frequency score ranks " + byFrequency.label + " first and " + lastByFrequency.label +
-        " last however many mentions are added, while " + byDeployment.label + " carries the most signs of deployment.";
+        ? "Every sentence now says AI " + added + " more " + (added === 1 ? "time" : "times") + ", and no score moved. "
+        : "") + byMentions.label + " says AI most and scores " + byMentions.score +
+        (byMentions.sold ? ", because it describes AI the company sells rather than AI it uses. " : ". ") +
+        byScore.label + " scores highest, because it puts " +
+        (byScore.figure ? "a figure on what AI saved the company." : "AI to work inside the company.");
     }
 
     update();

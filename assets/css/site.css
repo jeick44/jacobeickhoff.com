@@ -2632,10 +2632,10 @@ button.prep__cell:focus-visible {
   color: var(--ink-soft);
 }
 
-/* SPREAD DIRECTION - a result reported by direction only. One column per period, each arrow one
-   length above or below a zero line, so the drawing cannot say more than the words beside it. The
-   status colours are the right place for it: pointed the right way or the wrong way is a pass or a
-   fail, and each arrow is paired with its direction in words. */
+/* QUARTILE SPREAD - a result reported with its size. One column per period, each bar drawn above or
+   below a zero line to a length set by its spread, all on one scale. The status colours are the
+   right place for it: the top quartile ahead or behind is a pass or a fail, and each bar is paired
+   with its figure in words. */
 .spread {
   padding: var(--space-sm);
   border: 1px solid var(--line);
@@ -2671,47 +2671,50 @@ button.prep__cell:focus-visible {
 }
 
 /* The zero line is drawn per column and runs edge to edge, so the columns share one unbroken axis;
-   the words beneath carry the gutter instead. */
+   the words beneath carry the gutter instead. The bar grows from the line, up or down. */
 .spread__mark {
+  position: relative;
   display: block;
   width: 100%;
-  height: 6rem;
+  height: 8rem;
   background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat;
 }
 
-.spread__mark svg {
-  display: block;
-  width: 1.5rem;
-  height: 100%;
-  margin: 0 auto;
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.spread__bar {
+  position: absolute;
+  left: 50%;
+  width: 2rem;
+  max-width: 60%;
+  transform: translateX(-50%);
 }
 
-.is-up .spread__mark svg {
-  stroke: var(--good);
+.is-up .spread__bar {
+  bottom: 50%;
+  border-radius: 2px 2px 0 0;
+  background: var(--good);
 }
 
-.is-down .spread__mark svg {
-  stroke: var(--bad);
+.is-down .spread__bar {
+  top: 50%;
+  border-radius: 0 0 2px 2px;
+  background: var(--bad);
 }
 
-.spread__direction {
+.spread__value {
   font-size: var(--text-sm);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
-.is-up .spread__direction {
+.is-up .spread__value {
   color: var(--good);
 }
 
-.is-down .spread__direction {
+.is-down .spread__value {
   color: var(--bad);
 }
 
-.spread__direction,
+.spread__value,
 .spread__label {
   padding-inline: var(--space-3xs);
 }
@@ -2729,9 +2732,9 @@ button.prep__cell:focus-visible {
   color: var(--ink-mute);
 }
 
-/* MENTIONS AGAINST DEPLOYMENT - the same passages scored two ways. One card per passage, its text
-   with every mention of AI marked, then a bar per score on its own scale with the figure in words
-   beside it. The cards reflow into one column, so nothing here needs a frame of its own. */
+/* MENTIONS AGAINST THE RUBRIC - the same sentences counted and scored. One card per sentence, its
+   text with every mention of AI marked, then a bar for its mentions and one for its score, each on
+   its own scale with the figure in words beside it. The cards reflow into one column, so nothing here needs a frame of its own. */
 .mentions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
@@ -2807,7 +2810,7 @@ button.prep__cell:focus-visible {
   background: var(--data-2);
 }
 
-.is-deployment .mentions__fill {
+.is-score .mentions__fill {
   background: var(--data-1);
 }
 

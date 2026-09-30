@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Competition — Engagement 03 — Jacob Eickhoff</title>
-<meta name="description" content="A four-person hedge fund case competition entry scoring operational AI adoption across the S&amp;P 500 from filings and earnings transcripts, reported with all three measured periods — the one the signal worked in and the two it inverted in.">
+<meta name="description" content="A four-person hedge fund case competition entry that scored how far each S&amp;P 500 company had put AI to work in its own operations, read from 5,548 earnings calls and filings, with the score reported over all three years it was tested on.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -49,23 +49,22 @@
         <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
         <span class="crumb__here">Engagement 03</span>
       </nav>
-      <h1 class="case-head__title">A signal tested over three periods instead of <em>the one that
-        flattered it</em></h1>
+      <h1 class="case-head__title">Reading which companies <em>use</em> AI, not which ones
+        talk about it</h1>
       <p class="case-head__lede">The Competition: four of us built a score for how far each S&amp;P 500
-        company had put AI into its operations, sorted the index on it, and submitted a paper. On our own numbers the top quartile beat the bottom over the eight weeks
-        to late February 2026, but over the same weeks of the two years before, the same signal pointed
-        the wrong way.</p>
+        company had put AI to work inside its own business, read from its earnings calls and filings.
+        Built only from documents through the end of 2025, it ranked the index, and over the first
+        eight weeks of 2026 the top quartile beat the bottom by 11.4%.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>Four-person team &middot; hedge fund case competition</dd></div>
         <div><dt>Status</dt><dd>Paper submitted</dd></div>
-        <div><dt>Governing constraint</dt><dd>Self-Computed: direction shown, magnitudes withheld</dd></div>
+        <div><dt>Governing constraint</dt><dd>Self-Computed: the team&rsquo;s own figures, not checked by an outside party</dd></div>
         <div><dt>Reading time</dt><dd>9 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Self-Computed</span> Every
-        performance figure from this Engagement was computed by the team from terminal data. Nobody
-        outside the team checked it, and no independent party reviewed it. That is why What Changed
-        reports the direction of all three periods and withholds their magnitudes until they are
-        re-derived, rather than restating them from the paper.</p>
+        performance figure on this page was computed by the team from Bloomberg data and is taken
+        from the submitted paper. Nobody outside the team checked it, and no independent party
+        reviewed it.</p>
     </div>
   </section>
 
@@ -75,27 +74,27 @@
       <ul class="stats__list">
         <li class="stat reveal">
           <p class="stat__figure">
-            <span class="stat__value" data-stat-final="1">1</span>
-            <span class="stat__unit">paper submitted</span>
+            <span class="stat__value" data-stat-final="487">487</span>
+            <span class="stat__unit">companies scored</span>
           </p>
-          <span class="stat__label">One formal submission, co-written by a team of four, on
-            operational AI adoption across the index.</span>
+          <span class="stat__label">Every S&amp;P 500 company the pipeline had documents for, each
+            given one score between 0 and 1.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="5,548">5,548</span>
+            <span class="stat__unit">documents read</span>
+          </p>
+          <span class="stat__label">3,800 earnings calls and 1,748 SEC filings, read sentence by
+            sentence.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
             <span class="stat__value" data-stat-final="3">3</span>
-            <span class="stat__unit">measured periods</span>
+            <span class="stat__unit">years tested</span>
           </p>
-          <span class="stat__label">Windows the signal was tested over, and it pointed the right way
-            in one of them.</span>
-        </li>
-        <li class="stat reveal">
-          <p class="stat__figure">
-            <span class="stat__value" data-stat-final="2">2</span>
-            <span class="stat__unit">corpora read</span>
-          </p>
-          <span class="stat__label">Public filings and earnings transcripts, machine-read into one
-            adoption score per company.</span>
+          <span class="stat__label">2024, 2025 and the start of 2026, all three reported in the
+            paper, including the two in which the score lost.</span>
         </li>
       </ul>
     </div>
@@ -139,62 +138,74 @@
                   revenue is the adoption. For an operator the same adoption arrives as cost that has stopped
                   being incurred, which surfaces later and through a noisier channel.</p>
                 <p>The paper&rsquo;s argument is that the lag is where a public-market reader can still
-                  act, because by the time an operator&rsquo;s advantage is legible in its margin it is legible
-                  to everybody, and the disclosure documents move first. Whether that argument survives
-                  is a separate question from whether it was worth testing, and What Changed is about
-                  which of the two this turned out to be.</p>
+                  act, because by the time an operator&rsquo;s advantage shows in its margin it shows to
+                  everybody, and the earnings calls and filings move first. What Changed shows how that
+                  argument held up in the numbers.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>The team built a document-processing pipeline: pull the filings and the earnings-call
-              transcripts for the index, split them into passages, score each company on the language of
-              deployment rather than on the frequency of the word, roll the passages up to one score per
-              company, cut the index into quartiles on it, and measure the top-quartile-minus-bottom
-              spread forward against an equal-weight benchmark.</p>
-            <figure class="exhibit" id="exhibit-mentions-vs-deployment" data-exhibit="mentions-deployment"
+            <p>The team built a pipeline that reads every earnings call since 2024 and every SEC filing
+              since 2023 for 487 S&amp;P 500 companies. It pulls out each sentence that ties AI to a
+              financial result, such as a cost saved, a margin improved or work done with fewer people,
+              and sorts it into one of 12 operational categories. Claude Opus then scores each of those
+              sentences from 0 to 6, where 0 is buzzwords and 6 is a CFO citing dollar figures across
+              several deployments.</p>
+            <p>Those sentence scores are joined with Bloomberg figures on margin, SG&amp;A and operating
+              leverage, and a set of four machine learning models turns the lot into one score between 0
+              and 1 for each company. The models learned from the AI winners and losers that Goldman
+              Sachs and UBS had each published from their own research, so the labels came from outside
+              the team rather than from our own guesses.</p>
+            <figure class="exhibit" id="exhibit-mentions-vs-evidence" data-exhibit="mentions-rubric"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Mentioning AI
-                  more raises a frequency score and leaves the deployment score where it was</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Saying AI more
+                  often does not move a sentence&rsquo;s score, and putting a number on the
+                  company&rsquo;s own savings does</h3>
                 <p class="exhibit__instruction">Move the slider to write more mentions of AI into every
-                  passage.</p>
+                  sentence.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
               <details class="exhibit__data">
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>Four synthetic passages, each scored two ways: how often it mentions AI,
-                      and which of the four signs of deployment it carries</caption>
+                    <caption>Four synthetic sentences, each with how often it mentions AI, whether the AI
+                      it describes runs the company&rsquo;s own operations or is a product it sells,
+                      whether it gives a dollar or percentage result, and its score on the paper&rsquo;s
+                      rubric, from 0 for buzzwords to 6 for a CFO citing dollar figures across several
+                      deployments</caption>
                     <thead>
-                      <tr><th scope="col">Passage</th><th scope="col">Text</th><th scope="col">Mentions of AI</th><th scope="col">Named internal system</th><th scope="col">Capital expenditure attached</th><th scope="col">Process change described</th><th scope="col">Headcount discussed</th></tr>
+                      <tr><th scope="col">Sentence</th><th scope="col">Text</th><th scope="col">Mentions of AI</th><th scope="col">What the AI is for</th><th scope="col">Dollar or percentage result</th><th scope="col">Rubric score, 0 to 6</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Passage A</th><td>AI is at the center of everything we do. We are an AI-first business, and AI will define the next decade for our customers.</td><td>3</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
-                      <tr><th scope="row">Passage B</th><td>Our in-house claims router now makes the first review of every claim. Its build was capitalised this year, and the review staff now handle exceptions only.</td><td>0</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
-                      <tr><th scope="row">Passage C</th><td>We are exploring AI across the business and expect AI to become a meaningful driver of efficiency over time.</td><td>2</td><td>No</td><td>No</td><td>No</td><td>No</td></tr>
-                      <tr><th scope="row">Passage D</th><td>The demand forecaster we built with AI tooling replaced the weekly manual reorder, and its capital cost is broken out below.</td><td>1</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+                      <tr><th scope="row">Sentence A</th><td>Our AI platform brings AI to every enterprise client, and AI will define the next decade of their business.</td><td>3</td><td>A product it sells</td><td>No</td><td>0</td></tr>
+                      <tr><th scope="row">Sentence B</th><td>We are exploring AI across our operations and expect it to make us more efficient over time.</td><td>1</td><td>Its own operations</td><td>No</td><td>1</td></tr>
+                      <tr><th scope="row">Sentence C</th><td>The AI claims tool we built now makes the first review of every claim, so our review staff handle only the exceptions.</td><td>1</td><td>Its own operations</td><td>No</td><td>3</td></tr>
+                      <tr><th scope="row">Sentence D</th><td>Our three AI deployments, in routing, billing and claims, cut our cost per order by $3 this year, or 6%.</td><td>1</td><td>Its own operations</td><td>Yes</td><td>6</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> synthetic, four passages written for
-                this Exhibit in the manner of a filing or an earnings call. They quote no real document
-                and name no company. The four signs of deployment are the ones this page names, and each
-                counts once here. The pipeline and its scoring are the team&rsquo;s work and are not
-                reproduced.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> synthetic, four sentences written for
+                this Exhibit in the manner of an earnings call. They quote no real document and name no
+                company. This is a simplification of the team&rsquo;s pipeline, not the pipeline. The
+                scores were set by hand against the paper&rsquo;s rubric, where the pipeline had Claude
+                Opus score each sentence, and the models that turned sentence scores into a company&rsquo;s
+                score are left out. In the paper, a company whose AI sentences are more than 70% about
+                products it sells has its score capped at 0.35 out of 1.</figcaption>
             </figure>
-            <p>My own part, stated plainly: I contributed to the pipeline, read every prior year&rsquo;s
-              winning entry to work out what the judges actually rewarded, and co-wrote the final
-              submission.</p>
-            <p>The other three owned the financial modeling, the index construction, and the
-              presentation the paper was defended with. They are credited by what they owned rather than
-              by name, for the same reason the Sponsor of Engagements 01 and 02 is not named, since none
-              of them has approved a public write-up of their work and putting a co-author&rsquo;s name on
-              my portfolio is their decision to make, not mine.</p>
+            <p>My part: I owned the model, from how each sentence was scored through to the ensemble that
+              produced the final number. Nobody on the team stayed inside one section, though. We broke
+              every part of the paper into pieces and passed them around, so I also worked on the
+              financial modeling, the index construction and the presentation, and every piece, the model
+              included, was read by someone who had not written it.</p>
+            <p>Before any of that, I read every prior year&rsquo;s winning entry to work out what the
+              judges actually rewarded, and I co-wrote the final submission. My three teammates are not
+              named here, because none of them has approved a public write-up of their work, and putting
+              their names on my portfolio is their decision to make, not mine.</p>
             <figure class="exhibit" id="exhibit-what-the-judges-rewarded" data-exhibit="judges-rewarded"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -254,127 +265,130 @@
               </div>
             </details>
             <details class="disclosure">
-              <summary class="disclosure__summary">Counting mentions is not measuring adoption, and
-                this is the part I would attack first</summary>
+              <summary class="disclosure__summary">The four things the score measures, and the one
+                thing it caps</summary>
               <div class="disclosure__body">
-                <p>A filing that says &ldquo;AI&rdquo; forty times is a filing with a communications
-                  strategy, so the score treats bare frequency as noise and keys instead on the
-                  language of something actually running: named internal systems, capital expenditure
-                  attached to them, described changes to a process, and headcount discussed in relation
-                  to them.</p>
-                <p>The weakness sits in the same place as the idea, because the label is inferred from
-                  what a company chose to write down and is never checked against what it runs. A firm
-                  with a
-                  disciplined investor-relations team and no deployment scores like an operator, and a
-                  firm that deploys quietly does not score at all. We said so in the paper, and it is
-                  still the first thing I would go after.</p>
+                <p>First, whether a company&rsquo;s AI language is about its own operations or about AI
+                  it sells. &ldquo;AI cut our cost per package 8%&rdquo; is a company using AI, and
+                  &ldquo;our AI platform serves enterprise clients&rdquo; is a company selling it. Any
+                  company whose AI language is more than 70% the selling kind is capped at 0.35, which
+                  keeps chipmakers and cloud providers, whose prices already reflect the enthusiasm, out
+                  of the top of the ranking.</p>
+                <p>Second, how often the company puts a number on the result. Sentences with a dollar or
+                  percentage outcome count for more than general claims of efficiency. Third, the gap
+                  between what management says in its prepared remarks and how hard analysts press on it
+                  in the Q&amp;A, since claims that analysts ignore are more likely to be promotion.
+                  Fourth, whether the company&rsquo;s talk about AI is speeding up quarter over quarter,
+                  which picks out companies early in deployment before the savings reach the
+                  margin.</p>
+                <p>The paper names its own limits. Banks, insurers and REITs are scored on their
+                  documents alone, because the usual margin measures do not fit how they make money. The
+                  models learned from only 34 labeled companies, so the paper leans on forward returns as
+                  its main evidence rather than on how well the models fit those 34.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>Measured, and mine to state: one paper submitted, and the signal tested over three
-              periods instead of the one that flattered it.</p>
-            <p>The result, by direction, is that out of sample, over roughly eight weeks ending in late
-              February 2026, the top quartile beat the bottom quartile against an equal-weight benchmark,
-              and the team computed that spread itself from terminal data. Run over the equivalent stretch of
-              each of the two preceding years, the same signal produced a negative spread both
-              times.</p>
-            <figure class="exhibit" id="exhibit-flattering-window" data-exhibit="spread-direction"
+            <p>Measured, and ours to state: the model was built only from documents through the end of
+              2025, so every 2026 return is one it never saw. Across the 487 companies, the top quartile
+              by score returned 9.9% from the start of January to February 27, 2026, while the bottom
+              quartile lost 1.5%, a spread of 11.4%. The equal-weight S&amp;P 500 returned 3.5% over the
+              same weeks. The pattern held across the whole range of scores and not only at the ends,
+              with a correlation of +0.296 between a company&rsquo;s score and its 2026 return.</p>
+            <p>Run against earlier years, the same score pointed the other way. The top quartile trailed
+              the bottom by 18.4% in 2024 and by 11.9% in 2025, and the paper reports both years in
+              full.</p>
+            <figure class="exhibit" id="exhibit-spread-by-period" data-exhibit="quartile-spread"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The signal
-                  pointed the wrong way in two of the three periods it was tested over</h3>
-                <p class="exhibit__instruction">Switch to the one-period chart a less careful paper
-                  would have published.</p>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The same score
+                  lost in 2024 and 2025 and won in 2026, which is the lag the paper describes</h3>
+                <p class="exhibit__instruction">Switch to the chart a paper showing only 2026 would have
+                  published.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
               <details class="exhibit__data">
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>Direction of the top-minus-bottom quartile spread against an equal-weight
-                      benchmark, by period, oldest first</caption>
+                    <caption>The top-minus-bottom quartile spread by period, oldest first: the return of
+                      the quarter of companies the score ranked highest, minus the return of the quarter
+                      it ranked lowest</caption>
                     <thead>
-                      <tr><th scope="col">Period</th><th scope="col">Direction of the top-minus-bottom quartile spread</th></tr>
+                      <tr><th scope="col">Period</th><th scope="col">Top-minus-bottom quartile spread</th><th scope="col">Direction</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Same stretch, two years earlier</th><td>Negative</td></tr>
-                      <tr><th scope="row">Same stretch, one year earlier</th><td>Negative</td></tr>
-                      <tr><th scope="row">Eight weeks to late Feb 2026, out of sample</th><td>Positive</td></tr>
+                      <tr><th scope="row">2024, full year</th><td>&minus;18.4%</td><td>Top quartile behind</td></tr>
+                      <tr><th scope="row">2025, full year</th><td>&minus;11.9%</td><td>Top quartile behind</td></tr>
+                      <tr><th scope="row">Jan 2 to Feb 27, 2026, out of sample</th><td>+11.4%</td><td>Top quartile ahead</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> published, the three directions this
-                page reports, Self-Computed by the team from terminal data and carried in the submitted
-                paper. Every arrow is one length because the magnitudes and their standard errors are
-                withheld until re-derived from the source, and no price series and no terminal capture is
-                published.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> published, the three spreads the team
+                reported in its submitted paper. They are Self-Computed, meaning the team calculated them
+                from Bloomberg data and no outside party has checked them. No price series is published
+                here.</figcaption>
             </figure>
-            <p class="withheld-result">
-              <span class="withheld-result__flag">Withheld</span>
-              The magnitudes of the three spreads and their standard errors were measured and are in the
-              submitted paper, but they are not reproduced here. I will not restate a
-              performance figure from memory on a page with my name on it, and I have not yet re-derived
-              these from the source. That is a different thing from a Pending Result, which is an outcome
-              nobody has measured yet, whereas this one is measured and withheld until I have checked it. The
-              paragraph gets replaced by the three figures at that point.
-            </p>
-            <p>Two of the three periods went against us, and that is the finding rather than a footnote
-              on it. An eight-week window that works, sitting on top of two years that do not, is far
-              more likely to be an eight-week window than a signal. A reader shown only the
-              window that worked has been handed the one period out of three in which the thesis is
-              true. All three went into the paper and all three are here.</p>
-            <p>For anyone reading Engagement 04 next, this scoring work and the pipeline I later withdrew
-              in The Research are independent pieces of work, on the evidence of the two things I can
-              actually check. They measure different constructs over different corpora, operational adoption here
-              and machine authorship there, and this paper was written months before
-              that pipeline existed. I have not sat down and diffed the two, so that is the basis for the
-              claim rather than more than it is. What it supports is that the withdrawal there does not
-              reach back into the result here.</p>
+            <p>Those two years are the mechanism the paper is built on, not a failure it has to explain
+              away. The companies that put AI to work in 2022 and 2023 had already been rewarded by the
+              market before our documents begin, and they said little about AI in 2024 and 2025 because
+              that work was finished, so they scored low while their stock did well. By 2026 a new group
+              was in the middle of deploying, describing AI in its operations in specific terms with the
+              savings not yet in its earnings, and that is the group the score ranks highest.</p>
+            <p>The financials point the same way. A company&rsquo;s score has almost no relationship with
+              its change in operating margin over 2024 and 2025 (r = &minus;0.070 across 350 non-financial
+              companies), which is what the paper expects, because firms deploying AI are paying for it
+              now and have not yet banked the savings. The market is paying for them anyway, and that gap
+              is what the strategy trades.</p>
+            <p>Two further checks back this up. On the 453 companies the models never saw a label for,
+              the Buy tier returned 9.2% against 6.6% for the rest, so the score is picking out the pattern
+              across the index rather than memorising the 34 it learned from. And the Goldman Sachs
+              winners against the UBS losers went from &minus;50.4% in 2024 to +13.9% in 2025 to +32.6% in
+              early 2026, the same arc as the score. The paper is plain that eight weeks is a short live
+              window, and a full year of 2026 returns is the real test.</p>
+            <p>For anyone reading Engagement 04 next, this model and the pipeline I later withdrew in The
+              Research are separate pieces of work. They measure different things in different
+              documents, operational adoption here and machine authorship there, and this paper was
+              written months before that pipeline existed. I have not compared the two line by line, so
+              that is the whole basis for the claim, but it is enough to say the withdrawal there does
+              not reach back into the result here.</p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>That one good window is a window, and that the argument I had to make on my own team was
-              for publishing the two that were not.</p>
+            <p>That a result which looks like a failure can turn out to be the evidence, once you ask
+              why it happened.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">The case against reporting the inversion, and why it
-                lost</summary>
+              <summary class="disclosure__summary">Why the losing years went into the paper</summary>
               <div class="disclosure__body">
-                <p>The case against was real and not lazy: a competition rewards a clean result, the
-                  prior periods were out of sample in a direction nobody had asked about, and volunteering
-                  them invites a judge to spend his limited attention on our weakest exhibit.</p>
-                <p>What beat it was that a judge who finds the inverted periods himself has found something,
-                  and a judge who is handed them is reading a paper that already knows where it is weak.
-                  The second is the better paper even when it scores worse. The inversion is also
-                  information, because a signal that works only in the most recent window is a signal
-                  fitted to that window, whether or not anybody fitted it on purpose, and three
-                  eight-week stretches cannot tell those two apart.</p>
+                <p>Leaving 2024 and 2025 out would have made a cleaner paper. But a judge who found the
+                  losing years on their own would have found a hole, while a judge handed them along with
+                  the reason is reading a paper that already knows where it is weak.</p>
+                <p>Working out why those years lost is what gave the paper its argument, which is the
+                  lag between a company putting AI to work and the savings showing up in its numbers.
+                  Without the losing years there would have been nothing to explain, and the 2026 result
+                  would have been one good window with no reason behind it.</p>
               </div>
             </details>
-            <p>The second thing is smaller and I keep relearning it, which is that attribution on a team has to be
-              written down while the work is happening. Six months later, working out who owned which
-              part of a pipeline is reconstruction, and reconstruction flatters whoever is doing it. The
-              single sentence about my own contribution in What I Did is narrower than what I could have
-              claimed, because narrow and checkable is the only version worth anything in an
-              interview.</p>
+            <p>The second thing is about how a team checks its own work. Because every piece was passed
+              around, nobody was the last reader of their own section. That mattered most for the model,
+              since I owned it and was the person least able to see its gaps.</p>
           </section>
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
-            <p><strong>Reporting the periods that went against you.</strong> Any performance claim,
-              whether for a strategy, a pricing change, a marketing channel or a process redesign, is
-              measured over some window, and the window is usually chosen after the result is known.
-              Stating the periods that failed alongside the one that worked is the only version a reader
-              can price.</p>
-            <p><strong>Measuring the behavior rather than the disclosure.</strong> Reading an
-              organization from its own documents is the same problem in sustainability reporting, in
-              risk, and in any diligence read of a target, because the document says what somebody chose to
-              write, and the gap between that and what it does is where the wrong conclusions come
-              from.</p>
+            <p><strong>Reporting the periods that went against you, and explaining them.</strong> Any
+              performance claim, whether for a strategy, a pricing change, a marketing channel or a
+              process redesign, is measured over some window, and the window is usually chosen after the
+              result is known. Showing the periods that failed next to the one that worked, with the
+              reason they failed, is the version a reader can trust.</p>
+            <p><strong>Telling what a company does from what it says.</strong> Reading an organization
+              from its own documents is the same problem in sustainability reporting, in risk, and in any
+              diligence read of a target. The useful signal is the specific, numbered claim about its own
+              operations, and the noise is the general statement written for an audience.</p>
             <p><strong>Finding out what the audience rewards before producing for it.</strong> The record
               of what an audience has actually rewarded, such as prior winning entries, prior approved
               deals and prior board memos that got a decision, exists in most organizations and is
