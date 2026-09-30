@@ -3483,7 +3483,7 @@
       else {
         var by = r.byEdit > r.byPairs ? ["Its edit distance", "its word pairs"]
                                       : ["The word pairs it broke", "its edit distance"];
-        note.textContent = by[0] + " put it on " + rung + "; " + by[1] + " alone would have said " +
+        note.textContent = by[0] + " put it on " + rung + ", where " + by[1] + " alone would have said " +
           RUNGS[Math.min(r.byEdit, r.byPairs)].toLowerCase() + ".";
       }
       /* Each run of changes between kept words as one struck run, then one added run. */
@@ -3693,7 +3693,7 @@
       var pass = aucOk && fprOk;
       verdict.className = "gate__verdict " + (pass ? "gate__verdict--pass" : "gate__verdict--fail");
       icon.innerHTML = pass ? ICON_PASS : ICON_FAIL;
-      verdictWords.textContent = pass ? "Clears the Gate — may score filings" : "Disqualified — reported as such";
+      verdictWords.textContent = pass ? "Clears the Gate and may score filings" : "Disqualified and reported as such";
       why.textContent = pass ? m + ", false positives " + f + " on pre-2020 footnotes."
         : !aucOk && !fprOk ? "Misses both bars. The bar is not lowered and the ladder is not re-cut."
         : !aucOk ? m + " is under " + BAR.toFixed(2) + ". " + cap(lastName) + "-edit accuracy does not count toward the Gate."
