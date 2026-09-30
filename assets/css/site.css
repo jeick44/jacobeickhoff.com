@@ -3181,7 +3181,77 @@ button.prep__cell:focus-visible {
 /* =================================================================================================
    PRINT - a recruiter saving this as a PDF gets the whole page
    ============================================================================================== */
+/* The Resume page: one entry per role, the card rule the credentials use on top, the dates set
+   right of the title from tablet width up. The page is also the source of the PDF download, so
+   the print rules below keep it to plain type on paper. */
+.resume-entry {
+  border-top: 2px solid var(--ink);
+  padding-top: var(--space-sm);
+  margin-top: var(--space-lg);
+  max-width: 48rem;
+}
+
+.resume-entry__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 var(--space-sm);
+  align-items: baseline;
+}
+
+.resume-entry__role {
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  margin: 0;
+}
+
+.resume-entry__when {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mute);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.resume-entry__where {
+  grid-column: 1 / -1;
+  color: var(--ink-soft);
+  margin: var(--space-3xs) 0 0;
+}
+
+.resume-entry__sub {
+  font-size: var(--text-base);
+  margin: var(--space-md) 0 0;
+}
+
+.resume-entry__sub span {
+  font-weight: 400;
+  color: var(--ink-mute);
+  margin-left: var(--space-2xs);
+}
+
+.resume-entry__list {
+  margin: var(--space-2xs) 0 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+@media (max-width: 36rem) {
+  .resume-entry__head {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
+  /* The resume PDF is built from the Resume page, so on that page the footer goes too. */
+  body:has(.resume-entry) .site-footer {
+    display: none;
+  }
+
+  .resume-entry {
+    break-inside: avoid;
+  }
+
   .site-header,
   .skip-link,
   .hero__ctas,
