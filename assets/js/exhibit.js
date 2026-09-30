@@ -1158,16 +1158,38 @@
     var W = 520, H = 430, L = 44, R = 508, T = 16, B = 384, MX = (L + R) / 2, MY = (T + B) / 2;
     function X(u) { return L + (R - L) * u; }
     function Y(u) { return T + (B - T) * u; }
-    /* Where a quadrant's members go: evenly down its height, clear of its name (at the outer edge),
-       and stepping in from its outer side, the side their labels do not run to. */
+    /* Where the marks go, in two layouts, since a name runs toward the middle and may cross it.
+
+       Wide: each row of the 2x2 is cut into bands, one mark to a band, so no two marks share a line
+       and a name that crosses the divide never meets its neighbour's. The bands count in from the
+       row's outer edge, below its quadrant names and clear of the midline, alternating the left
+       quadrant and the right in reading order; within a quadrant the marks step in toward the middle.
+
+       Narrow (under 30rem, set by the stylesheet): each name wraps and keeps to its own quadrant, so
+       each quadrant's members go evenly down its own height in one column at its outer side, the side
+       their labels do not run to, leaving the names facing each other across the divide the whole
+       width between. */
+    var HALF = (B - T) / 2, CLEAR = 36, MARGIN = 16;
+    [0, 1].forEach(function (row) {
+      var left = (quads["0," + row] || { members: [] }).members,
+          right = (quads["1," + row] || { members: [] }).members, bands = [];
+      for (var j = 0; j < Math.max(left.length, right.length); j++) {
+        if (left[j]) bands.push(left[j]);
+        if (right[j]) bands.push(right[j]);
+      }
+      bands.forEach(function (m, b) {
+        var q = m.quad, n = q.members.length, j = q.members.indexOf(m);
+        var d = CLEAR + (b + 0.5) * (HALF - CLEAR - MARGIN) / bands.length;
+        var inset = (n === 1 ? 0.4 : 0.2 + 0.25 * j / (n - 1)) * (R - L) / 2;
+        m.wide = { x: q.col ? R - inset : L + inset, y: row ? B - d : T + d };
+      });
+    });
     Object.keys(quads).forEach(function (k) {
       var q = quads[k], n = q.members.length;
       var lo = q.row ? 0.15 : 0.55, hi = q.row ? 0.45 : 0.82;
       q.members.forEach(function (m, j) {
         var t = n === 1 ? 0.5 : j / (n - 1);
-        var inset = 0.1 + 0.06 * j;
-        m.x = q.col ? 1 - inset : inset;
-        m.y = hi - (hi - lo) * t;
+        m.narrow = { x: X(q.col ? 0.9 : 0.1), y: Y(1 - (hi - (hi - lo) * t)) };
         m.right = !q.col;
       });
     });
@@ -1175,7 +1197,7 @@
     var frame = make("div", "exhibit__frame", stage);
     var plot = make("div", "overview", frame);
     var svg = [];
-    svg.push('<svg viewBox="0 0 ' + W + " " + H + '" aria-hidden="true" focusable="false">');
+    svg.push('<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="none" aria-hidden="true" focusable="false">');
     svg.push('<rect class="overview__ground" x="' + L + '" y="' + T + '" width="' + (R - L) + '" height="' + (B - T) + '" rx="8"/>');
     svg.push('<rect class="overview__lead-quadrant" x="' + L + '" y="' + T + '" width="' + (MX - L) + '" height="' + (MY - T) + '" rx="8"/>');
     svg.push('<path class="overview__divide" d="M' + MX + " " + T + " V" + B + " M" + L + " " + MY + " H" + R + '"/>');
@@ -1236,7 +1258,10 @@
       var a = make("a", "overview__mark" + (m.right ? "" : " is-left-label"), field);
       a.href = m.href;
       a.style.setProperty("--i", String(i));
-      place(a, X(m.x), Y(1 - m.y));
+      a.style.setProperty("--wide-x", (m.wide.x / W * 100) + "%");
+      a.style.setProperty("--wide-y", (m.wide.y / H * 100) + "%");
+      a.style.setProperty("--narrow-x", (m.narrow.x / W * 100) + "%");
+      a.style.setProperty("--narrow-y", (m.narrow.y / H * 100) + "%");
       make("span", "overview__dot", a, m.no).setAttribute("aria-hidden", "true");
       make("span", "visually-hidden", a, "Engagement " + m.no + ": ");
       make("span", "overview__label", a, m.name);

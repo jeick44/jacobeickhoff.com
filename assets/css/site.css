@@ -2915,6 +2915,7 @@ button.prep__cell:focus-visible {
   fill: none;
   stroke: var(--paper);
   stroke-width: 3;
+  vector-effect: non-scaling-stroke;
 }
 
 .overview__quadrant,
@@ -2965,14 +2966,18 @@ button.prep__cell:focus-visible {
   inset: 0;
 }
 
-/* A mark is its numbered dot with its name beside it; the dot's centre is the mark's place. */
+/* A mark is its numbered dot with its name beside it; the dot's centre is the mark's place, which
+   the script gives in two layouts (see the kind in exhibit.js): the wide one here, the narrow one at
+   phone width below. */
 .overview__mark {
+  --x: var(--wide-x);
+  --y: var(--wide-y);
   --dot: 1.75rem;
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
   transform: translate(calc(var(--dot) / -2), -50%);
-  font-size: var(--text-compact);
+  font-size: var(--text-xs);
   font-weight: 600;
   line-height: 1.2;
   color: var(--ink);
@@ -3032,10 +3037,18 @@ button.prep__cell:focus-visible {
 /* At phone width the diagram reflows instead of scrolling: half a 2x2 off-frame reads as the whole
    of one, and the overview's opaque quadrants cover the frame's edge shade. It draws to the column's
    width, the quadrant names step aside as they do on the compact copy (the readout's "described as"
-   line and the table carry them), and each name wraps beside its dot. */
+   line and the table carry them), and the marks take the narrow layout, each name wrapping beside
+   its dot inside its own quadrant. */
 @media (max-width: 30rem) {
   .overview {
     min-width: 0;
+  }
+
+  /* Drawn taller than the wide copy (the SVG stretches; its words keep their size), so that each
+     upright axis name fits beside its own half and a name wrapped to three lines stays in its
+     quadrant. */
+  .overview svg {
+    height: 30rem;
   }
 
   .overview__quadrant {
@@ -3043,8 +3056,9 @@ button.prep__cell:focus-visible {
   }
 
   .overview__mark {
+    --x: var(--narrow-x);
+    --y: var(--narrow-y);
     --dot: 1.5rem;
-    font-size: var(--text-xs);
   }
 
   /* A name keeps to its own quadrant: the room between a dot and the divider is about this wide. */
