@@ -1369,7 +1369,7 @@
       make("span", "spread__label", li, p.label);
       return li;
     });
-    make("p", "spread__scale", chart, "No scale: every arrow is one length. Direction only.");
+    make("p", "spread__scale", chart, "Every arrow is one length, because this chart shows direction only and has no scale.");
 
     var readout = make("div", "exhibit__readout", stage);
     readout.setAttribute("aria-live", "polite");
@@ -1750,9 +1750,9 @@
       });
       mentioned.textContent = sum(function (p) { return p.mentions; }) + added * passages.length;
       note.textContent = (added
-        ? "Every frequency score rose by " + added + "; no deployment score moved. "
+        ? "Every frequency score rose by " + added + ", and no deployment score moved. "
         : "") + "A frequency score ranks " + byFrequency.label + " first and " + lastByFrequency.label +
-        " last, however many mentions are added; " + byDeployment.label + " carries the most signs of deployment.";
+        " last however many mentions are added, while " + byDeployment.label + " carries the most signs of deployment.";
     }
 
     update();
