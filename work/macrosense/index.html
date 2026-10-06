@@ -51,22 +51,22 @@
       </nav>
       <h1 class="case-head__title">An allocation process that can be replayed, argued with, and
         <em>shown to be wrong</em></h1>
-      <p class="case-head__lede">MacroSense: whether the disciplined, repeatable allocation process
-        an investment committee is supposed to run can be built and operated end to end by one
-        person, on data anybody can look up. This page is the architecture, and deliberately not a
-        performance claim; the third section says why.</p>
+      <p class="case-head__lede">MacroSense: a regime and sentiment allocator that tests whether one
+        person can build and run the repeatable allocation process an investment committee is
+        supposed to run, on data anybody can look up. I built it alone. Each trading day it sorts the
+        market into one of four regimes (market environments such as calm growth or rate stress) and
+        sets weights across fifteen funds.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>Self-directed</dd></div>
-        <div><dt>Status</dt><dd>In flight &middot; not yet validated</dd></div>
+        <div><dt>Status</dt><dd>In progress &middot; not yet validated</dd></div>
         <div><dt>Governing constraint</dt><dd>Architecture, Not Performance</dd></div>
         <div><dt>Reading time</dt><dd>10 minutes</dd></div>
       </dl>
-      <p class="case-head__status"><span class="case-head__flag">In flight</span> MacroSense works
-        end to end and has not been validated, and those are two different sentences. The backtest
-        harness is built and runs; the history it has to run over is fifty-six trading days, which
-        cannot support a return, a ratio or a probability of beating a benchmark. Extending that
-        history is the current work, and until it is done no performance figure appears on this
-        page.</p>
+      <p class="case-head__status"><span class="case-head__flag">In progress</span> MacroSense runs
+        end to end. It has not been validated. The backtest (replaying the strategy over past data
+        as if it were live) is built, but the history it can run over is fifty-six trading days.
+        That cannot support a return, a ratio or a probability of beating a benchmark, so no
+        performance figure appears on this page. Extending the history is the current work.</p>
     </div>
   </section>
 
@@ -95,8 +95,7 @@
             <span class="stat__value" data-stat-final="56">56</span>
             <span class="stat__unit">trading days of history</span>
           </p>
-          <span class="stat__label">The whole window a backtest has to work with, and the reason no
-            performance figure appears below.</span>
+          <span class="stat__label">All the history the backtest can run over so far.</span>
         </li>
       </ul>
     </div>
@@ -122,43 +121,43 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>Allocation decisions made by hand share a defect that has nothing to do with whether they
-              are any good: they are made once, defended in a meeting, and never recorded in a form
-              anybody can re-run. Six months later there is no process to interrogate &mdash; there was a
-              sequence of opinions.</p>
-            <p>A system that executes on a schedule, from stated inputs, and writes down what it did and
-              why is a different object. It can be replayed, argued with on its merits, and &mdash; the
-              part that matters &mdash; shown to be wrong. So the question was not whether I could pick
-              sectors, but whether the whole loop could be built and run by one person, with no step
-              that works only because somebody is watching.</p>
-            <p>One constraint was fixed at the start and never relaxed. Every input is free and public:
-              Treasury yields and credit spreads from the Federal Reserve&rsquo;s published series,
-              volatility and fund prices from public market data, and company commentary from 10-K and
-              10-Q filings and earnings-call transcripts.</p>
+            <p>Allocation decisions made by hand are usually made once, defended in a meeting, and never
+              recorded in a form anybody can re-run. Six months later there is no process to question,
+              only a sequence of opinions.</p>
+            <p>A system that runs on a schedule from stated inputs, and writes down what it did and why,
+              can be checked later. So I set out to build the whole loop alone, with no step that works
+              only because somebody is watching.</p>
+            <p>MacroSense has two layers. The macro layer reads market data, classifies the regime, and
+              sets weights across fifteen sector and credit exchange-traded funds. The company layer
+              scores what companies say in their filings and earnings calls, and passes a sector score
+              back to the macro layer.</p>
+            <p>One constraint was fixed at the start and never relaxed: every input is free and public.
+              Treasury yields and credit spreads come from the Federal Reserve&rsquo;s published series.
+              Volatility and fund prices come from public market data. Company commentary comes from
+              10-K and 10-Q filings and earnings-call transcripts.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">Why free and public was a design constraint rather
-                than a budget</summary>
+              <summary class="disclosure__summary">Why every input is free and public</summary>
               <div class="disclosure__body">
-                <p>The cheap reading is that a student cannot afford a terminal. The real one is that a
-                  system built on a subscription cannot be reproduced by a reader or checked by somebody
-                  who doubts it, and a process whose whole claim is that it repeats should not have a
-                  paywall in the middle of it. The cost is that free sources go missing: identifiers get
-                  retired, endpoints change shape, requests come back empty. So every signal resolves
-                  through a fallback chain rather than a single call.</p>
+                <p>Cost is part of it, but not the main part. A system built on a subscription cannot be
+                  reproduced by a reader or checked by somebody who doubts it. A process whose whole
+                  claim is that it repeats should not have a paywall in the middle of it. The price is
+                  that free sources go missing: identifiers get retired, endpoints change shape, requests
+                  come back empty. So each input has a list of backup sources, tried in order.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>I built it as separable components, each taking a stated input, returning a stated
-              output, and runnable on its own.</p>
+            <p>I built every part myself. MacroSense has thirteen modules, each runnable on its own,
+              and the seven below carry the daily loop. Each takes a stated input and returns a stated
+              output.</p>
             <figure class="exhibit" id="exhibit-pipeline" data-exhibit="pipeline"
                     data-layout="Sentiment scorer: top-left; Regime classifier: top-center; Scheduler: top-right; Data fetcher: middle-left; Portfolio optimizer: middle-right; Dashboard: lower-right; Briefing: bottom-center"
                     data-provenance="published" data-first-column="Every input free and public">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The
-                  components that carry the loop, each with a fixed input and output</h3>
+                  seven components that carry the loop</h3>
                 <p class="exhibit__instruction">Select a component to see what goes in and what comes
                   out.</p>
               </div>
@@ -185,13 +184,8 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> published; each component&rsquo;s
-                input and output in the words of the paragraphs below, and where its output goes as
-                they describe it. A ring from the Scheduler starts each cycle, then
-                packets carry the data from component to component, and each component lights as its
-                input arrives. The packets show which way data travels between
-                components, not how much or when. The code, the fitted model and every
-                performance figure are withheld, because this page publishes the architecture and not
-                the results.</figcaption>
+                input and output as the paragraphs below state them. The moving packets show which way
+                data travels, not how much or when.</figcaption>
             </figure>
             <p><strong>The data fetcher.</strong> In: public macro series and public market prices
               &mdash; Treasury yields at two and ten years and the spread between them, high-yield and
@@ -203,23 +197,24 @@
             <p><strong>The regime classifier.</strong> In: a rolling window of at least twenty of those
               rows, plus sentiment signals for the energy and healthcare sectors. Out: one of four
               regimes &mdash; Calm Growth, Turbulent Growth, Rate Stress, Risk Off &mdash; with a
-              probability for each. The model is a four-state Gaussian hidden Markov model: it treats the
-              market&rsquo;s regime as something that can&rsquo;t be seen directly and works out which of
-              four states most likely produced the data. The probabilities matter more than the label:
-              0.41 against a runner-up at 0.39 says something different from 0.90, so the briefing gets
-              all four, not just the winner.</p>
+              probability for each. The model is a four-state Gaussian hidden Markov model. It treats the
+              market&rsquo;s regime as something that can&rsquo;t be seen directly, and works out which of
+              the four states most likely produced the data. The probabilities matter more than the
+              label: 0.41 against a runner-up at 0.39 says something different from 0.90. So the
+              briefing gets all four probabilities, not just the top one.</p>
             <p><strong>The portfolio optimizer.</strong> In: the regime and the current signal row. Out:
               weights across the same fifteen funds, summing to one. Each regime changes the constraints
-              (rules the weights must obey), not the model: long only with a cap per position in the two
-              growth regimes; short positions allowed within tighter bounds in the two stress regimes,
-              defensive holdings favored and rate-sensitive ones penalized. A convex solver (a method
-              that finds the single best set of weights under those rules) does the work; when it fails,
-              the optimizer falls back to equal weights and logs the reason as an error.</p>
+              (rules the weights must obey), not the model. In the two growth regimes the portfolio is
+              long only, with a cap per position. In the two stress regimes short positions are allowed
+              within tighter bounds, defensive holdings are favored, and rate-sensitive ones are
+              penalized. A convex solver (a method that finds the single best set of weights under those
+              rules) does the work. If the solver fails, the optimizer falls back to equal weights and
+              logs the reason as an error.</p>
             <figure class="exhibit" id="exhibit-regime-vector" data-exhibit="regime-vector"
                     data-provenance="illustrative">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Why the
-                  briefing gets the whole vector, not the label</h3>
+                  briefing gets all four probabilities, not just the top one</h3>
                 <p class="exhibit__instruction">Pick the leading regime, then drag from a close call
                   to a decisive one.</p>
               </div>
@@ -247,11 +242,8 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative; the Case Study&rsquo;s
-                own worked example, a regime called at 0.41 against a runner-up at 0.39 and one called
-                at 0.90, not model output. The other probabilities are filled in only so that each call
-                sums to one. The classifier&rsquo;s real probabilities, its fitted parameters and any
-                performance figure are withheld, because this page publishes the architecture and not
-                the results.</figcaption>
+                own worked example (0.41 against 0.39, and 0.90), not model output. The other
+                probabilities are filled in so each call sums to one.</figcaption>
             </figure>
             <p><strong>The sentiment scorer.</strong> In: earnings-call transcripts and 10-K and 10-Q
               filings from the SEC&rsquo;s public archive, collected by a companion updater that waits
@@ -259,12 +251,12 @@
               four dimensions &mdash; revenue tone, cost and margin direction, confident versus hedged
               language, newly disclosed risk &mdash; a weighted composite of the four, and a sector
               roll-up that goes back to the classifier as one of its features (the inputs a model learns
-              from).</p>
+              from). This is the company layer.</p>
             <p><strong>The scheduler.</strong> In: the clock and the exchange calendar. Out: a completed
               cycle, logged. Three jobs &mdash; a rebalance after each trading day&rsquo;s close, a model
-              retrain on the first of the month, a filings pull on Sunday. Every step is fault-tolerant
-              on its own (one can fail without stopping the rest), because a scheduler is only worth
-              having if it&rsquo;s still running in March.</p>
+              retrain on the first of the month, a filings pull on Sunday. Each step can fail
+              without stopping the rest, because the scheduler has to keep running for months with
+              nobody watching it.</p>
             <figure class="exhibit" id="exhibit-scheduler-week" data-exhibit="scheduler-week"
                     data-provenance="published">
               <div class="exhibit__head">
@@ -292,18 +284,14 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> published; the three jobs as the
-                paragraph above states them. The week is drawn from those rules, not from the
-                scheduler&rsquo;s log: it draws every weekday as a trading day; an exchange holiday
-                would remove that day&rsquo;s rebalance, and none is drawn. The day the month turns
-                on is the reader&rsquo;s to pick. Run times, the log itself and every performance figure
-                are withheld, because this page publishes the architecture and not the
-                results.</figcaption>
+                paragraph above states them, drawn from those rules, not from the scheduler&rsquo;s log.
+                Every weekday is drawn as a trading day, with no exchange holiday.</figcaption>
             </figure>
             <p><strong>The briefing.</strong> In: the regime name, the probability vector, the previous
               weights, the new weights, the sentiment signals. Out: a few sentences of plain English
-              saying what changed and why. A language model writes them; with no API key available it
-              falls back to a fixed template, so the record has no gaps on days an outside service was
-              unreachable.</p>
+              saying what changed and why. A language model writes them. With no API key available,
+              it falls back to a fixed template, so the record has no gaps on days an outside service
+              was unreachable.</p>
             <p><strong>The dashboard.</strong> In: the regime and its four probabilities, the weights,
               the sentiment scores, and every past rebalance, which is saved to a local database. Out:
               one page showing where the market stands, what the portfolio holds and why, and how both
@@ -311,46 +299,52 @@
             <details class="disclosure">
               <summary class="disclosure__summary">The rule that kept the components separable</summary>
               <div class="disclosure__body">
-                <p>A short list of interfaces was written down and then treated as fixed: what the
-                  classifier is called with and what it hands back, that the optimizer returns weights
-                  keyed by ticker summing to one, the five arguments the briefing takes. Everything
-                  behind those signatures was rewritten repeatedly &mdash; the fetcher most of all
-                  &mdash; and none of those rewrites reached another module. Where the shapes are not
-                  fixed, every change is a whole-system change, and the symptom is that you stop making
-                  improvements because you cannot price them.</p>
+                <p>I wrote down a short list of interfaces (what each module takes in and hands back)
+                  and treated it as fixed. It covered what the classifier is called with and what it
+                  returns, that the optimizer returns weights keyed by ticker summing to one, and the
+                  five arguments the briefing takes. Everything behind those interfaces was rewritten
+                  repeatedly, the fetcher most of all, and none of those rewrites reached another
+                  module. Without fixed interfaces, every change is a whole-system change. Then you stop
+                  making improvements, because you can&rsquo;t tell what each one will break.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>The system works end to end. It fires on schedule, fetches, classifies, allocates,
-              explains itself and logs the result, and it has been doing that rather than being
-              demonstrated once. That is what I set out to build, and it is done.</p>
-            <p>The backtest harness is built too. It reuses the live classifier and the live optimizer
-              verbatim rather than reimplementing the strategy, because a backtest that reimplements the
-              thing it is testing is testing the reimplementation. It walks the history forward one
-              rebalance at a time, classifying on data up to that date and no further, applies real daily
-              fund returns afterwards, charges a cost against turnover, and compares the result with
-              buying and holding the broad market. It computes what a reader would ask for: total return,
-              a compound growth rate, a Sharpe ratio, volatility, maximum drawdown, attribution by
-              regime, and a distribution of outcomes.</p>
-            <p>None of those numbers appears on this page.</p>
+            <p>The system works end to end. On schedule it fetches, classifies, allocates, explains
+              itself and logs the result. It has kept doing that, not just in a one-time demo.
+              That is what I set out to build, and it is done.</p>
+            <p>Running it also turned up two defects. The optimizer&rsquo;s equal-weight fallback is
+              meant for a solver that fails, and it logs that as an error. But when the optimizer&rsquo;s
+              import failed, it took the same fallback and kept producing weights that looked normal.
+              Separately, an alert channel was built but never configured, so every alert returned
+              quietly and reached nobody.</p>
+            <p>The backtest is built too. It reuses the live classifier and the live optimizer
+              unchanged, because a backtest that rewrites the strategy ends up testing the rewrite. It
+              works in three steps. First, it walks the history forward one rebalance at a time,
+              classifying on data up to that date and no further. Second, it applies the real daily fund
+              returns that followed and charges a cost for turnover (how much of the portfolio is
+              traded). Third, it compares the result with buying and holding the broad market. It
+              computes what a reader would ask for: total return, a compound growth rate, a Sharpe ratio
+              (return per unit of risk), volatility, maximum drawdown (the largest fall from a peak),
+              results by regime, and a distribution of outcomes.</p>
             <p class="pending-result">
               <span class="pending-result__flag">Pending Result</span>
               Whether MacroSense allocates well is not answered here. The continuous history it has
               accumulated is fifty-six trading days, from 7 January to 27 March 2026. Replayed at the
-              backtest&rsquo;s default weekly rebalance that is roughly eleven decisions; monthly, two. Every ratio in the list
-              above would be annualized out of that, a single market environment three months long, and
-              a figure produced that way describes the window rather than the system. Backfilling the snapshot
-              series so the model can be run across several years and several regimes is the current
-              work. The numbers go on this page when the window can carry them, and not before.
+              backtest&rsquo;s default weekly rebalance that is roughly eleven decisions; monthly, two.
+              Every ratio above would be annualized (scaled up to a yearly rate) from a single market
+              environment three months long. A figure produced that way describes the window, not the
+              system. The current work is backfilling the snapshot series so the model can run across
+              several years and several regimes. The numbers go on this page when the window can carry
+              them.
             </p>
             <figure class="exhibit" id="exhibit-no-return-figure" data-exhibit="decision-window"
                     data-provenance="published">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> Why there is
-                  no return figure: the whole window holds a handful of decisions</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> The whole
+                  window holds a handful of decisions</h3>
                 <p class="exhibit__instruction">Pick a rebalance frequency to count the decisions the
                   window holds.</p>
               </div>
@@ -374,67 +368,54 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> published; this page&rsquo;s own
-                figures, the window of continuous history from 7 January to 27 March 2026 and the
-                decisions the paragraph above counts in it. The daily count is one decision on each
-                trading day, and the marks are spread evenly across the window, half a step in from
-                its start, rather than set on real dates. The multi-year axis is drawn to no stated
-                scale, because the page names no length for the backfill beyond several years. Every
-                return, ratio and drawdown the backtest computes is withheld, because a window this
-                short cannot support one.</figcaption>
+                figures for the window, 7 January to 27 March 2026. Marks are spaced evenly, not set on
+                real dates, and the multi-year axis has no stated scale. Every return the backtest
+                computes is withheld, because a window this short cannot support one.</figcaption>
             </figure>
-            <p>One thing belongs alongside that, because it is the same error one level down: the
-              history carries no scored sentiment at all &mdash; those columns are absent from it, and
-              the classifier imputes them to zero &mdash; so the company layer has never been in a
-              backtest. The macro layer has.</p>
+            <p>The backtest also has no sentiment data. Those columns are missing from the history, so
+              the classifier fills them with zeros. Only the macro layer has been tested; the company
+              layer has not.</p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>The first time the backtest rendered an equity curve next to its benchmark, the shape of
-              it felt like a result. It was not one, and the distance between those two things is what
-              building this actually taught me.</p>
-            <p>Sample size is not a caveat you attach at the end; it decides whether a number is a
-              number at all. Fifty-six daily observations look like a sample and are closer to one
-              &mdash; a single market environment, read fifty-six times. The ratios a backtest prints
-              are annualized, which makes that window wear the clothes of a year, and nothing in the
-              output says so.</p>
-            <p>The harder half is that a system which runs is enormously satisfying, and the
-              satisfaction is misleading. Every day the scheduler fires, a cycle completes, a briefing is
-              written and a row lands in the database &mdash; and none of it is evidence about whether
-              the allocations are any good. Running and being right are unrelated properties, and only
-              one of them gives feedback.</p>
+            <p>Fifty-six trading days is one market environment, not a sample. The first time the
+              backtest drew an equity curve (the portfolio&rsquo;s value over time) next to its
+              benchmark, the shape felt like a result. It was not one. The ratios a backtest prints are
+              annualized, which makes three months look like a year, and nothing in the output says so.
+              Sample size decides whether a number means anything at all.</p>
+            <p>The harder lesson is that a system which runs is very satisfying, and the satisfaction is
+              misleading. Every day the scheduler fires, a cycle completes, a briefing is written and a
+              row lands in the database. None of that is evidence about whether the allocations are any
+              good.</p>
             <details class="disclosure">
               <summary class="disclosure__summary">What it would take for a number to go on this
                 page</summary>
               <div class="disclosure__body">
-                <p>A history long enough to contain all four regimes, with enough time in each that the
-                  per-regime constraint sets have been exercised against real returns. Scored sentiment
-                  across it instead of placeholders. And the result reported with its window, its costs
-                  and the periods where it went the other way &mdash; the standard Engagement 03 is held
-                  to on this site.</p>
+                <p>A history long enough to contain all four regimes, with enough time in each to test
+                  that regime&rsquo;s constraints against real returns. Scored sentiment across that
+                  history instead of zeros. And the result reported with its window, its costs, and the
+                  periods where it went the other way.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
-            <p><strong>A pipeline that runs is not a pipeline that is right.</strong> Any automated
-              process handed to a client &mdash; a nightly reporting refresh, a scoring model, a
-              forecast that regenerates itself &mdash; produces its most convincing evidence, a clean
-              run, on the one axis nobody was asking about. The question to put to a working system is
-              not whether it ran. It is what would have to be true for the output to be wrong, and
-              whether anybody has gone and looked.</p>
-            <p><strong>State the window in the same breath as the figure.</strong> A pilot over six
-              weeks, a test over two, a model checked against one quarter: each produces a point estimate
-              whose uncertainty is wide enough to contain the opposite conclusion, and each is routinely
-              escalated as a finding. The discipline costs nothing &mdash; the window travels with the
-              number, and nothing is annualized out of a window that cannot support it.</p>
-            <p><strong>Make the degraded path announce itself.</strong> Two defects here were the same
-              defect: an optimizer that fell back to equal weight when its import failed, and an alert
-              channel built but never configured, which returned quietly every time. Both kept producing
-              output after a component had stopped working, which is worse than stopping, because nothing
-              downstream can tell. Any monitoring or integration work meets this in some form, and the
-              fallback that never announces itself costs the most.</p>
+            <p><strong>Ask what would make the output wrong.</strong> Any automated process handed to
+              a client, such as a nightly reporting refresh, a scoring model or a self-updating forecast,
+              offers a clean run as its best evidence. A clean run says nothing about whether the output
+              is right. The useful question is what would have to be true for the output to be wrong, and
+              whether anybody has checked.</p>
+            <p><strong>State the window in the same breath as the figure.</strong> Think of a six-week
+              pilot, a two-week test, or a model checked against one quarter. Each gives an estimate
+              uncertain enough to contain the opposite conclusion, and each is often reported as a
+              finding. Report the window with the number, and never annualize a window too short to
+              support it.</p>
+            <p><strong>Make the degraded path announce itself.</strong> Both defects in What Changed kept
+              producing output after a component had stopped working. That is worse than stopping,
+              because nothing downstream can tell. Any monitoring or integration work meets this in some
+              form, and a fallback that stays silent costs the most.</p>
           </section>
 
           <p class="case-foot">

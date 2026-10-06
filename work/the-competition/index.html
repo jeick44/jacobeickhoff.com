@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Competition — Engagement 03 — Jacob Eickhoff</title>
-<meta name="description" content="A four-person hedge fund case competition entry that scored how far each S&amp;P 500 company had put AI to work in its own operations, read from 5,548 earnings calls and filings, with the score reported over all three years it was tested on.">
+<meta name="description" content="A four-person entry to Georgia State University&rsquo;s Southeastern Hedge Fund Competition: a score for how far each S&amp;P 500 company had put AI to work in its own operations, read from 5,548 earnings calls and filings, reported over all three years it was tested on.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -52,20 +52,21 @@
       </nav>
       <h1 class="case-head__title">Reading which companies <em>use</em> AI, not which ones
         talk about it</h1>
-      <p class="case-head__lede">The Competition: four of us built a score for how far each S&amp;P 500
-        company had put AI to work inside its own business, read from its earnings calls and filings.
-        Built only from documents through the end of 2025, it ranked the index, and over the first
-        eight weeks of 2026 the top quartile beat the bottom by 11.4%.</p>
+      <p class="case-head__lede">The Competition: four of us built an entry to Georgia State
+        University&rsquo;s Southeastern Hedge Fund Competition, and I owned the model. It scored how far
+        each S&amp;P 500 company had put AI to work inside its own business, read from its earnings
+        calls and filings. The score used only documents through the end of 2025. Over the first eight
+        weeks of 2026, the top quartile, the quarter of companies it ranked highest, beat the bottom
+        quartile by 11.4%.</p>
       <dl class="case-meta">
-        <div><dt>Sponsor</dt><dd>Four-person team &middot; hedge fund case competition</dd></div>
+        <div><dt>Sponsor</dt><dd>Georgia State University &middot; Southeastern Hedge Fund Competition</dd></div>
         <div><dt>Status</dt><dd>Paper submitted</dd></div>
-        <div><dt>Governing constraint</dt><dd>Self-Computed: the team&rsquo;s own figures, not checked by an outside party</dd></div>
-        <div><dt>Reading time</dt><dd>9 minutes</dd></div>
+        <div><dt>Governing constraint</dt><dd>Self-Computed figures</dd></div>
+        <div><dt>Reading time</dt><dd>8 minutes</dd></div>
       </dl>
-      <p class="case-head__status"><span class="case-head__flag">Self-Computed</span> Every
-        performance figure on this page was computed by the team from Bloomberg data and is taken
-        from the submitted paper. Nobody outside the team checked it, and no independent party
-        reviewed it.</p>
+      <p class="case-head__status"><span class="case-head__flag">Self-Computed</span> The team
+        computed every performance figure here from Bloomberg data, and no outside party has checked
+        them.</p>
     </div>
   </section>
 
@@ -121,50 +122,55 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>The one thing a hedge fund case competition wants is a formal paper carrying an investable
-              idea and enough evidence that somebody can argue with it. Early in 2026 nearly every such
-              idea priced who <em>sells</em> AI, meaning the chips, the models and the clouds they run
-              on, and far fewer were about who had actually put it to work.</p>
-            <p>That gap stays open because the evidence is awkward, since companies say a great deal
-              about AI in their filings and on their earnings calls and most of it is positioning. So the
-              question we took was whether the documents alone separate a company running AI in its
-              operations from a company with an AI paragraph, and whether the market pays for the
-              difference.</p>
+            <p>A hedge fund case competition asks for a formal paper: an investable idea, with enough
+              evidence that somebody can argue with it. Early in 2026, nearly every such idea bet on who
+              <em>sells</em> AI, meaning the chips, the models and the clouds they run on. Far fewer were
+              about who had actually put it to work.</p>
+            <p>That gap stays open because the evidence is awkward. Companies say a great deal about AI
+              in their filings and on their earnings calls, and most of it is positioning. So we asked
+              whether the documents alone can tell a company running AI in its operations from a company
+              with an AI paragraph. Then we asked whether the market pays for the difference.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">Why the paper was about operators rather than
-                sellers</summary>
+              <summary class="disclosure__summary">Why the paper looked at companies using AI rather
+                than selling it</summary>
               <div class="disclosure__body">
-                <p>In a winner-take-most market the returns to a technology concentrate in a handful of
-                  firms, and the vendors are where that concentration shows first, because their
-                  revenue is the adoption. For an operator the same adoption arrives as cost that has stopped
-                  being incurred, which surfaces later and through a noisier channel.</p>
-                <p>The paper&rsquo;s argument is that the lag is where a public-market reader can still
-                  act, because by the time an operator&rsquo;s advantage shows in its margin it shows to
-                  everybody, and the earnings calls and filings move first. What Changed shows how that
-                  argument held up in the numbers.</p>
+                <p>Sellers&rsquo; gains show up as sales right away. Users&rsquo; gains show up later, as
+                  lower costs, mixed in with everything else on the income statement.</p>
+                <p>That delay is where an outside investor can still act. Once a user&rsquo;s savings
+                  reach its margins, everybody can see them, but its earnings calls and filings describe
+                  the work first. What Changed shows how that argument held up in the numbers.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>The team built a pipeline that reads every earnings call since 2024 and every SEC filing
-              since 2023 for 487 S&amp;P 500 companies. It pulls out each sentence that ties AI to a
-              financial result, such as a cost saved, a margin improved or work done with fewer people,
-              and sorts it into one of 12 operational categories. Claude Opus then scores each of those
-              sentences from 0 to 6, where 0 is buzzwords and 6 is a CFO citing dollar figures across
-              several deployments.</p>
-            <p>Those sentence scores are joined with Bloomberg figures on margin, SG&amp;A and operating
-              leverage, and a set of four machine learning models turns the lot into one score between 0
-              and 1 for each company. The models learned from the AI winners and losers that Goldman
-              Sachs and UBS had each published from their own research, so the labels came from outside
-              the team rather than from our own guesses.</p>
+            <p>I owned the model, from how each sentence was scored to the final score for each company.
+              We split every part of the paper into pieces and passed them around. So I also worked on
+              the financial modeling, the index construction and the presentation, and I co-wrote the
+              final submission. Every piece, the model included, was read by someone who had not written
+              it. My three teammates are not named here because they have not approved a public
+              write-up.</p>
+            <p>The team&rsquo;s pipeline reads every earnings call since 2024 and every SEC filing since
+              2023 for 487 S&amp;P 500 companies. It pulls out each sentence that ties AI to a financial
+              result, such as a cost saved, a margin improved or work done with fewer people. It sorts
+              each one into one of 12 operational categories. Claude Opus, Anthropic&rsquo;s large
+              language model, then scores each sentence from 0 to 6. A 0 is buzzwords; a 6 is a CFO
+              citing dollar figures across several deployments.</p>
+            <p>The score weighs four things: whether a company uses AI or sells it, how often it puts a
+              number on the result, how hard analysts question its AI claims, and whether its AI talk is
+              speeding up. These are joined with Bloomberg figures on margins, SG&amp;A (overhead costs)
+              and operating leverage (how much profit grows as sales grow). An ensemble, four
+              machine-learning models whose outputs are combined, turns them into one score between 0
+              and 1 for each company.</p>
+            <p>The ensemble learned from 34 labeled companies: 20 AI winners named by Goldman Sachs and
+              14 software companies UBS expects AI to hurt. Both banks published those lists from their
+              own research, so the labels came from outside the team.</p>
             <figure class="exhibit" id="exhibit-mentions-vs-evidence" data-exhibit="mentions-rubric"
                     data-provenance="synthetic">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Saying AI more
-                  often does not move a sentence&rsquo;s score, and putting a number on the
-                  company&rsquo;s own savings does</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> More AI mentions
+                  don&rsquo;t raise the score. A dollar figure does.</h3>
                 <p class="exhibit__instruction">Move the slider to write more mentions of AI into every
                   sentence.</p>
               </div>
@@ -191,28 +197,17 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> synthetic, four sentences written for
-                this Exhibit in the manner of an earnings call. They quote no real document and name no
-                company. This is a simplification of the team&rsquo;s pipeline, not the pipeline. The
-                scores were set by hand against the paper&rsquo;s rubric, where the pipeline had Claude
-                Opus score each sentence, and the models that turned sentence scores into a company&rsquo;s
-                score are left out. In the paper, a company whose AI sentences are more than 70% about
-                products it sells has its score capped at 0.35 out of 1.</figcaption>
+                this Exhibit in the style of an earnings call, quoting no real document or company. Their
+                scores were set by hand against the paper&rsquo;s rubric; in the pipeline, Claude Opus
+                scored each sentence.</figcaption>
             </figure>
-            <p>My part: I owned the model, from how each sentence was scored through to the ensemble that
-              produced the final number. Nobody on the team stayed inside one section, though. We broke
-              every part of the paper into pieces and passed them around, so I also worked on the
-              financial modeling, the index construction and the presentation, and every piece, the model
-              included, was read by someone who had not written it.</p>
             <p>Before any of that, I read every prior year&rsquo;s winning entry to work out what the
-              judges actually rewarded, and I co-wrote the final submission. My three teammates are not
-              named here, because none of them has approved a public write-up of their work, and putting
-              their names on my portfolio is their decision to make, not mine.</p>
+              judges actually rewarded.</p>
             <figure class="exhibit" id="exhibit-what-the-judges-rewarded" data-exhibit="judges-rewarded"
                     data-provenance="illustrative">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> A judge&rsquo;s
-                  time covers every part of a paper built to be checked, and runs out early in one built
-                  to impress</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> A judge has 10
+                  minutes for one paper</h3>
                 <p class="exhibit__instruction">Move the slider to change how many minutes the judge
                   has.</p>
               </div>
@@ -244,68 +239,64 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> illustrative. The parts and the
-                minutes are written for this Exhibit to show the kind of structure the prior winners
-                pointed to, and they are not the paper&rsquo;s parts, its length or any judge&rsquo;s
-                timing. &lsquo;Built to impress&rsquo; is a made-up contrast, not any entry, draft or
-                teammate&rsquo;s work. The
-                judge is drawn reading each part in order until the time runs out, which is a
-                simplification. The paper and the prior winning entries are not reproduced.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative. The parts, the minutes and
+                the &lsquo;built to impress&rsquo; contrast were written for this Exhibit. They are not
+                the paper&rsquo;s contents, any entry or any judge&rsquo;s timing.</figcaption>
             </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">Reading the prior winners before writing a
                 word</summary>
               <div class="disclosure__body">
-                <p>The entries that had won in previous years were not the ones with the strongest
-                  backtest. They were the ones whose thesis could be stated in a sentence, and whose
-                  evidence a judge could check inside the time a judge actually has.</p>
-                <p>That changed what we produced: fewer exhibits, each defensible on its own, and every
-                  figure in the abstract carrying the window it was measured over. It is the most
-                  transferable thing I did here, and it was not analysis. It was finding out what
-                  the audience rewards before spending six weeks producing for it.</p>
+                <p>The entries that had won in earlier years did not have the strongest backtests. Their
+                  thesis fit in one sentence, and a judge could check their evidence in the time a judge
+                  actually has.</p>
+                <p>So we produced fewer exhibits, each able to stand on its own, and every figure in the
+                  abstract states the period it was measured over. This was the most transferable thing I
+                  did here: finding out what the audience rewards before spending six weeks producing for
+                  it.</p>
               </div>
             </details>
             <details class="disclosure">
-              <summary class="disclosure__summary">The four things the score measures, and the one
-                thing it caps</summary>
+              <summary class="disclosure__summary">How the four things are measured, and the cap on AI
+                sellers</summary>
               <div class="disclosure__body">
-                <p>First, whether a company&rsquo;s AI language is about its own operations or about AI
-                  it sells. &ldquo;AI cut our cost per package 8%&rdquo; is a company using AI, and
-                  &ldquo;our AI platform serves enterprise clients&rdquo; is a company selling it. Any
-                  company whose AI language is more than 70% the selling kind is capped at 0.35, which
-                  keeps chipmakers and cloud providers, whose prices already reflect the enthusiasm, out
-                  of the top of the ranking.</p>
-                <p>Second, how often the company puts a number on the result. Sentences with a dollar or
-                  percentage outcome count for more than general claims of efficiency. Third, the gap
-                  between what management says in its prepared remarks and how hard analysts press on it
-                  in the Q&amp;A, since claims that analysts ignore are more likely to be promotion.
-                  Fourth, whether the company&rsquo;s talk about AI is speeding up quarter over quarter,
-                  which picks out companies early in deployment before the savings reach the
-                  margin.</p>
-                <p>The paper names its own limits. Banks, insurers and REITs are scored on their
-                  documents alone, because the usual margin measures do not fit how they make money. The
-                  models learned from only 34 labeled companies, so the paper leans on forward returns as
-                  its main evidence rather than on how well the models fit those 34.</p>
+                <p><strong>Using or selling.</strong> &ldquo;AI cut our cost per package 8%&rdquo; is a
+                  company using AI. &ldquo;Our AI platform serves enterprise clients&rdquo; is a company
+                  selling it. A company whose AI sentences are more than 70% the selling kind has its
+                  score capped at 0.35 out of 1. That keeps chipmakers and cloud providers, whose prices
+                  already reflect the enthusiasm, out of the top of the ranking.</p>
+                <p><strong>Numbers.</strong> Sentences with a dollar or percentage result count for more
+                  than general claims of efficiency.</p>
+                <p><strong>Analyst pressure.</strong> Each earnings call is split into management&rsquo;s
+                  prepared remarks and the analysts&rsquo; Q&amp;A. A wide gap between management&rsquo;s
+                  AI claims and how hard analysts follow up on them suggests promotion.</p>
+                <p><strong>Speed-up.</strong> The pipeline tracks whether a company&rsquo;s talk about AI
+                  is growing faster quarter over quarter. That picks out companies early in deployment,
+                  before the savings reach their margins.</p>
+                <p><strong>Limits.</strong> Banks, insurers and REITs (real estate investment trusts)
+                  are scored on their documents alone, because the usual margin measures do not fit how
+                  they make money. The ensemble learned from only 34 labeled companies, so the
+                  paper&rsquo;s main evidence is the returns that came after scoring.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>Measured, and ours to state: the model was built only from documents through the end of
-              2025, so every 2026 return is one it never saw. Across the 487 companies, the top quartile
-              by score returned 9.9% from the start of January to February 27, 2026, while the bottom
-              quartile lost 1.5%, a spread of 11.4%. The equal-weight S&amp;P 500 returned 3.5% over the
-              same weeks. The pattern held across the whole range of scores and not only at the ends,
-              with a correlation of +0.296 between a company&rsquo;s score and its 2026 return.</p>
-            <p>Run against earlier years, the same score pointed the other way. The top quartile trailed
-              the bottom by 18.4% in 2024 and by 11.9% in 2025, and the paper reports both years in
-              full.</p>
+            <p>The model was built only from documents through the end of 2025. So every 2026 return
+              is out of sample: a period the model never saw while it was being built. Across the 487
+              companies, the top quartile returned 9.9% from the start of January to February 27, 2026,
+              while the bottom quartile lost 1.5%. That is a spread of 11.4%. The equal-weight S&amp;P
+              500, where every company counts the same, returned 3.5% over the same weeks.</p>
+            <p>The pattern held across the whole range of scores, not only at the ends. The correlation
+              between a company&rsquo;s score and its 2026 return was +0.296.</p>
+            <p>Run on earlier years, the same score pointed the other way. The top quartile trailed the
+              bottom by 18.4% in 2024 and by 11.9% in 2025. The paper reports both years in full.</p>
             <figure class="exhibit" id="exhibit-spread-by-period" data-exhibit="quartile-spread"
                     data-provenance="published">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> The same score
-                  lost in 2024 and 2025 and won in 2026, which is the lag the paper describes</h3>
+                  lost in 2024 and 2025, then won in 2026</h3>
                 <p class="exhibit__instruction">Switch to the chart a paper showing only 2026 would have
                   published.</p>
               </div>
@@ -328,72 +319,69 @@
                   </table>
                 </div>
               </details>
-              <figcaption class="exhibit__source"><b>Source:</b> published, the three spreads the team
-                reported in its submitted paper. They are Self-Computed, meaning the team calculated them
-                from Bloomberg data and no outside party has checked them. No price series is published
-                here.</figcaption>
+              <figcaption class="exhibit__source"><b>Source:</b> published, the three spreads in the
+                team&rsquo;s submitted paper. They are Self-Computed, meaning the team calculated them
+                from Bloomberg data. No price series is published here.</figcaption>
             </figure>
-            <p>Those two years are the mechanism the paper is built on, not a failure it has to explain
-              away. The companies that put AI to work in 2022 and 2023 had already been rewarded by the
-              market before our documents begin, and they said little about AI in 2024 and 2025 because
-              that work was finished, so they scored low while their stock did well. By 2026 a new group
-              was in the middle of deploying, describing AI in its operations in specific terms with the
-              savings not yet in its earnings, and that is the group the score ranks highest.</p>
-            <p>The financials point the same way. A company&rsquo;s score has almost no relationship with
-              its change in operating margin over 2024 and 2025 (r = &minus;0.070 across 350 non-financial
-              companies), which is what the paper expects, because firms deploying AI are paying for it
-              now and have not yet banked the savings. The market is paying for them anyway, and that gap
-              is what the strategy trades.</p>
-            <p>Two further checks back this up. On the 453 companies the models never saw a label for,
-              the Buy tier returned 9.2% against 6.6% for the rest, so the score is picking out the pattern
-              across the index rather than memorising the 34 it learned from. And the Goldman Sachs
-              winners against the UBS losers went from &minus;50.4% in 2024 to +13.9% in 2025 to +32.6% in
-              early 2026, the same arc as the score. The paper is plain that eight weeks is a short live
-              window, and a full year of 2026 returns is the real test.</p>
-            <p>For anyone reading Engagement 04 next, this model and the pipeline I later withdrew in The
-              Research are separate pieces of work. They measure different things in different
-              documents, operational adoption here and machine authorship there, and this paper was
-              written months before that pipeline existed. I have not compared the two line by line, so
-              that is the whole basis for the claim, but it is enough to say the withdrawal there does
-              not reach back into the result here.</p>
+            <p>The paper explains those two years as a lag. Companies that put AI to work in 2022 and
+              2023 had already been rewarded by the market before our documents begin. Their deployments
+              were finished, so they said little about AI in 2024 and 2025. They scored low while their
+              stock did well. By 2026 a new group was in the middle of deploying. These companies
+              described AI in their operations in specific terms, and the savings were not yet in their
+              earnings. That is the group the score ranks highest.</p>
+            <p>The financials fit that explanation. Across 350 non-financial companies, a company&rsquo;s
+              score had almost no relationship with its change in operating margin over 2024 and 2025
+              (r = &minus;0.070). The paper expects this, because companies deploying AI are paying for
+              it now and have not yet banked the savings. The market is paying for them anyway, and that
+              gap is what the strategy trades.</p>
+            <p>Two more checks point the same way. First, 453 of the 487 companies never had a label.
+              On those, the companies the model rated Buy returned 9.2%, against a 6.6% average for all
+              453. So the score is finding the pattern across the index, and not memorizing the 34 it
+              learned from.</p>
+            <p>Second, a portfolio holding Goldman&rsquo;s AI winners and shorting UBS&rsquo;s likely
+              losers went from &minus;50.4% in 2024 to +13.9% in 2025 to +32.6% in early 2026. That is
+              the same arc as the score. The paper is plain that eight weeks is a short live window. A
+              full year of 2026 returns is the real test.</p>
+            <p>This model is separate from the pipeline I later withdrew in The Research. It measures a
+              different thing in different documents, and it was built months earlier.</p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>That a result which looks like a failure can turn out to be the evidence, once you ask
-              why it happened.</p>
+            <p>First, report the periods that went against you. The score lost in two of the three
+              years it was tested on, and the paper shows all three.</p>
             <details class="disclosure">
               <summary class="disclosure__summary">Why the losing years went into the paper</summary>
               <div class="disclosure__body">
                 <p>Leaving 2024 and 2025 out would have made a cleaner paper. But a judge who found the
-                  losing years on their own would have found a hole, while a judge handed them along with
-                  the reason is reading a paper that already knows where it is weak.</p>
-                <p>Working out why those years lost is what gave the paper its argument, which is the
-                  lag between a company putting AI to work and the savings showing up in its numbers.
-                  Without the losing years there would have been nothing to explain, and the 2026 result
-                  would have been one good window with no reason behind it.</p>
+                  losing years on their own would have found a hole. A judge handed them with an
+                  explanation is reading a paper that already knows where it is weak.</p>
+                <p>The losing years are also what any explanation of the result has to account for.
+                  Without them, the 2026 result would have been one good window with nothing to test the
+                  lag against.</p>
               </div>
             </details>
-            <p>The second thing is about how a team checks its own work. Because every piece was passed
-              around, nobody was the last reader of their own section. That mattered most for the model,
-              since I owned it and was the person least able to see its gaps.</p>
+            <p>The second lesson is about how a team checks its own work. Because every piece was passed
+              around, nobody was the last reader of their own section. That mattered most for the model.
+              I owned it, so I was the person least able to see its gaps.</p>
           </section>
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
             <p><strong>Reporting the periods that went against you, and explaining them.</strong> Any
-              performance claim, whether for a strategy, a pricing change, a marketing channel or a
-              process redesign, is measured over some window, and the window is usually chosen after the
-              result is known. Showing the periods that failed next to the one that worked, with the
-              reason they failed, is the version a reader can trust.</p>
+              performance claim is measured over some window, whether for a strategy, a pricing change, a
+              marketing channel or a process redesign. That window is usually chosen after the result is
+              known. Showing the periods that failed next to the one that worked, with the reason they
+              failed, is the version a reader can trust.</p>
             <p><strong>Telling what a company does from what it says.</strong> Reading an organization
               from its own documents is the same problem in sustainability reporting, in risk, and in any
-              diligence read of a target. The useful signal is the specific, numbered claim about its own
-              operations, and the noise is the general statement written for an audience.</p>
-            <p><strong>Finding out what the audience rewards before producing for it.</strong> The record
-              of what an audience has actually rewarded, such as prior winning entries, prior approved
-              deals and prior board memos that got a decision, exists in most organizations and is
-              almost never read before the work starts.</p>
+              due-diligence review of a company being bought. The useful evidence is the specific,
+              numbered claim about its own operations. General statements written for an audience add
+              little.</p>
+            <p><strong>Finding out what the audience rewards before producing for it.</strong> Most
+              organizations keep a record of what their audience has rewarded: prior winning entries,
+              prior approved deals, board memos that got a decision. It is almost never read before the
+              work starts.</p>
           </section>
 
           <p class="case-foot">

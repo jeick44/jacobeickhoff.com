@@ -52,11 +52,13 @@
       <h1 class="case-head__title">Holding investment decisions to a plan written <em>before the
         decision</em>, and measuring the gap from the broker&rsquo;s record</h1>
       <p class="case-head__lede">TradeLog and Indy: a decision-discipline system for active
-        investors, with a companion charting toolkit. Rules are committed in advance, and
-        adherence to them is measured from the broker&rsquo;s own execution record as
-        <strong>Verified Adherence</strong>, then kept beside the adherence the investor
-        reports, because the distance between the two is the signal worth reviewing. Indy, the
-        companion toolkit, records what a chart displayed at a point in time.</p>
+        investors, with a companion charting toolkit. I designed and built both. The investor
+        writes down their Rules before a session. Afterwards, TradeLog reads every execution
+        from the broker&rsquo;s record and grades each Rule as kept or broken: that is
+        <strong>Verified Adherence</strong>. The investor&rsquo;s own grade for the same day is
+        <strong>Claimed Adherence</strong>, and the two sit side by side, because the gap between
+        them is what a review should look at. Indy is a set of chart indicators that records what
+        a chart displayed at a point in time.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>Self-directed &middot; product design and architecture</dd></div>
         <div><dt>Status</dt><dd>Design and architecture published</dd></div>
@@ -64,11 +66,12 @@
         <div><dt>Reading time</dt><dd>11 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Design, not dollars</span> The
-        figures behind this system are personal, which constrains what the page can say rather
-        than licensing it to say more. No dollar figure, account balance, return or behavioral
-        finding from the account&rsquo;s record appears here, and neither does any of the method
-        behind the tooling. What is published is the product and the architecture, which is the part that is
-        mine to publish.</p>
+        figures behind this system are personal. No dollar figure, account balance, return or
+        behavioral finding from the account&rsquo;s record appears here. The method stays private
+        too: the real Rules, their thresholds and their definitions are withheld, which is what
+        Methodology Silence means on this page. Every Exhibit uses the Illustrative Investor, an
+        invented investor with a synthetic account over a synthetic period, whose Rules A to D
+        stand in for the real ones. What is published is the product and its architecture.</p>
     </div>
   </section>
 
@@ -124,19 +127,21 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>An investor held to a written plan is usually asked afterwards whether the plan
-              was followed, and the answer comes from the person whose plan it was, and it is
-              recorded after the fact, about decisions made under pressure and reconsidered since. The
-              decisions most worth reviewing are the ones taken outside the plan and disowned on
-              review, and those are the ones least likely to be recorded at all.</p>
-            <p>So a self-reported adherence figure measures intention, and effort inflates it, because the
-              more carefully somebody keeps a written record of their decisions, the more convincing
-              the number they produce about the sessions that record never saw.</p>
-            <p>The record that would settle it already exists, since the broker writes
-              down the entry, exit, size, fees and timestamps of every execution as it happens and
-              hands over the file. Nothing needs remembering, only reading, and then something has to be willing to
-              disagree with the investor about it.</p>
-            <p>TradeLog was built around a single futures account, my own.</p>
+            <p>TradeLog was built around a single futures account, my own. Each day it does three
+              jobs. It holds the investor&rsquo;s Rules, written in advance. It reads every execution
+              the broker recorded. And it grades each Rule on each day as kept or broken, next to
+              the investor&rsquo;s own grade for the same day.</p>
+            <p>Investors with a written plan usually grade themselves afterwards. They grade from
+              memory, after the pressure has passed. The decisions most worth reviewing are the
+              ones taken outside the plan and disowned on review. Those are the least likely to be
+              recorded at all.</p>
+            <p>So a self-reported adherence figure shows what the investor meant to do. Care makes
+              this worse. The more carefully someone writes up their decisions, the more believable
+              their number looks, even for the sessions their notes never covered.</p>
+            <p>The record that would settle it already exists. The broker writes down the entry,
+              exit, size, fees and timestamps of every execution as it happens. Nothing needs
+              remembering, only reading. Then something has to be willing to disagree with the
+              investor about it.</p>
           </section>
 
           <section class="spine" id="what-i-did">
@@ -147,7 +152,7 @@
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Four steps
                   turn a plan into a record that can be reviewed.</h3>
                 <p class="exhibit__instruction">Step through the cycle to see what the Illustrative
-                  Investor has in front of it at each step, and which part of the system carries it.</p>
+                  Investor has in front of them at each step, and which part of the system carries it.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
               <details class="exhibit__data">
@@ -180,24 +185,20 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative, one day of the
-                Illustrative Investor, a synthetic account over a synthetic period, taken once
-                around the cycle, with the components this Case Study describes. Rules A to D and
-                their categories are illustrative, not the real ruleset, and every threshold and
-                definition behind the real Rules is withheld under Methodology Silence. No figure
-                from a real account appears. The cycle repeats whenever the Rules are revised, and
-                one pass is drawn.</figcaption>
+                Illustrative Investor, taken once around the cycle. The cycle repeats whenever the
+                Rules are revised, and one pass is drawn.</figcaption>
             </figure>
-            <p>TradeLog computes <strong>Verified Adherence</strong> from the broker&rsquo;s export
-              by evaluating the Rules the investor committed to in advance, written as conditions a
-              machine can check, against every execution the broker recorded, and nothing the
-              investor types reaches it.</p>
-            <p>The simpler product deletes the self-report at that point, and this one does the
-              opposite. <strong>Claimed Adherence</strong>, the investor&rsquo;s own account of the
-              same session, is kept beside the computed figure, and the difference is displayed
-              and treated as a signal rather than reconciled away. The record knows what happened and
-              can never know why, while the investor knows why and has the only reason to be generous. That gap
-              measures where belief has drifted from behavior, which is what a record of decisions was
-              always supposed to be about, and averaging the two is the one operation that destroys it.</p>
+            <p>TradeLog computes <strong>Verified Adherence</strong> by checking every execution the
+              broker recorded against the investor&rsquo;s Rules. Each Rule is written in advance, in
+              the ruleset, as a condition a computer can check. The figure comes from the ruleset
+              and the broker&rsquo;s record alone, and nothing the investor types reaches it.</p>
+            <p>A simpler product would delete the self-report at this point. TradeLog keeps it.
+              <strong>Claimed Adherence</strong>, the investor&rsquo;s own account of the same
+              session, sits beside the computed figure, and the difference is shown for review
+              instead of reconciled away. The record knows what happened and can never know why.
+              The investor knows why, and has every reason to be generous. The gap shows where
+              belief has drifted from behavior, which is what a record of decisions is for.
+              Averaging the two into one score is the one step that destroys it.</p>
             <figure class="exhibit" id="exhibit-recorded-reported-adherence" data-exhibit="adherence-gap"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -243,30 +244,25 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative, a synthetic week of the
-                Illustrative Investor, a synthetic account over a synthetic period. Verified Adherence
-                grades each Rule for each day from the broker&rsquo;s record, and Claimed Adherence is the
-                Illustrative Investor&rsquo;s own grade for the same Rule on the same day, given in
-                review. A Rule-day is a Rule graded for a day. Grading each Rule-day as simply kept or
-                broken is a simplification made for this Exhibit, and the combined score is the plain
-                average of both counts. Rules A to D and their categories are illustrative, not the
-                real ruleset, and every threshold and definition behind the real Rules is withheld under
-                Methodology Silence. No figure from a real account appears.</figcaption>
+                Illustrative Investor. Each Rule on each day is graded from the broker&rsquo;s record
+                (Verified Adherence) and by the investor in review (Claimed Adherence). Kept or broken
+                is a simplification for this Exhibit, and the combined score is the plain average of
+                both counts.</figcaption>
             </figure>
             <p>Three decisions hold Verified Adherence up.</p>
-            <p><strong>The evaluator is deterministic, and the clock is an argument.</strong> One pure
-              function takes the executions, the ruleset, the account, the annotations and
-              <code>now</code>, and returns every derived number on every screen. It reads no clock and
-              touches no storage. Injecting the time rather than reading it is what makes a session from
-              March re-evaluate today to what it evaluated to in March, and nothing recomputes adherence
-              on its own, so there is one answer rather than one per surface.</p>
-            <p><strong>Rules are stored, versioned configuration.</strong> They have to be editable, or
-              they are the system&rsquo;s rules rather than the investor&rsquo;s. But a threshold edited in
-              place rewrites its own history, because last month&rsquo;s adherence silently becomes a claim
-              about this month&rsquo;s rule. So an edit mints a version and a day records the version it
-              was graded under. A rule changed today changes what tomorrow is graded by and nothing
-              already graded. The journaling rubric is versioned on the same seam one grain finer, so where Rules
-              bind a day, because a clean day is a day-shaped claim, a rubric binds the single
-              entry it scored.</p>
+            <p><strong>Decision 1: one calculation produces every number.</strong> The evaluator is
+              a single function. It takes the executions, the ruleset, the account, the
+              investor&rsquo;s notes and the date as inputs, and returns every number on every
+              screen. It does not look up the time or read saved data for itself. Because the date
+              is an input, re-running a session from March today gives the answer it gave in March.
+              Nothing else recomputes adherence, so every screen shows the same answer.</p>
+            <p><strong>Decision 2: Rules are stored as versioned configuration.</strong> The investor
+              has to be able to edit them, or they are the system&rsquo;s rules and not the
+              investor&rsquo;s. But a threshold edited in place rewrites its own history: last
+              month&rsquo;s adherence silently becomes a claim about this month&rsquo;s rule. So
+              every edit saves a new version, and every day records the version it was graded
+              under. A rule changed today changes how tomorrow is graded and leaves graded days
+              alone.</p>
             <figure class="exhibit" id="exhibit-versioned-investment-rules" data-exhibit="versioned-rules"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -299,26 +295,22 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative, the synthetic week of
-                Exhibit 2, for Rule B only, of the Illustrative Investor, a synthetic account over a
-                synthetic period. Rule B is revised on review after Thursday and saved as version 2,
-                as in Exhibit 1, and a day&rsquo;s grade under its own version is its Verified
-                Adherence in Exhibit 2. The system grades a day only under the version it was
-                recorded under, but each day is graded here under both versions so that an edit in
-                place can be shown. Grading a day simply kept or broken is a simplification made for
-                this Exhibit. Rules A to D and their categories are illustrative, not the real
-                ruleset, and what either version of Rule B says, along with every threshold and
-                definition behind the real Rules, is withheld under Methodology Silence. No figure
-                from a real account appears.</figcaption>
+                Exhibit 2, for Rule B only, of the Illustrative Investor. Rule B is revised on review after Thursday and saved as version 2,
+                as in Exhibit 1, and the system grades each day only under its own version, matching
+                Exhibit 2. Both versions are shown here so an edit in place can be drawn. What either version of Rule B says is withheld.</figcaption>
             </figure>
-            <p><strong>Order placement is rejected outright.</strong> The appeal was real, since the system
-              knows the budget is spent and could refuse the next order at the gateway rather than
-              merely objecting to it. It was rejected because a gateway enforces only if it cannot be
-              bypassed, and the broker&rsquo;s own platform is one keystroke away, so it buys no enforcement while adding two failure
-              modes that did not exist before: a bug that moves
-              money and a failed request that leaves a position open. What is left is a read-only broker integration, run server-side with the key held outside
-              the browser, that reads and never writes. When the connection fails the system says so
-              loudly. A stale count shown as a
-              current one is worse than no count, because it gets believed.</p>
+            <p>The rubric that scores the investor&rsquo;s notes is versioned the same way, one level
+              finer. A Rule version is recorded per day, because a clean day is a claim about the
+              whole day. A rubric version is recorded per note, the single entry it scored.</p>
+            <p><strong>Decision 3: order placement is rejected outright.</strong> The appeal was
+              real. The system knows when the budget is spent, so it could block the next order
+              instead of only objecting to it. I rejected it because a block works only if it cannot
+              be bypassed, and the broker&rsquo;s own platform is one keystroke away. It would buy no
+              enforcement while adding two failure modes that did not exist before: a bug that moves
+              money and a failed request that leaves a position open. What is left is a read-only
+              broker integration. It runs on the server, keeps the key out of the browser, and reads
+              without ever writing. When the connection fails, the system says so loudly. A stale
+              count shown as a current one is worse than no count, because it gets believed.</p>
             <figure class="exhibit" id="exhibit-read-only-broker-integration" data-exhibit="broker-integration"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -347,47 +339,47 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative, the paths between the
-                broker and TradeLog for the Illustrative Investor, a synthetic account over a
-                synthetic period. The failure modes of placing an order are those named in the
-                paragraph above, and because they belong to a path that was not built, they are drawn
-                struck through. The notice is worded for this Exhibit, not copied from the system. The
-                broker&rsquo;s name, how the system signs in to it, and every detail of the account
-                are withheld, because the account behind TradeLog is personal and what this page
-                publishes is the product and its architecture. No figure from a real account
-                appears.</figcaption>
+                broker and TradeLog for the Illustrative Investor. The order path was not built, so
+                its failure modes, named above, are drawn struck through. The notice is worded for
+                this Exhibit, not copied from the system. The broker&rsquo;s name, how the system signs in to it,
+                and every detail of the account are withheld.</figcaption>
             </figure>
+            <p><strong>Indy</strong> is the charting half: a set of chart indicators whose job is
+              to remove drafting labor, not to supply judgment. Where it could either present
+              evidence or resolve it, it presents, and it carries no direction readout at all. Its
+              link to TradeLog is an export of what a chart showed at a point in time. The export is
+              structured data, imported through TradeLog&rsquo;s existing import as a chart record
+              that makes no claim a trade was placed.</p>
+            <p>Indy began as an inherited script that did a fraction of what I wanted, and did that
+              fraction wrong. The first work was not the rewrite. It was saying exactly how the
+              script failed. One readout had never displayed once in months of use. A four-digit
+              time was being handed to an argument expecting an hour, so every comparison fell
+              through to the same branch. I deleted it instead of repairing it. It existed to make
+              the script look elaborate, nothing depended on it, and a requirement nobody has is not
+              a requirement.</p>
+            <p>A second defect had two possible behaviors and nothing to tell them apart. A daily
+              reset was keyed to a timezone where it needed a session. So either the overnight
+              levels were cleared before the investor&rsquo;s active session, or they were never
+              cleared at all. Neither reading the code nor using it had settled which. Naming both
+              defects turned a vague intention to rebuild into a specification of fifty numbered
+              requirements.</p>
+            <p>The charting platform&rsquo;s shared-library feature publishes its source code to
+              anyone, without exception. So the shared logic could not be published there as a
+              library, and that one decision shapes the architecture for good. The code lives as
+              modules in a private repository, and a build step joins them into the three scripts
+              that run on the charts. All three are built from the same private code, and none of
+              that code is published.</p>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
             <p>TradeLog stopped being a place to type once executions arrived by import and
-              became the record, and journaling became annotation of rows that already exist, restricted to what the
-              broker cannot know. The headline figure changed with it, from a score TradeLog
-              computed about its own journaling, which measures how completely a form was filled in,
-              to the one that says how much room the account has left before it ends.</p>
-            <p><strong>Indy is the other half of that record.</strong> It is a charting toolkit whose
-              job is to remove drafting labor rather than to supply judgment, so where it could present
-              evidence or resolve it, it presents, and it carries no direction readout at all. What it adds here is an export of what a
-              chart showed at a point in time, emitted as structured data and imported through
-              TradeLog&rsquo;s existing surface as an Observation that carries no claim that a trade was placed. A week&rsquo;s review became
-              reading records instead of opening dated folders of screenshots.</p>
-            <p>It began as an inherited script that did a fraction of what I wanted and did that
-              fraction wrong, and the first work was not the rewrite. It was saying exactly how it
-              failed. One readout had never displayed once in months of use, because a four-digit time was being
-              handed to an argument expecting an hour, so every comparison fell through to the same
-              branch. It was deleted rather than repaired, since it
-              existed to make the script look elaborate and nothing depended on it, and a requirement nobody has is not a requirement. A
-              second defect had two possible behaviors and nothing to tell them apart. A daily reset
-              keyed off a call given a timezone where it wanted a session, so either the overnight
-              levels were cleared before the investor&rsquo;s active session, or they were never
-              cleared at all. Reading the code did not decide which, and neither had using it.
-              Naming both turned a vague intention to rebuild into a specification of fifty numbered
-              requirements.</p>
-            <p>Because the charting platform&rsquo;s shared-library mechanism
-              publishes source to anyone, without exception, the shared logic is not a library, and
-              that one decision constrains the architecture permanently. It lives as modules in a private repository
-              and a build step concatenates them into the three deployable scripts: one source of truth,
-              three outputs, nothing published.</p>
+              became the record. Journaling became adding notes to rows that already exist, limited
+              to what the broker cannot know. The headline figure changed with it. It used to be a
+              score of how completely the journaling form was filled in. Now it is how much room the
+              account has left before it ends.</p>
+            <p>Indy changed the weekly review the same way. A week&rsquo;s review became reading
+              records instead of opening dated folders of screenshots.</p>
             <p class="pending-result">
               <span class="pending-result__flag">Pending Result</span>
               Whether holding decisions to a written plan this way improves them is not answered here.
@@ -399,40 +391,37 @@
             </p>
             <p class="withheld-result">
               <span class="withheld-result__flag">Withheld</span>
-              What the committed Rules would have done across the account&rsquo;s history is computed exactly, from
-              executions that already happened, and it is not on this page. That figure is a personal
-              profit-and-loss number, and a number describing my own account is not evidence about my engineering, and it is what a reader would remember instead of it. The site&rsquo;s
-              own check now refuses the shape of those figures in any shipped file, so this is a
-              property of what gets published rather than a promise about my restraint.
+              What the committed Rules would have done across the account&rsquo;s history has been
+              computed exactly, from executions that already happened. It is not on this page. That
+              figure is a personal profit-and-loss number. A number about my own account is not
+              evidence about my engineering, and it is what a reader would remember instead. A check
+              in the site&rsquo;s build now fails if a dollar figure of that kind appears in any page.
+              So this is enforced by the build, not left to my restraint.
             </p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>The interventions were written from a story about the user rather than from the
-              user&rsquo;s record. Each one was plausible, and that was the whole of the evidence behind
-              it. When the same import that produces Verified Adherence was finally pointed at the
-              trigger list, one trigger turned out to be watching for a pattern the record did not
-              contain. It was retired rather than kept on the grounds that it was plausible.</p>
-            <p>The uncomfortable part is that the check cost nothing and had been there from the first
-              day the data was. A feature justified by a plausible story about a user is a feature
-              nobody has checked, and I had built the instrument that could check it before it occurred
-              to me to point it at my own product. Indy taught the same thing from the other end with a readout dead from the day it was
-              written, displayed on the chart for months and unnoticed
-              precisely because nothing depended on it. &ldquo;I use it and it works&rdquo; is not
-              evidence that it works.</p>
+            <p>I wrote TradeLog&rsquo;s interventions from a story about the user, not from the
+              user&rsquo;s record. Each one was plausible, and that was the whole of the evidence
+              behind it. When I finally pointed the same import that produces Verified Adherence at
+              the trigger list, one trigger turned out to be watching for a pattern the record did
+              not contain. I retired it.</p>
+            <p>The uncomfortable part is that the check cost nothing, and the data for it had been
+              there from the first day. I had built the instrument that could check my own product
+              before it occurred to me to point it there. Indy taught the same thing from the other
+              end: a readout dead from the day it was written sat on the chart for months, unnoticed
+              because nothing depended on it. &ldquo;I use it and it works&rdquo; is not evidence
+              that it works.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">The evidence this product would need, and why it is
-                not here</summary>
+              <summary class="disclosure__summary">What this page claims, and what it does
+                not</summary>
               <div class="disclosure__body">
-                <p>TradeLog is designed on the behavioral premise that computing adherence rather
-                  than collecting it changes what an investor does. The only evidence that would settle it is a
-                  long enough run of sessions read against the same account before the change, which is a
-                  personal ledger and the one document this page will not publish. Nothing here should
-                  be read as a claim that the product worked.</p>
-                <p>What the page claims is narrower and checkable: the figure is derived from a record
-                  the user does not author, the derivation reproduces on old data, and the decisions
-                  behind both were written down with their alternatives at the time rather than
+                <p>Nothing here should be read as a claim that the product worked. The Pending
+                  Result above says what evidence that would take, and why it is not published.</p>
+                <p>What the page claims is narrower and checkable. The figure comes from a record the
+                  user does not write. The calculation gives the same answer on old data. And the
+                  decisions behind both were written down with their alternatives at the time, not
                   reconstructed afterwards for a write-up.</p>
               </div>
             </details>
@@ -441,29 +430,29 @@
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
             <p><strong>The framework is not specific to one account.</strong> Any investor, adviser
-              or investment committee held to a written plan faces the same gap wherever the plan
-              is committed in advance, the executions are recorded by someone else, and adherence is
-              reported by the people who made the decisions. An adviser&rsquo;s recorded rationale against the
-              client&rsquo;s executed trades, or a committee&rsquo;s investment policy statement
-              against the portfolio&rsquo;s transactions, could be read the same way: adherence
-              computed from the execution record, kept beside the adherence reported, and the gap
-              reviewed rather than reconciled.</p>
+              or investment committee held to a written plan faces the same gap. It appears wherever the plan is committed
+              in advance, someone else records the executions, and the people who made the
+              decisions report their own adherence. An adviser&rsquo;s recorded rationale could be
+              read against the client&rsquo;s executed trades, or a committee&rsquo;s investment
+              policy statement against the portfolio&rsquo;s transactions. Adherence would be
+              computed from the execution record and kept beside the adherence reported, and the gap
+              would be reviewed instead of reconciled.</p>
             <p><strong>Self-report measures intention, and it fails hardest where it matters
               most.</strong> Control attestations, training completion, time recording and
-              safety checklists each ask the person who did the work to confirm they did it properly,
-              and each is least reliable in exactly the cases worth catching. Where a system already
-              holds a record of the behavior, compliance can be computed from it, and the distance
-              between claim and record is a second measurement most organizations throw away by
-              reconciling it.</p>
-            <p><strong>A threshold edited in place rewrites its own history.</strong> Change a credit policy, a risk limit,
-              an eligibility criterion or a service-level definition, and last
+              safety checklists all ask the person who did the work to confirm they did it
+              properly. Each is least reliable in exactly the cases worth catching. Where a system
+              already holds a record of the behavior, compliance can be computed from it. The
+              distance between claim and record is then a second measurement, and most
+              organizations throw it away by reconciling it.</p>
+            <p><strong>A rule that changes needs versions.</strong> Change a credit policy, a risk
+              limit, an eligibility criterion or a service-level definition in place, and last
               quarter&rsquo;s compliance rate silently becomes a statement about this quarter&rsquo;s
-              rule, with nobody told. Versioning the rule and recording which version graded each case
-              costs almost nothing at design time and cannot be retrofitted afterwards.</p>
+              rule, with nobody told. Versioning the rule, and recording which version graded each
+              case, costs almost nothing at design time and cannot be added afterwards.</p>
             <p><strong>Refusing a capability is an architecture decision.</strong> The broker integration is
-              not read-only because writing was hard. It is read-only because the write path added risk
-              to a system whose whole purpose was to reduce it. A decision recorded with the
-              alternative it was chosen over survives the next person to notice the gap, including when
+              not read-only because writing was hard. It is read-only because the write path added
+              risk to a system whose whole purpose was to reduce it. A decision recorded with the
+              alternative it was chosen over survives the next person to notice the gap, even when
               that person is me, six months later, with a plausible reason.</p>
           </section>
 

@@ -53,10 +53,10 @@
       <h1 class="case-head__title">A map of dots gets looked at. A number for the spot somebody
         pointed at gets <em>argued with</em></h1>
       <p class="case-head__lede">Customer Intelligence: leadership had only ever seen its customer base as
-        rows in an export, and seeing where customers were or how old they were took a day of
-        spreadsheet work. I built four browser tools, three maps and the utility that prepares their
-        data, so both questions could be answered in the meeting that raised them, on a laptop with
-        nothing to install and no backend behind it.</p>
+        rows in an export, and seeing where customers were or how old they were took hours of
+        spreadsheet work. As the bank&rsquo;s Credit Analyst &amp; AI Implementation Lead, I led the project and built four browser tools
+        (three maps and a data-preparation tool). With them, both questions could be answered in
+        the meeting that raised them, on a laptop with nothing to install and no backend.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
         <div><dt>Status</dt><dd>In use</dd></div>
@@ -79,8 +79,8 @@
             <span class="stat__value" data-stat-final="4">4</span>
             <span class="stat__unit">tools shipped</span>
           </p>
-          <span class="stat__label">Three maps and the utility that prepares their data, each a
-            single file that opens with a double-click.</span>
+          <span class="stat__label">Three maps and a data-preparation tool, each a single file that
+            opens with a double-click.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -124,78 +124,68 @@
             <h2 class="spine__title">The Situation</h2>
             <p>Two questions came up often enough that they needed a real answer. Where are our
               customers, and what does our age profile look like? The core system exported rows
-              showing an address, a balance and sometimes a date of birth, and rows are not a map but
-              static numbers that say little on their own. Turning them into a useful picture meant
-              hours of manual work in a spreadsheet, for an answer that might not be worth it.</p>
-            <p>That cost never shows up as a problem, which is exactly why it matters. When a
-              question is expensive to answer, people stop asking it, often without realizing they
-              should or knowing how, and nobody keeps a record of the questions that never got
-              asked.</p>
-            <details class="disclosure">
-              <summary class="disclosure__summary">What an expensive question costs, and why nobody
-                logs it</summary>
-              <div class="disclosure__body">
-                <p>A question that takes a day to answer does not get asked often. It gets asked only
-                  when somebody is already willing to spend the day finding out. Sometimes people do
-                  not know how to ask the question at all, so they cannot picture what the answer might
-                  be. The first thing these tools changed was the price of asking.</p>
-              </div>
-            </details>
+              showing an address, a balance and sometimes a date of birth, which are static numbers
+              that say little on their own. Turning them into a useful picture meant hours of manual
+              work in a spreadsheet, for an answer that might not be worth it.</p>
+            <p>When a question takes hours to answer, it gets asked only when somebody is already
+              willing to spend those hours. Often people stop asking without realizing they should, or
+              without knowing how to ask, and nobody keeps a record of the questions that never got
+              asked. The first thing these tools changed was the cost of asking.</p>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>I built four browser tools, three maps and a data-preparation utility. One map shows
-              where customers are and who they are, one shows what each location earns, and one
-              compares two periods, while the utility turns a raw export into the one format all three
-              read. Each is a single HTML file opened on the computer it runs on, with no server, no
-              login, no database and nothing to install, so nothing needed approval before someone
-              could try it. The only thing any of them downloads is map imagery, and no customer data
-              leaves the computer. I built them in a deliberate order, starting with a version that
-              only had to prove the idea could work.</p>
-            <p>I also built a prototype that puts an assistant on top of the same data. It runs a
-              trained language model, Llama, inside the browser, so a user can ask a question in plain
-              words, go back and forth until it is the right question, or use the map as before, and
-              the customer data still never leaves the computer.</p>
+            <p>The four tools split the work. One map shows where customers are and who they are. The second, the profitability map,
+              shows the net annual income of each location, meaning one customer address and the
+              accounts held there. The third compares two periods. The data-preparation tool turns a
+              raw export into the one format all three maps read.</p>
+            <p>Each is a single HTML file that opens in a browser, with no server, no login, no database
+              and nothing to install. Because nothing runs on a server, nothing needed approval
+              before someone could try it.
+              The only thing any of them downloads is map imagery, and no customer data leaves the
+              computer. I built them in a deliberate order, starting with a version that only had to
+              prove the idea could work.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">From a proof of concept to an interaction
-                model</summary>
+              <summary class="disclosure__summary">From a demo map to a tool you can
+                question</summary>
               <div class="disclosure__body">
                 <p>The first version was a map with two layers and dots at hardcoded coordinates,
                   about five hundred lines of code with no real data in it. Its only job was to prove
                   this could be done in a browser.</p>
-                <p>Everything about this project was new to me, so before building further I met with
-                  someone who has years of experience in GIS to ask what good practice looks like. He
-                  pushed back on my format. Points on a map that do nothing say nothing. That changed
-                  how I thought about it, and led to a map that calculates as you zoom in and shades
-                  each area by the income it earns.</p>
+                <p>Because everything about this project was new to me, I met with someone who has years of
+                  experience in GIS (mapping and geographic data) to ask what
+                  good practice looks like. He pushed back on my format, because points on a map that
+                  do nothing say nothing. That led to a map that
+                  shades each area by its net annual income when zoomed out and shows individual
+                  locations as you zoom in.</p>
                 <p>The idea that turned the picture into a tool was simple. Select an area and see
                   real numbers for it. Click to drop a circle, drag a slider to size it, and the panel
                   reports what is inside, including the dollars, the record counts and the age
                   distribution. Everything added afterwards applies that idea to something else. It
-                  also changed the demos. A map of dots gets looked at, and a number for the spot
-                  somebody pointed at gets argued with.</p>
+                  also changed the demos, because people stopped just looking at dots and started
+                  arguing over the numbers for a place they had picked.</p>
               </div>
             </details>
             <details class="disclosure">
-              <summary class="disclosure__summary">A color is a conclusion, so the location shows
-                its arithmetic</summary>
+              <summary class="disclosure__summary">Hovering a location shows its
+                arithmetic</summary>
               <div class="disclosure__body">
                 <p>The profitability map colors each location by its net annual income, which is
-                  what its loans earn at their own rates minus what its deposits cost. The scale runs
-                  from green to red, and a grid view groups an area into cells the reader can size. But
-                  a color is a conclusion presented as an observation, and a reader has no way to check
-                  it. So hovering a location does not repeat its color. It shows the subtraction, loan
-                  income minus deposit expense, and the net that results.</p>
-                <p>Each line is also the line a lender would challenge first, so any disagreement
-                  happens over a rate or a balance, where it can be settled.</p>
+                  what its loans earn at their own rates minus what its deposits cost. Its scale runs
+                  from red for a loss to green for a gain, and a grid view groups an area into cells
+                  the reader can size. A color alone gives the reader nothing to check. So hovering a
+                  location shows the subtraction instead, loan income minus deposit expense, and the
+                  net that results.</p>
+                <p>Loan income and deposit expense are the two figures a lender would challenge
+                  first, so any disagreement happens over a rate or a balance, where it can be
+                  settled.</p>
               </div>
             </details>
             <figure class="exhibit" id="exhibit-radius-map" data-exhibit="radius-map"
                     data-provenance="synthetic">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> What sits inside
-                  the circle, and what it earns</h3>
+                  the circle, and its net annual income</h3>
                 <p class="exhibit__instruction">Click or drag the map, or choose an area, to place the
                   circle, then size it with the slider.</p>
               </div>
@@ -266,36 +256,35 @@
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> synthetic geography and synthetic
-                accounts, invented for this site. The real tool&rsquo;s figures are the
-                Sponsor&rsquo;s business and are not published. The areas are named by letter, the
-                river and roads are drawn only to make the map readable, and each location carries its
-                dollar figures directly rather than the balances and rates the real tool multiplies.
-                Dot color shows net annual income, from rose (loss) to blue (gain).</figcaption>
+                accounts, invented for this site, because the real tool&rsquo;s figures are the
+                Sponsor&rsquo;s business. Each location carries its dollar figures directly rather
+                than the balances and rates the real tool multiplies. Dot color runs from rose (loss) to blue (gain), where the real tool uses
+                red and green.</figcaption>
             </figure>
-            <p>This is the original layout, the version I first presented to the CEO, COO, CFO and
-              the board. It shows where customers are and what each area earns, which gave leadership
-              a clearer view of its customer base than any export could.</p>
+            <p>This is the original layout, the version I first presented to the bank&rsquo;s
+              executives and board. It shows where customers are and the net annual income of each
+              area, which gave leadership a clearer view of its customer base than any export
+              could.</p>
             <details class="disclosure">
-              <summary class="disclosure__summary">Detect the anomaly, correct only when it is safe,
-                flag the correction visibly</summary>
+              <summary class="disclosure__summary">How the data-preparation tool handles a broken
+                export</summary>
               <div class="disclosure__body">
                 <p>Real exports arrive broken in small ways that affect the outputs, such as a title
                   row above the headers, an address with no coordinates or an age column holding
-                  dates. One tool handles all of it by one standing rule.</p>
-                <p>Detect the problem, and correct it only when the correction is unambiguous. A date
-                  of birth becomes an age, and a missing coordinate is filled in from a matching
-                  address in a file that was already cleaned. Otherwise the cell is left empty. Every
-                  correction is flagged where the person using the output cannot miss it. The cell is
-                  highlighted, the reason shows on hover, and a count of corrections sits above the
-                  preview. A tool that quietly improves its data looks exactly like one that quietly
-                  damages it.</p>
+                  dates. The data-preparation tool handles all of them by one standing rule.</p>
+                <p>It corrects a problem only when the correction is unambiguous. A date of birth
+                  becomes an age, and a missing coordinate is filled in from a matching address in a
+                  file that was already cleaned. Otherwise the cell is left empty. Every correction is
+                  flagged where the person using the output cannot miss it. The cell is highlighted,
+                  the reason shows on hover, and a count of corrections sits above the preview. A tool
+                  that quietly improves its data looks exactly like one that quietly damages it.</p>
               </div>
             </details>
             <figure class="exhibit" id="exhibit-detect-correct-flag" data-exhibit="detect-correct-flag"
                     data-provenance="synthetic">
               <div class="exhibit__head">
                 <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> Four corrections,
-                  each flagged where it was made, and two cells left empty rather than guessed</h3>
+                  each flagged, and two cells left empty</h3>
                 <p class="exhibit__instruction">Choose Prepared, then hover or focus a flagged cell to
                   read why.</p>
               </div>
@@ -326,20 +315,29 @@
                 accounts whose addresses are placeholders and whose coordinates describe no one. No real
                 export is shown, because every row of one is a customer of the Sponsor.</figcaption>
             </figure>
+            <p>I also built a prototype that puts an assistant on top of the same data. It runs a
+              trained language model, Llama, inside the browser. A user can ask a question in plain words and go back and forth until it is the right
+              question, or use the map as before. Either way, the customer data never leaves the
+              computer.</p>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>The tools are in active use by the bank&rsquo;s CEO, CFO and senior lending staff, and
-              I presented them formally to the CEO, COO, CFO and the board. The outcome I am most
-              confident in came as a byproduct of the work. This Engagement is why the bank offered me
-              an ongoing role, and the quality of these tools is why I have kept building more of them
-              there.</p>
-            <p>The tools also turned up something nobody had seen before. The bank&rsquo;s deposits
+            <p>The map plots every loan and deposit account the bank holds and filters them by
+              geography, customer age and loan type. A question about where customers are or how old
+              they are used to take hours of spreadsheet work, and the map now answers it directly.
+              The bank&rsquo;s CEO, CFO, senior lending staff and board use it to decide where to focus
+              outreach and to manage risk.</p>
+            <p>The map also turned up something nobody had seen before. The bank&rsquo;s deposits
               are concentrated in its oldest customers, enough that it belongs in a conversation about
-              funding rather than demographics. It is described here without its figures on purpose.
-              The tools are my work product and the finding is the Sponsor&rsquo;s business, so only
-              one of them gets a number on this site.</p>
+              funding rather than demographics. If those deposits leave, the bank has to replace that
+              funding, usually at a higher cost. The finding is described here without figures
+              because it is the Sponsor&rsquo;s business, and only my own work product gets numbers on
+              this site.</p>
+            <p>The outcome I am most confident in came as a byproduct of the work. This Engagement is
+              why the bank offered me an ongoing role after it
+              ended. The quality of these tools is why I have kept building more there, including the
+              Credit Process Rebuild (Engagement 02).</p>
           </section>
 
           <section class="spine" id="what-i-learned">
@@ -348,21 +346,21 @@
               refuses.</p>
             <p>An age column sometimes arrives holding date serials, which are dates of birth stored
               as a count of days and never formatted as dates. The map recognized these and converted
-              them, but only above a floor of twenty thousand days, which lands in October 1954. So any
-              customer born earlier, roughly anyone seventy-one or older, failed the serial test, then
-              every other test, and came back as zero. Zero is a real age band in the tool, not an
-              error value, so those customers were neither dropped nor flagged. They were filed with
-              the infants, and the band being emptied was the very band the demographic finding was
-              about. It was the third defect of that kind here, after an age filter that counted
-              records it had been told to exclude and a loader that read every dollar value as zero.
-              It taught me to check what goes into a tool as carefully as what comes out, and to keep
-              a record of every change made to the data along the way.</p>
+              them, but only above a floor of twenty thousand days, which lands in October 1954.</p>
+            <p>Any customer born before then, roughly anyone seventy-one or older, failed the serial
+              test. Their value then failed every other test and came back as zero. Zero is a real age
+              band in the tool, not an error value, so those customers were neither dropped nor
+              flagged. They were filed with the infants, and the band they were taken from was the
+              very band the demographic finding was about.</p>
+            <p>It was the third defect of this kind, where a tool gave wrong numbers that looked
+              right. An age filter counted records it had been told to exclude. A loader read every
+              dollar value as zero. Together they taught me to check a tool&rsquo;s inputs as carefully as its outputs, and
+              to keep a record of every change made to the data.</p>
             <figure class="exhibit" id="exhibit-age-serial" data-exhibit="age-serial"
                     data-provenance="illustrative">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> A date of birth
-                  stored as a serial before October 1954 was filed at age zero, beside the band that
-                  should have held it</h3>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> Born before
+                  October 1954, filed as age zero</h3>
                 <p class="exhibit__instruction">Slide the date of birth across the floor and watch the
                   computed age switch between zero and the true age.</p>
               </div>
@@ -414,36 +412,37 @@
             <details class="disclosure">
               <summary class="disclosure__summary">How it surfaced, and how it was fixed</summary>
               <div class="disclosure__body">
-                <p>I did not find it by reading the code but by building a fixture from the shape of
-                  a real export to test something else, and two of its ten ages came back as zero when
-                  I knew what they should have been. The same check had been written twice a few weeks
-                  apart and the two copies had drifted, while the preparation tool had the range right
-                  the whole time.</p>
+                <p>I did not find it by reading the code. I was testing something else with a test
+                  file built from the shape of a real export. Two of its ten ages came back as zero
+                  when I knew what they should have been. The same check had been written twice a few
+                  weeks apart, and the two copies had drifted. The data-preparation tool had the range
+                  right the whole time.</p>
                 <p>The fix checks for a plausible age first and a date serial second, and any value
-                  that fits neither is now flagged instead of being filed at zero. Due to the fact it
-                  moved ages on screen in a tool executives were already reading, I told them before it
-                  went in, since numbers changing without warning is its own problem even when they
+                  that fits neither is now flagged instead of being filed at zero. Because the fix
+                  moved ages on screen in a tool executives were already reading, I told them before
+                  it went in. Numbers changing without warning is its own problem, even when they
                   change from wrong to right.</p>
               </div>
             </details>
-            <p>The general lesson, and one I have found no way around, is that real files break
-              parsers in ways no synthetic fixture predicts, because synthetic data is built on the
-              same assumptions the parser was written under and so agrees with the code by design.
-              Every edge case the preparation tool handles came from a file that broke it first.</p>
+            <p>Test data I invent agrees with my code by design, because I build it on the same
+              assumptions the code was written under. A test file catches what the code does not
+              expect only when it copies a real file, as this one copied a real export&rsquo;s shape.
+              Every edge case the data-preparation tool handles came from a real file that broke it
+              first.</p>
           </section>
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
-            <p><strong>Pricing a question before answering it.</strong> Any organization where an
-              ordinary question costs a day of somebody&rsquo;s time has a set of questions it has
-              stopped asking and no record of which ones.</p>
+            <p><strong>Lowering the cost of a question.</strong> Any organization where an
+              ordinary question costs hours of somebody&rsquo;s time has a set of questions it has
+              stopped asking, and no record of which ones.</p>
             <p><strong>Making a visual show its arithmetic.</strong> Heat maps, scores, ratings, risk
               tiers and red-amber-green dashboards all hand the reader a conclusion with the working
               removed, and each is believed until the first person checks one.</p>
-            <p><strong>Detect, correct only when safe, flag always.</strong> Any pipeline that cleans
-              data on its way into a decision, whether claims intake, survey responses, meter reads or
-              a system migration, has to choose between staying silent about what it changed and
-              showing it.</p>
+            <p><strong>Showing every correction.</strong> Any process that cleans data on its way
+              into a decision has to choose between staying silent about what it changed and showing
+              it. That covers claims intake, survey responses, meter reads and system migrations
+              alike.</p>
           </section>
 
           <p class="case-foot">
