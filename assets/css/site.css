@@ -3242,6 +3242,124 @@ button.prep__cell:focus-visible {
   }
 }
 
+.resume-contact {
+  color: var(--ink-soft);
+  margin: var(--space-2xs) 0 0;
+}
+
+@media print {
+  /* The Resume page prints as a resume: letter paper, the name on top, sections packed together
+     instead of spaced for a screen, and no heading left alone at the foot of a page. */
+  @page {
+    size: letter;
+    margin: 0.45in 0.5in;
+  }
+
+  body:has(.resume-entry) {
+    font-size: 9.5pt;
+    line-height: 1.35;
+  }
+
+  body:has(.resume-entry) .wrap {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  body:has(.resume-entry) .page-head,
+  body:has(.resume-entry) .section {
+    padding-block: 0.08in;
+    background: none;
+  }
+
+  body:has(.resume-entry) .page-head__title {
+    font-size: 22pt;
+    margin: 0;
+  }
+
+  body:has(.resume-entry) .page-head__lede {
+    font-size: 9.5pt;
+    max-width: none;
+    margin-top: 0.06in;
+  }
+
+  body:has(.resume-entry) .section__title {
+    font-size: 12.5pt;
+    max-width: none;
+    margin: 0;
+    break-after: avoid;
+  }
+
+  body:has(.resume-entry) .resume-entry {
+    max-width: none;
+    margin-top: 0.08in;
+    padding-top: 0.04in;
+    border-top-width: 1px;
+  }
+
+  body:has(.resume-entry) .resume-entry__head {
+    grid-template-columns: 1fr auto;
+  }
+
+  body:has(.resume-entry) .resume-entry__role {
+    font-size: 10.5pt;
+  }
+
+  body:has(.resume-entry) .resume-entry__when,
+  body:has(.resume-entry) .resume-entry__where {
+    font-size: 9pt;
+  }
+
+  body:has(.resume-entry) .resume-entry__sub {
+    font-size: 9.5pt;
+    margin-top: 0.05in;
+    break-after: avoid;
+  }
+
+  body:has(.resume-entry) .resume-entry__list {
+    gap: 0.02in;
+    margin-top: 0.03in;
+  }
+
+  body:has(.resume-entry) .credentials,
+  body:has(.resume-entry) .skillset {
+    margin-top: 0.06in;
+  }
+
+  body:has(.resume-entry) .skillset {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.1in 0.25in;
+  }
+
+  body:has(.resume-entry) .skillset__name {
+    font-size: 10pt;
+    padding-bottom: 0.02in;
+    border-bottom-width: 1px;
+  }
+
+  body:has(.resume-entry) .credential {
+    padding-top: 0.04in;
+    margin-top: 0.06in;
+    border-top-width: 1px;
+  }
+
+  body:has(.resume-entry) .credential__what {
+    font-size: 10.5pt;
+    margin: 0;
+  }
+
+  body:has(.resume-entry) .credential__where,
+  body:has(.resume-entry) .credential__meta {
+    font-size: 9pt;
+    margin: 0.02in 0 0;
+  }
+
+  body:has(.resume-entry) .skillset__list li {
+    padding-block: 0;
+    border: 0;
+    font-size: 9pt;
+  }
+}
+
 @media print {
   /* The resume PDF is built from the Resume page, so on that page the footer goes too. */
   body:has(.resume-entry) .site-footer {
