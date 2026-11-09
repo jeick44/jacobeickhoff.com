@@ -250,7 +250,22 @@
      (the stage stays empty and the table stands alone): a workstation exposes its own group in
      every architecture, and a server, where it exists, exposes every file on the shelf. */
   register("blast-radius", function (fig, stage, data) {
-    var modes = data.columns.slice(1);
+    /* A column named "<architecture>, open work" says what happens to the work open on the
+       compromised machine; every other column after the first is an architecture's files exposed. */
+    var exposure = [], workCols = [];
+    data.columns.slice(1).forEach(function (c, i) {
+      var m = /^(.*), open work$/.exec(c);
+      (m ? workCols : exposure).push({ name: m ? m[1] : c, at: i });
+    });
+    var modes = exposure.map(function (e) { return e.name; });
+    data.rows.forEach(function (r) {
+      var cells = r.cells, vals = r.values;
+      r.work = modes.map(function (name) {
+        var w = workCols.filter(function (x) { return x.name === name; })[0];
+        return w ? cells[w.at] : null;
+      });
+      r.values = exposure.map(function (e) { return vals[e.at]; });
+    });
     var stations = [], hubs = [];
     data.rows.forEach(function (r) {
       (r.values.every(function (v) { return v !== null; }) ? stations : hubs).push(r);
@@ -319,6 +334,7 @@
     count.setAttribute("data-result", "");
     line.appendChild(document.createTextNode(" of " + total + " customer files exposed"));
     var note = make("p", "exhibit__note", readout);
+    var workLine = make("p", "exhibit__note", readout);
 
     /* Wires a button: pressing it acts on the state, then redraws everything from the state. */
     function operates(b, act) {
@@ -377,10 +393,14 @@
         note.textContent = hub ? "Select a workstation, or the " + hub.label.toLowerCase() + "."
                                : "Select a workstation to compromise it.";
       } else if (station < 0) {
-        note.textContent = "Its service account has to read every file, and bypasses the share’s permissions by design.";
+        note.textContent = "Its service account has to read every file, so it is the one machine to harden, and it never faces outside the bank.";
+      } else if (hub) {
+        note.textContent = "The server cuts that machine off. It yields only that analyst’s own files, and nothing else is touched.";
       } else {
         note.textContent = "It yields only what that analyst could already open from the share.";
       }
+      var w = compromised ? compromised.work[mode] : null;
+      workLine.textContent = w ? "Work open on it: " + w.toLowerCase() + "." : "";
     }
 
     update();

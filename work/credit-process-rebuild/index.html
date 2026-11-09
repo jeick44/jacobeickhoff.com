@@ -52,14 +52,16 @@
       </nav>
       <h1 class="case-head__title">Rebuilding loan origination as tools that <em>never touch a
         server</em></h1>
-      <p class="case-head__lede">Credit Process Rebuild: nine browser tools that carry a loan request
-        to the credit committee without customer data ever reaching a server. I led it as Credit
-        Analyst &amp; AI Implementation Lead, embedded with the credit team.</p>
+      <p class="case-head__lede">Credit Process Rebuild: a ground-up rework of how a loan request reaches the credit committee at a
+        community bank in the Upper Midwest, replacing a chain of undocumented spreadsheets with
+        nine browser tools that never send customer data to a server. I lead it as Credit Analyst
+        &amp; AI Implementation Lead, embedded with the credit team and doing the analyst work
+        alongside the build.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>A community bank in the Upper Midwest</dd></div>
         <div><dt>Status</dt><dd>Ongoing &middot; AI Integration Phase</dd></div>
         <div><dt>Governing constraint</dt><dd>The Local-Only Constraint</dd></div>
-        <div><dt>Reading time</dt><dd>6 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>10 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Ongoing</span> Outcomes not
         yet measured are marked Pending Results.</p>
@@ -118,85 +120,119 @@
 
           <section class="spine" id="the-situation">
             <h2 class="spine__title">The Situation</h2>
-            <p>When a lender submits a request for a new loan, a renewal or a modification, an analyst
-              turns it into the approval presentation, the document the credit committee decides
-              from. Everything in between ran through a legacy Excel system: a chain of spreadsheets
-              on a shared drive. None of it was written down, so one concept could carry two
-              definitions in one workbook and nothing would notice.</p>
-            <p>The Local-Only Constraint came before any design: no customer data reaches a cloud
-              service, and no tool requires a server. I treat it as the starting point. The reasoning
-              behind it is a threat model, an account of what an attacker could reach, and not an IT
-              preference.</p>
+            <p>This project started with the <a href="/work/customer-intelligence/">customer map</a>. That work got
+              me in the door at the bank, and afterward the CFO asked if I wanted to spend the
+              summer working on processes he thought needed improving, mostly to see what I could do
+              with them. Once my internship started, the loan process was the first thing I saw that
+              could be done better.</p>
+            <p>When a lender submits a request for a new loan, a renewal or a modification, an analyst turns it
+              into the approval presentation, which is the document the credit committee makes its
+              decision from. Everything between those two points ran through a legacy Excel system
+              on a shared drive. The credit request workbook fed three more files: the presentation
+              figures, a written description of the deal and the spreads, which lay out the
+              borrower&rsquo;s financials year by year. Each file was built separately and pulled in
+              its own direction, none of the logic was written down, and a single concept could
+              carry two different definitions in the same workbook without anything flagging it. A
+              presentation took a lot of analyst time to build and still came out inconsistent.</p>
+            <p>The Local-Only Constraint was in place before any design work began, meaning that no customer data
+              reaches a cloud service and no tool requires a server. I treated it as the starting
+              point of the project rather than an obstacle, because the reasoning behind it is a
+              threat model, an account of what an attacker could reach, rather than an IT
+              preference. The planned hub keeps to it by running on the bank&rsquo;s own server,
+              which never faces outside the bank.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-blast-radius" data-exhibit="blast-radius"
                     data-provenance="illustrative">
               <div class="exhibit__head">
-                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> The constraint
-                  is about concentration, not connectivity</h3>
-                <p class="exhibit__instruction">Compromise one machine, then switch to a central server
-                  and compromise that.</p>
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> A server inside
+                  the bank saves the work, and becomes the one machine to protect</h3>
+                <p class="exhibit__instruction">Compromise one workstation, then switch to the planned
+                  bank server and compromise a workstation, then the server.</p>
               </div>
               <div class="exhibit__stage" data-stage></div>
               <details class="exhibit__data">
                 <summary class="exhibit__data-toggle">View the data</summary>
                 <div class="exhibit__table">
                   <table>
-                    <caption>Customer files exposed when one machine is compromised, by
-                      architecture</caption>
+                    <caption>Customer files exposed, and what happens to the work open on it, when
+                      one machine is compromised, by architecture</caption>
                     <thead>
-                      <tr><th scope="col">Machine compromised</th><th scope="col">Local-only (today)</th><th scope="col">With a central server</th></tr>
+                      <tr><th scope="col">Machine compromised</th><th scope="col">Today: shared drive</th><th scope="col">Today: shared drive, open work</th><th scope="col">Planned: bank server</th><th scope="col">Planned: bank server, open work</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Analyst 1 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Analyst 2 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Analyst 3 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Analyst 4 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Analyst 5 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Analyst 6 workstation</th><td>8</td><td>8</td></tr>
-                      <tr><th scope="row">Central server</th><td>No server</td><td>48</td></tr>
+                      <tr><th scope="row">Analyst 1 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Analyst 2 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Analyst 3 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Analyst 4 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Analyst 5 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Analyst 6 workstation</th><td>8</td><td>Lost</td><td>8</td><td>Saved</td></tr>
+                      <tr><th scope="row">Bank server</th><td>No server</td><td>No server</td><td>48</td><td>At risk</td></tr>
                     </tbody>
                   </table>
                 </div>
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative. The six analysts and
                 forty-eight files are a diagram, not the Sponsor&rsquo;s headcount or loan
-                book.</figcaption>
+                book. The bank server is planned and in development.</figcaption>
             </figure>
             <details class="disclosure">
-              <summary class="disclosure__summary">Why the constraint rules out a server</summary>
+              <summary class="disclosure__summary">Why the server stays inside the bank</summary>
               <div class="disclosure__body">
-                <p>The case for a server is convenience, and its cost is that it puts every file in one
-                  place. A compromised workstation yields only what that analyst could already open from
-                  the shared drive. A compromised server yields every customer. Its service account has
-                  to read all of them, so it bypasses the shared drive&rsquo;s permissions by design.</p>
-                <p>A server would also turn a document on the shared drive into a formal internal
-                  service. At a regulated institution that means risk assessment, sign-off and examiner
-                  scrutiny. Three conditions would reverse the decision: outside
-                  access, routine editing of one file by several people at once, or access control finer
-                  than the shared drive allows. None is true today.</p>
+                <p>Today a compromised workstation yields only what that analyst could already open
+                  from the shared drive, but it also takes the work open on it down with it, since
+                  nothing in progress is saved anywhere else. With the planned server inside the bank,
+                  the compromised machine is cut off, no other machine is touched, and anything in
+                  progress is already saved.</p>
+                <p>The cost is concentration. The server&rsquo;s service account has to read every
+                  file, so it bypasses the shared drive&rsquo;s permissions by design, and a compromise
+                  of the server itself would yield every customer. That makes it the one machine worth
+                  hardening, and it is why the server sits only on the bank&rsquo;s own network and
+                  never faces outside it.</p>
+                <p>A server also turns a document on the shared drive into a formal internal service,
+                  which at a regulated institution means risk assessment, sign-off and examiner
+                  scrutiny before it goes live.</p>
               </div>
             </details>
           </section>
 
           <section class="spine" id="what-i-did">
             <h2 class="spine__title">What I Did</h2>
-            <p>I started with a current-state assessment of credit origination. I mapped where it broke
-              down across intake, documentation and risk presentation, then laid out a phased delivery
-              roadmap. Alongside it I do standard analyst work, assessing credit risk and spreading
-              financials. Spreads lay a borrower&rsquo;s statements out year by year in one standard
-              format.</p>
-            <p>I&rsquo;m rebuilding origination as nine browser tools. Each is a single file opened from
-              the shared drive. No server, no database, no network. Together they cover the path from
-              the lender&rsquo;s request to the committee: intake, importing the spreads, reading tax
-              returns, and building the approval presentation. Keeping data local is the main security
-              control, so it is not left to memory. An automated check blocks any release in which a
-              shipped file makes a network call or loads anything from outside.</p>
-            <p>Two pieces of the rebuild are process design, and the first is the Three-Stage Review.
-              The approval presentation used to be produced by doing three things at once: filling in
-              the figures, working out why they look the way they do, and checking the result. Every
-              question the analyst could not answer stopped the analysis for a call to the lender who
-              wrote the deal. The Three-Stage Review separates the three: fill the figures, analyze the
-              why, then review. Questions only the lender can answer are saved up and asked in one call
-              at the end.</p>
+            <p>I started with a current-state assessment of credit origination, mapping where the process broke
+              down across intake, documentation and risk presentation, and then laid out a phased
+              delivery roadmap. Alongside building the tools, I continued doing standard analyst
+              work, assessing credit risk and spreading financials, which kept the design grounded
+              in how the work actually gets done.</p>
+            <p>What started as a simple project turned out to have a lot of nuance, so I took the whole process
+              apart and rebuilt it from the ground up, with the goal of combining four separate
+              documents into one fluid form. Not everyone was sold on that at first. The CEO&rsquo;s
+              view was that the Excel files worked, and that code would be more likely to break than
+              a spreadsheet. What brought him around was a roadmap and an early rendering of the
+              layout, which showed exactly what the bank would get before any of the files were
+              replaced. The CFO backed the project the whole way through, and the analysts and
+              lenders were kept in the loop as it moved forward.</p>
+            <p>The system is made up of nine browser tools, and that number continues to grow as the project
+              expands. Each tool is opened directly from the shared drive, so there is no online
+              server, no network connection and no database beyond the bank&rsquo;s own private
+              data. Together the tools let analysts work with client information more effectively
+              than they could before, saving time and cutting down on the places where errors can
+              enter. The main security control is that the data never leaves the bank&rsquo;s
+              machines, and the goal was to make internal data feel as usable and automated as an
+              external service would without giving up that control. An automated check enforces
+              this by blocking any release in which a shipped file makes a network call or loads
+              anything from outside.</p>
+            <p>Buying a vendor platform was the obvious alternative, but a small bank needs more flexibility than
+              most packaged systems allow, so the bank chose tools built around its own data and
+              process instead. I built them on my own, using AI for the coding and drawing on the
+              MIT Sloan course Artificial Intelligence: Implications for Business Strategy. Most of
+              the build happened in 40-plus-hour weeks over the summer, and the work has continued
+              alongside school since.</p>
+            <p>Two pieces of the rebuild are process design, and the first is the Three-Stage Review. The approval
+              presentation used to be produced by working toward three objectives at once: filling
+              in the figures, working out why they look the way they do, and checking the result.
+              Every question the analyst could not answer stopped the analysis for a call to the
+              lender who wrote the deal, which made for a choppy process with numerous delays. The
+              Three-Stage Review separates the work into filling the figures, analyzing the why and
+              then reviewing, so the questions only the lender can answer are no longer a bottleneck
+              and are instead batched into a single step at the end that finalizes the file.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-three-stage-review" data-exhibit="three-stage"
                     data-provenance="synthetic">
               <div class="exhibit__head">
@@ -243,15 +279,16 @@
                   that saves the analyst an hour but costs the lender two is a net loss.</p>
               </div>
             </details>
-            <p>The second is a rule built into the tax-document tool. The tool reads a business tax
-              return and produces an income statement for that customer, with debt-service coverage:
-              the cash available to pay debt, divided by the debt payments due. The rule is that in a
-              credit file a wrong number costs more than a missing one. A missing number is visibly
-              missing. A wrong one is what everybody works from.</p>
-            <p>So the tool refuses a scanned, image-only return (a picture of each page, with no text
-              to read) and says why, instead of guessing at it. A line whose description is scrambled is
-              held for review. The reading step sits behind a pluggable interface, so a vendor-approved
-              method can drop in later.</p>
+            <p>The second tool is built to remove a manual process entirely by reading tax documents. It takes a
+              business tax return and produces an income statement for that customer, along with
+              debt-service coverage, which is the cash available to pay debt divided by the debt
+              payments due. The rule built into the tool is that a wrong number costs more than a
+              missing one, so a missing number shows up as visibly missing and a number the tool
+              cannot trust is flagged rather than passed through.</p>
+            <p>That is why the tool refuses a scanned, image-only return (a picture of each page with no text to
+              read) and explains why, rather than leaving the user to guess what caused the error. A
+              line whose description is scrambled is held for review, and the reading step sits
+              behind a pluggable interface so a vendor-approved method can drop in later.</p>
             <figure class="exhibit" id="exhibit-extraction-triage" data-exhibit="triage"
                     data-provenance="synthetic">
               <div class="exhibit__head">
@@ -294,35 +331,42 @@
                   attached to the nearest plausible label.</p>
               </div>
             </details>
-            <p>The current stage is the AI Integration Phase. Its first piece is a prototype policy
-              assistant: analysts ask about the bank&rsquo;s credit policy in plain language. It answers
-              90% of queries directly, and on the rest it identifies the correct policy section every
-              time. It is pending compliance review.</p>
+            <p>The project is now in the AI Integration Phase, starting with a prototype policy assistant and an
+              AI-enabled tax scanner, both pending compliance review. The next step is a single hub
+              where every tool can be opened from one place and each one can feed the others. Each
+              tool still runs without it, but the hub is being built so it can sit on the
+              bank&rsquo;s own internal server and nowhere outside it.</p>
           </section>
 
           <section class="spine" id="what-changed">
             <h2 class="spine__title">What Changed</h2>
-            <p>Request completion has gone from days to hours. Roughly 90% of the repeatable work is
-              now automated, so analysts spend their time on judgment calls.</p>
-            <p>Nine tools have shipped. 3,923 automated checks cover the approval-presentation tool
-              alone, and none fail. A second program, the fault injector, plants the faults those checks
-              exist to catch and confirms each check fails. Nine architecture decisions are written
-              down, each with the alternative it was chosen over.</p>
+            <p>In my own use, a request that used to take days now takes hours, and by my estimate roughly 90% of
+              the repeatable work is now automated, so analysts spend their time on the judgment
+              calls that actually need them. Every analyst on the team now has access to the tools.</p>
+            <p>Nine tools have shipped, and 3,923 automated checks cover the approval-presentation tool alone. A
+              second program, the fault injector, plants the faults those checks exist to catch and
+              confirms that each check fails when it should. Nine architecture decisions are also
+              documented, each alongside the alternative it was chosen over.</p>
             <p class="pending-result">
               <span class="pending-result__flag">Pending Results</span>
-              Lender callbacks per file and the rate of corrected figures in a finished approval
-              presentation have no before-and-after measurement I would stand behind. They stay
-              labeled, not estimated, until there are numbers.
+              Lender callbacks per file and the rate of corrected figures in a finished approval presentation do
+              not yet have a before-and-after measurement I would stand behind, so that data is
+              being collected now and will be added once it is complete.
             </p>
           </section>
 
           <section class="spine" id="what-i-learned">
             <h2 class="spine__title">What I Learned</h2>
-            <p>A test suite that passes tells you the tests passed and nothing else. I learned that from
-              one change to the spreads import. It generalized the import so a new kind of financial tab
-              could reuse the code the existing tabs used. It worked, and every check passed. A code
-              review of that same change still found six defects. Two of them would have corrupted
-              figures on their way into a credit decision.</p>
+            <p>A test suite that passes tells you the tests passed and nothing else, which I learned from a single
+              change to the spreads import. The change generalized the import so that a new kind of
+              financial tab could reuse the code the existing tabs already relied on, and it worked,
+              with every check passing. A code review of that same change still found six defects,
+              and two of them would have corrupted figures on their way into a credit decision.</p>
+            <p>The project also taught me that a faster process is only as effective as its ability to clear the
+              bottleneck, which is the core idea of Eliyahu M. Goldratt&rsquo;s <cite>The
+              Goal</cite>. Here the bottleneck was the lender&rsquo;s time, and speeding up the
+              analysis without batching the callbacks would only have moved the work faster toward a
+              closed door.</p>
             <figure class="exhibit exhibit--wide" id="exhibit-green-suite" data-exhibit="green-suite"
                     data-provenance="published">
               <div class="exhibit__head">
@@ -371,25 +415,26 @@
                   analyst&rsquo;s hand-entered grid was deleted.</p>
               </div>
             </details>
-            <p>What matters more than the six: the checks, the fault injector and I were all
-              satisfied. Reading the change as prose was the only thing left that caught them. I write
-              the tests and I still need the review.</p>
+            <p>What matters more than the six defects themselves is that the checks, the fault injector and I were
+              all satisfied, and reading the change as prose was the only thing left that caught
+              them. I write the tests, and I still need the review.</p>
           </section>
 
           <section class="spine" id="where-else-this-applies">
             <h2 class="spine__title">Where Else This Applies</h2>
-            <p><strong>Learning why a constraint exists before designing around it.</strong>
-              Healthcare, legal and defense work runs under rules that outsiders read as obstruction.
-              Often the rule protects something real. Knowing which is the difference between
+            <p><strong>Learning why a constraint exists before designing around it.</strong> Healthcare, legal and
+              defense work all run under rules that outsiders read as obstruction, but those rules
+              often protect something real, and knowing which is which is the difference between
               negotiating a constraint and building within it.</p>
-            <p><strong>Batching questions for the person whose time is scarce.</strong> Any workflow
-              where one role waits on another&rsquo;s answers has this problem. Judge a redesign by
-              total interruptions across everyone involved, not by hours saved for whoever designed
-              it.</p>
-            <p><strong>The refusal rule.</strong> Any process that turns documents such as claims,
-              invoices, applications and filings into figures somebody decides from must choose between
-              producing a number and admitting it cannot. A system that guesses reads exactly like one
-              that knows, until someone checks an output that has already been acted on.</p>
+            <p><strong>Batching questions for the person whose time is scarce.</strong> Any workflow where one role
+              waits on another&rsquo;s answers has this problem, so a redesign should be judged by
+              the total interruptions across everyone involved, not by the hours saved for whoever
+              designed it.</p>
+            <p><strong>The refusal rule.</strong> Any process that turns documents such as claims, invoices,
+              applications and filings into figures someone makes decisions from has to choose
+              between producing a number and admitting it cannot, because a system that guesses
+              reads exactly like one that knows until someone checks an output that has already been
+              acted on.</p>
           </section>
 
           <p class="case-foot">
