@@ -1471,6 +1471,16 @@ button {
   margin-bottom: var(--space-sm);
 }
 
+.spine__list {
+  max-width: 68ch;
+  color: var(--ink-soft);
+  font-size: var(--text-read);
+  line-height: 1.7;
+  margin: 0 0 var(--space-sm);
+  padding-left: 1.25em;
+  list-style: disc;
+}
+
 /* The drop cap: the first letter of The Situation, and nowhere else. */
 .case-body__prose > .spine:first-of-type > p:first-of-type::first-letter {
   float: left;
