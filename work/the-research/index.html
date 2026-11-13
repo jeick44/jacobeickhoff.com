@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Research — Engagement 04 — Jacob Eickhoff</title>
-<meta name="description" content="A faculty-advised study of whether AI-generated language in SEC filings predicts abnormal returns, rebuilt after I withdrew my own published result, with the pass bar fixed in advance and the three defects named.">
+<meta name="description" content="A faculty-advised study of whether AI-edited language in SEC filings earns different abnormal returns, rebuilt after I withdrew my own published result, where the pass bar fixed in advance came back no-go for every public detector.">
 <!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
      Not deferred: this script turns the hiding rules on and has to do that before first paint.
      Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
@@ -50,23 +50,27 @@
         <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
         <span class="crumb__here">Engagement 04</span>
       </nav>
-      <h1 class="case-head__title">A pass bar written down <em>before any detector ran</em>, and a
-        study allowed to come back empty</h1>
+      <h1 class="case-head__title">Can the market tell when a company lets <em>AI edit its
+        filings</em>?</h1>
       <p class="case-head__lede">The Research: the question is whether the passages of an SEC filing that a
         language model has revised earn different abnormal returns around the filing date than the
-        ones a person wrote. I published a first version in June 2026, checked it myself, found
-        its result at every date I tested rather than only the one it claimed, and withdrew it.</p>
+        ones a person wrote. I published a first version in June 2026, and after a detailed audit of
+        my own work I found that its results were showing how the system was built rather than
+        anything happening in the filings, so I withdrew it and used what the audit taught me to
+        rebuild the study from the ground up.</p>
       <dl class="case-meta">
         <div><dt>Sponsor</dt><dd>Independent &middot; faculty-advised</dd></div>
-        <div><dt>Status</dt><dd>Pre-registered &middot; validation stage</dd></div>
+        <div><dt>Status</dt><dd>Gate: no-go &middot; commercial detector next</dd></div>
         <div><dt>Governing constraint</dt><dd>The Gate, fixed before any detector ran</dd></div>
-        <div><dt>Reading time</dt><dd>11 minutes</dd></div>
+        <div><dt>Reading time</dt><dd>13 minutes</dd></div>
       </dl>
       <p class="case-head__status"><span class="case-head__flag">Pre-registered</span> The go/no-go
         bar for this study was fixed in a dated file before any detector had been run against the
-        validation set, and nothing below has been revised in light of a number. The work is at the
-        validation stage, with the corpus extracted and the detectors being measured. No panel
-        result exists yet, and the page says so where one would otherwise go.</p>
+        validation set, and the bar has not moved since. The full run came back no-go, with no
+        detector clearing it, and that is the first finding. Three things have changed since the
+        file was written, and each is named where it happens below: the decisive test moved from
+        the footnotes to MD&amp;A, detectors added afterwards are labeled post-hoc, and real filings
+        were scored descriptively before any detector had cleared.</p>
     </div>
   </section>
 
@@ -76,19 +80,19 @@
       <ul class="stats__list">
         <li class="stat reveal">
           <p class="stat__figure">
-            <span class="stat__value" data-stat-final="4,653">4,653</span>
-            <span class="stat__unit">passages extracted</span>
+            <span class="stat__value" data-stat-final="0">0</span>
+            <span class="stat__unit">of 5 detectors cleared the Gate</span>
           </p>
-          <span class="stat__label">Located by each filer&rsquo;s own structured tags, every one
-            traceable back to text a reader can open.</span>
+          <span class="stat__label">The best reached 0.684 at the moderate rung, against a bar of
+            0.70 that did not move.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
-            <span class="stat__value" data-stat-final="3">3</span>
-            <span class="stat__unit">edit intensities</span>
+            <span class="stat__value" data-stat-final="725">725</span>
+            <span class="stat__unit">filings scored descriptively</span>
           </p>
-          <span class="stat__label">The Detectability Curve gives accuracy at light, moderate and heavy
-            revision rather than one number for all three.</span>
+          <span class="stat__label">10-K MD&amp;A from 97 S&amp;P 500 companies, 2019 to 2026, with
+            each tool&rsquo;s Gate failure printed beside its numbers.</span>
         </li>
         <li class="stat reveal">
           <p class="stat__figure">
@@ -153,9 +157,9 @@
             <p><strong>Passages are located by the filer&rsquo;s own tags.</strong> The first version
               found the notes to the financial statements with a regular expression over the document
               text. The extractor now reads the index the filer publishes alongside the filing and takes
-              the sections the filer tagged as notes, which came to 4,653 passages from 1,324 notes across 74
-              filings, drawn from a 40-company sample of which 37 had filings in the window. All of them
-              are dated before 2020, so the human labels are certain by construction.</p>
+              the sections the filer tagged as notes, which came to 6,939 passages from 2,381 notes across
+              147 filings by 38 companies. All of them are dated before 2020, so the human labels are
+              certain by construction.</p>
             <p><strong>The labels are built, not assumed.</strong> The validation set holds 200 human
               passages, 600 model-revised versions of them and 50 wholly generated passages for the upper
               bound.
@@ -227,7 +231,7 @@
                 the style of a lease footnote with revisions of it written by hand for this Exhibit to
                 show how far one prompt&rsquo;s results can spread. No model wrote them, and none comes
                 from the study&rsquo;s validation set, whose passages, revisions and cut-points are not
-                reproduced here while the study is at its validation stage. Words are compared ignoring
+                reproduced here until the paper is out. Words are compared ignoring
                 case and punctuation. Edit distance is the
                 fewest words inserted, deleted or replaced to turn the original into the revision, as a
                 share of the original&rsquo;s words, and n-gram overlap is the share of the original&rsquo;s
@@ -243,6 +247,13 @@
               detectable with current public methods, and that is the finding rather than a failure to
               find one. The bar is not lowered, the ladder is not re-cut, and the panel is not scored in
               the hope that scale compensates.</p>
+            <p>That is the Gate as I wrote it in September, and three things have changed since, each
+              recorded in a dated file before it was acted on. The decisive run tested MD&amp;A rather
+              than footnotes, with every value of the bar carried over unchanged. Detectors added after
+              the first results are labeled post-hoc wherever their numbers appear. And when no
+              detector cleared, I scored real filings anyway, descriptively, which the sentence above
+              rules out, so the numbers from that panel authorize nothing and each one carries its
+              tool&rsquo;s Gate failure beside it.</p>
             <figure class="exhibit" id="exhibit-the-gate" data-exhibit="gate"
                     data-provenance="illustrative">
               <div class="exhibit__head">
@@ -261,7 +272,7 @@
                       <tr><th scope="col">Hypothetical detector</th><th scope="col">AUC at the light rung</th><th scope="col">AUC at the moderate rung</th><th scope="col">AUC at the heavy rung</th><th scope="col">False-positive rate on genuine pre-2020 footnotes</th></tr>
                     </thead>
                     <tbody>
-                      <tr><th scope="row">Sees only heavy edits</th><td>0.56</td><td>0.63</td><td>0.90</td><td>2.5%</td></tr>
+                      <tr><th scope="row">Sees only heavy edits</th><td>0.56</td><td>0.62</td><td>0.90</td><td>2.5%</td></tr>
                       <tr><th scope="row">Blind</th><td>0.51</td><td>0.53</td><td>0.56</td><td>3.0%</td></tr>
                       <tr><th scope="row">Noisy</th><td>0.66</td><td>0.86</td><td>0.90</td><td>8.0%</td></tr>
                       <tr><th scope="row">Clears the bar</th><td>0.67</td><td>0.76</td><td>0.90</td><td>3.5%</td></tr>
@@ -276,11 +287,12 @@
               </details>
               <figcaption class="exhibit__source"><b>Source:</b> illustrative, the Gate as
                 pre-registered above, with its bar at the foot of the table. Every detector shown is
-                hypothetical, invented for this Exhibit, and no detector&rsquo;s result is plotted here, the
-                pilot run&rsquo;s included, because none has yet been judged against the Gate. Each
-                rung is measured afterwards from edit distance and n-gram overlap, and the study&rsquo;s
-                cut-points between rungs are not reproduced here while the study is at its validation
-                stage.</figcaption>
+                hypothetical, invented for this Exhibit, and no real detector&rsquo;s result is plotted
+                here, the pilot run&rsquo;s included. The real detectors have now been judged against the
+                Gate, none of them cleared it, and their figures are given in the prose below rather
+                than drawn beside invented ones. Each rung is measured afterwards from edit distance and
+                n-gram overlap, and the study&rsquo;s cut-points between rungs are not reproduced here
+                until the paper is out.</figcaption>
             </figure>
             <details class="disclosure">
               <summary class="disclosure__summary">What a pilot run is allowed to decide</summary>
@@ -299,6 +311,17 @@
                   run is worth making.</p>
               </div>
             </details>
+            <p><strong>Choosing the detectors.</strong> Before the decisive run I moved the test from
+              the footnotes to Management&rsquo;s Discussion and Analysis, the section where management
+              chooses how to frame its results, because that is where an edit would most plausibly
+              reach the price. The four detectors named in advance were joined by EditLens, added
+              after the first results and labeled post-hoc for that reason. Binoculars needed more
+              memory than my laptop has and ran out partway through a run, so the full Gate run was
+              done on my professor&rsquo;s Mac on October 30, with every validation score made on that
+              one machine. None of them cleared. At the moderate rung the stylometric floor reached an
+              AUC of 0.633 and EditLens an AUC of 0.684, both short of 0.70, and the three neural
+              detectors came in at 0.304, 0.244 and 0.210, below chance, which means they scored the
+              human original as more machine-like than its revision.</p>
           </section>
 
           <section class="spine" id="what-changed">
@@ -307,7 +330,11 @@
               published result. A report I compiled in June 2026 carried three headline findings. I re-examined it
               against the source data and against live filings, found three defects, and superseded
               it.</p>
-            <p><strong>The score was a ranking wearing a probability&rsquo;s clothes.</strong> The final
+            <p><strong>The score carried no information, and was a ranking wearing a probability&rsquo;s
+              clothes.</strong> One of its two components was meant to be DetectGPT, but it disturbed
+              each passage by deleting 12% of its words at random rather than rewording them, which
+              broke the grammar and pinned the score at its ceiling, with a mean of 0.990 and 96% of
+              values above 0.95. The other called every filing human. The final
               quantity was a within-sample z-score through a sigmoid, and a filing was flagged if it
               landed in the top quartile. That flags exactly a quarter of any sample by
               construction, whatever the text says, and means adding one company changes the score of
@@ -451,18 +478,27 @@
               reader can open, which is the discipline whose absence let a signature page be reported as
               a finding.</p>
             <p class="pending-result">
-              <span class="pending-result__flag">Pending Result</span>
-              Whether AI-generated language in filings predicts abnormal returns is not answered here.
-              The
-              panel is not scored and is not authorised to be scored until a detector clears the Gate.
-              If none does, the reportable finding is non-detectability, with the curve attached so that
-              &ldquo;filers are not doing this&rdquo; stays distinguishable from &ldquo;this instrument
-              cannot see it&rdquo;.
+              <span class="pending-result__flag">Where It Stands</span>
+              The Gate came back no-go, so the first finding is the one written down in September, that
+              LLM editing of this kind of disclosure cannot be seen with the public detectors
+              available, and whether it earns different abnormal returns stays unanswered because no
+              instrument is authorized to ask. Since then the study has turned into a record of what
+              these tools can and cannot see in financial disclosure. I scored a descriptive panel of
+              2,175 passages from 725 10-K MD&amp;A sections, filed by 97 S&amp;P 500 companies between
+              2019 and 2026, and no tool&rsquo;s average score moved between the filings made before
+              ChatGPT&rsquo;s release and the ones made after. Two detectors flagged fewer passages
+              afterwards rather than more, which from instruments that read edited text backwards is
+              not evidence of anything. That is less than I was hoping for, and it is the case the Gate
+              was written for, since a flat line from an instrument that cannot see the thing cannot
+              tell &ldquo;filers are not doing this&rdquo; from &ldquo;this instrument cannot see
+              it&rdquo;. Pangram runs next, a commercial detector built for edited text, put through the
+              same Gate on the same validation set and labeled post-hoc like EditLens, to find out
+              whether it can see what the public ones could not.
             </p>
-            <p>As for where the rest of it stands, the study is faculty-advised, and that is a working
-              relationship rather than a name on a cover page. An application for research funding has
-              been submitted but has not been decided, and it has not been awarded. A conference is the
-              intended venue, whichever way the Gate falls. None of the three is an outcome.</p>
+            <p>As for the rest of it, the study is faculty-advised, and that is a working relationship
+              rather than a name on a cover page. Pangram awarded $5,000 in API credits for this
+              research, and a university research grant application is pending. The paper is due
+              December 4, and a conference is the intended venue.</p>
           </section>
 
           <section class="spine" id="what-i-learned">
@@ -473,8 +509,8 @@
               because at the time none of them felt like one.</p>
             <p>So the remedy is not more care, because care is what produced it, aimed in the direction
               of the result I expected. The remedy is to commit to the decisions before the numbers
-              exist, in a file with a date on it, which is why The Gate can disqualify a detector I
-              would rather keep. The narrower version of the lesson is that a result that has survived no placebo is not a
+              exist, in a file with a date on it, which is why The Gate could disqualify every detector
+              I ran. The narrower version of the lesson is that a result that has survived no placebo is not a
               result. The check that cost me the finding took an afternoon, and I had not run it because
               the finding agreed with what I expected.</p>
             <details class="disclosure">
