@@ -3059,6 +3059,121 @@
     update();
   });
 
+  /* ---- KIND: fan-range ------------------------------------------------------------------------
+     The Investment Analysis Toolkit's simulated price range. The table lists hours in order, each
+     with one simulated path's level and the level at the 5th, 25th, 50th (Median), 75th and 95th
+     percentile of every path. The drawing is a fan: the outer band (5th to 95th), the inner band
+     (25th to 75th) and the median line, with the one path drawn over it. Two views, "The range" and
+     "One path": the second hides the fan and leaves the single path alone, which is how a single
+     simulation reads, as a forecast. Columns are found by header; a table whose percentiles are out
+     of order at any hour, or whose hours do not climb, is refused rather than drawn wrong. */
+  register("fan-range", function (fig, stage, data) {
+    var K = "fan-range";
+    var at = {
+      one: column(data, K, "One path"), p5: column(data, K, "5th percentile"),
+      p25: column(data, K, "25th percentile"), p50: column(data, K, "Median"),
+      p75: column(data, K, "75th percentile"), p95: column(data, K, "95th percentile"),
+    };
+    var rows = data.rows.map(function (r) {
+      var h = number(r.label), o = { hour: h };
+      Object.keys(at).forEach(function (k) {
+        var v = number(cell(r, at[k]));
+        if (v === null) throw new Error(K + ": hour " + r.label + " has no figure for " + k);
+        o[k] = v;
+      });
+      if (h === null) throw new Error(K + ": " + JSON.stringify(r.label) + " is not an hour");
+      if (!(o.p5 <= o.p25 && o.p25 <= o.p50 && o.p50 <= o.p75 && o.p75 <= o.p95)) {
+        throw new Error(K + ": the percentiles at hour " + r.label + " are out of order");
+      }
+      return o;
+    });
+    if (rows.length < 2) throw new Error(K + ": the table needs at least two hours");
+    rows.forEach(function (r, i) {
+      if (i && r.hour <= rows[i - 1].hour) throw new Error(K + ": the hours do not climb");
+    });
+
+    var single = false;
+    var bar = make("div", "exhibit__controls", stage);
+    var view = segmented(bar, "What is drawn", ["The range", "One path"], function (i) {
+      single = i === 1;
+      update();
+    });
+
+    var frame = make("div", "exhibit__frame", stage);
+    var W = 640, H = 300, L = 48, R = 16, T = 14, B = 34;
+    frame.innerHTML = '<svg class="fan" viewBox="0 0 ' + W + " " + H + '" role="img"></svg>';
+    var svg = frame.firstChild;
+    var lo = Math.min.apply(null, rows.map(function (r) { return Math.min(r.p5, r.one); }));
+    var hi = Math.max.apply(null, rows.map(function (r) { return Math.max(r.p95, r.one); }));
+    var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+    var h0 = rows[0].hour, h1 = rows[rows.length - 1].hour;
+    function x(h) { return L + (h - h0) / (h1 - h0) * (W - L - R); }
+    function y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
+    function line(key) {
+      return rows.map(function (r, i) { return (i ? "L" : "M") + x(r.hour).toFixed(1) + " " + y(r[key]).toFixed(1); }).join(" ");
+    }
+    function band(a, b) {
+      var up = rows.map(function (r, i) { return (i ? "L" : "M") + x(r.hour).toFixed(1) + " " + y(r[b]).toFixed(1); });
+      var down = rows.slice().reverse().map(function (r) { return "L" + x(r.hour).toFixed(1) + " " + y(r[a]).toFixed(1); });
+      return up.concat(down).join(" ") + " Z";
+    }
+    // Axis: a tick at each third of the range of levels, and one at each hour in the table.
+    var axis = svgChild(svg, "g", "fan__axis");
+    [0, 1, 2, 3].forEach(function (i) {
+      var v = lo + pad + (hi - lo - 2 * pad) * i / 3, yy = y(v).toFixed(1);
+      var g = svgChild(axis, "line", "fan__grid");
+      g.setAttribute("x1", L); g.setAttribute("x2", W - R); g.setAttribute("y1", yy); g.setAttribute("y2", yy);
+      var t = svgChild(axis, "text", "fan__tick");
+      t.setAttribute("x", L - 6); t.setAttribute("y", yy); t.setAttribute("text-anchor", "end");
+      t.setAttribute("dominant-baseline", "middle"); t.textContent = v.toFixed(1);
+    });
+    rows.forEach(function (r) {
+      var t = svgChild(axis, "text", "fan__tick");
+      t.setAttribute("x", x(r.hour).toFixed(1)); t.setAttribute("y", H - B + 18);
+      t.setAttribute("text-anchor", "middle"); t.textContent = r.hour;
+    });
+    var cap = svgChild(axis, "text", "fan__tick");
+    cap.setAttribute("x", W - R); cap.setAttribute("y", H - 2); cap.setAttribute("text-anchor", "end");
+    cap.textContent = "Hours ahead";
+
+    var fan = svgChild(svg, "g", "fan__range");
+    svgChild(fan, "path", "fan__outer").setAttribute("d", band("p5", "p95"));
+    svgChild(fan, "path", "fan__inner").setAttribute("d", band("p25", "p75"));
+    svgChild(fan, "path", "fan__median").setAttribute("d", line("p50"));
+    svgChild(svg, "path", "fan__path").setAttribute("d", line("one"));
+
+    var readout = make("div", "exhibit__readout", stage);
+    readout.setAttribute("aria-live", "polite");
+    var count = make("p", "exhibit__count", readout);
+    var tally = make("b", "", count);
+    tally.setAttribute("data-result", "");
+    var phrase = count.appendChild(document.createTextNode(""));
+    var note = make("p", "exhibit__note", readout);
+
+    var last = rows[rows.length - 1];
+    function update() {
+      view.press(single ? 1 : 0);
+      fan.style.display = single ? "none" : "";
+      if (single) {
+        tally.textContent = last.one.toFixed(1);
+        phrase.nodeValue = " after " + last.hour + " hours, on one simulated path";
+        note.textContent = "On its own, this path reads like a call that the index falls. It is one draw of " +
+          "thousands, and it ends inside the range the full fan draws.";
+        svg.setAttribute("aria-label", "One simulated path, from " + rows[0].one.toFixed(1) + " to " +
+          last.one.toFixed(1) + " after " + last.hour + " hours.");
+      } else {
+        tally.textContent = last.p25.toFixed(1) + " to " + last.p75.toFixed(1);
+        phrase.nodeValue = ", the middle half of every path after " + last.hour + " hours";
+        note.textContent = "Nine in ten paths end between " + last.p5.toFixed(1) + " and " + last.p95.toFixed(1) +
+          ", and the median ends at " + last.p50.toFixed(1) + ". The range widens with every hour ahead.";
+        svg.setAttribute("aria-label", "A fan of simulated levels widening over " + last.hour + " hours: the middle " +
+          "half ends between " + last.p25.toFixed(1) + " and " + last.p75.toFixed(1) + ", nine in ten between " +
+          last.p5.toFixed(1) + " and " + last.p95.toFixed(1) + ".");
+      }
+    }
+    update();
+  });
+
   /* ---- TradeLog's shared reading -------------------------------------------------------------
      The TradeLog kinds find their columns by header. column() gives the index of the one column
      named `name` in the table's columns (0 is the row's header cell), and refuses a table where it
@@ -4244,7 +4359,7 @@
      Built other than Yes or No, a path whose rows disagree or sit apart, a row with no failure
      mode, no path not built, or anything but exactly one built path, from the broker to TradeLog -
      a built path to the broker is an order path, and the system places none. */
-  var INTEG_BROKER = "The broker", INTEG_SYSTEM = "TradeLog";
+  var INTEG_BROKER = "The broker", INTEG_SYSTEM = "The record";
   register("broker-integration", function (fig, stage, data) {
     var cols = ["Path", "From", "To", "Built", "Failure mode"].map(function (name) {
       return column(data, "broker-integration", name);
@@ -4273,7 +4388,7 @@
     var built = paths.filter(function (p) { return p.built === "Yes"; });
     var struck = paths.filter(function (p) { return p.built === "No"; });
     if (built.length !== 1 || built[0].from !== INTEG_BROKER || built[0].to !== INTEG_SYSTEM) {
-      throw new Error("broker-integration: exactly one path is built, from the broker to TradeLog");
+      throw new Error("broker-integration: exactly one path is built, from the broker to the record");
     }
     if (!struck.length) throw new Error("broker-integration: no path was left unbuilt");
     var inPath = built[0];
@@ -4335,7 +4450,7 @@
       if (failed) {
         notice.textContent = "Connection failed. The record is stale, so no count shown is current.";
         notice.setAttribute("data-mark", "Stale record");
-        said.textContent = "The connection failed, so the broker’s record is stale. TradeLog says so " +
+        said.textContent = "The connection failed, so the broker’s record is stale. The system says so " +
           "above everything else, the last count is not shown as current, and nothing is sent to " +
           "the broker to recover it, since the order path stays struck.";
         return;

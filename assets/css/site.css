@@ -5845,3 +5845,41 @@ button.prep__cell:focus-visible {
   font-size: var(--text-xs);
   color: var(--ink-mute);
 }
+
+/* ---- Exhibit kind: fan-range ------------------------------------------------------------------
+   The Investment Analysis Toolkit's simulated range. Outer band 5th-95th, inner band 25th-75th,
+   the median as a line, and one path drawn over the fan in the ink colour, so the path and the
+   range differ in weight and shape, not in hue alone. */
+.fan {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.fan__grid {
+  stroke: var(--line-soft);
+  stroke-width: 1;
+}
+.fan__tick {
+  fill: var(--ink-mute);
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  font-size: 12px;
+}
+.fan__outer {
+  fill: color-mix(in srgb, var(--blue) 12%, transparent);
+  stroke: none;
+}
+.fan__inner {
+  fill: color-mix(in srgb, var(--blue) 28%, transparent);
+  stroke: none;
+}
+.fan__median {
+  fill: none;
+  stroke: var(--blue-deep);
+  stroke-width: 2;
+}
+.fan__path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}

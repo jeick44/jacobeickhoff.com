@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Investment Analysis Toolkit — Engagement 05 — Jacob Eickhoff</title>
+<meta name="description" content="An investment analysis toolkit that turns the messy data a real investor produces into a clean record: decisions graded against a plan written in advance, a place to state the thesis behind each position, and Monte Carlo ranges for where an index future could close next, published with no figure from the account.">
+<!-- ABOVE THE STYLESHEETS, AND NOT DEFERRED. Both halves matter.
+     Not deferred: this script turns the hiding rules on and has to do that before first paint.
+     Above them: a classic <script src> cannot execute until every stylesheet BEFORE it has
+     loaded, because it might ask for a computed style - so below the Google Fonts link, a slow
+     or unreachable CDN blocks this script, which blocks the parser, and the reader gets a blank
+     page until a third party answers. Here, the page renders immediately in the fallback face
+     and the webfont swaps in when it arrives. See the header of motion.js. -->
+<script src="/assets/js/motion.js"></script>
+<!-- Deferred: it draws each Exhibit from its data table once the page has parsed, and the page is
+     complete without it. Above the stylesheets for the reason given for motion.js. -->
+<script src="/assets/js/exhibit.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,500;1,8..60,600&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<!-- chrome:nav -->
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="/">Jacob Eickhoff</a>
+      <nav class="nav" aria-label="Primary">
+        <ul class="nav__list">
+          <li><a class="nav__link is-current" href="/work/" aria-current="true">Work</a></li>
+          <li><a class="nav__link" href="/research/">Research</a></li>
+          <li><a class="nav__link" href="/about/">About</a></li>
+          <li><a class="nav__link" href="/resume/">Resume</a></li>
+          <li><a class="nav__link nav__cta" href="/contact/">Get in touch</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<!-- /chrome:nav -->
+
+<main id="main">
+  <section class="case-head">
+    <div class="wrap">
+      <nav class="crumb" aria-label="Breadcrumb">
+        <a class="crumb__link" href="/work/">The work</a>
+        <span class="crumb__sep" aria-hidden="true">&rsaquo;</span>
+        <span class="crumb__here">Engagement 05</span>
+      </nav>
+      <h1 class="case-head__title">Turning a messy investment record into data that tells <em>the
+        right story</em></h1>
+      <p class="case-head__lede">The investment analysis toolkit: two tools I designed and built to
+        test how well I could bring data handling and financial analysis together. The
+        <strong>Investment Decision Record</strong> cleans the messy data a real investor produces
+        and grades each decision against a plan written in advance. The <strong>Thesis
+        Builder</strong> is where the reason for a position gets written down, next to short courses
+        on the investing philosophies those reasons come from. A set of Monte Carlo simulations turns
+        price and volume history into a range for where an index future could close next.</p>
+      <dl class="case-meta">
+        <div><dt>Sponsor</dt><dd>Self-directed &middot; product design and architecture</dd></div>
+        <div><dt>Status</dt><dd>Built &middot; simulation ranges checked, and too narrow</dd></div>
+        <div><dt>Governing constraint</dt><dd>Methodology Silence</dd></div>
+        <div><dt>Reading time</dt><dd>13 minutes</dd></div>
+      </dl>
+      <p class="case-head__status"><span class="case-head__flag">Design, not dollars</span> The
+        record behind this toolkit is my own. No dollar figure, account balance, return or
+        behavioral finding from it appears here. The method stays private too: the real Rules, their
+        thresholds and their definitions are withheld, which is what Methodology Silence means on
+        this page. Every Exhibit uses the Illustrative Investor, an invented investor with a
+        synthetic account over a synthetic period, whose Rules A to D stand in for the real ones.
+        The counts below describe the data I handled, not how the account did.</p>
+    </div>
+  </section>
+
+  <section class="stats stats--row" aria-labelledby="stats-heading">
+    <div class="wrap">
+      <h2 class="eyebrow" id="stats-heading">What this Engagement produced</h2>
+      <ul class="stats__list">
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="231">231</span>
+            <span class="stat__unit">executions cleaned</span>
+          </p>
+          <span class="stat__label">Read from the broker&rsquo;s own export across 37 market
+            sessions, then rebuilt, de-duplicated and graded.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="5">5</span>
+            <span class="stat__unit">broker export formats</span>
+          </p>
+          <span class="stat__label">Read without a separate parser for each, by matching their
+            column headers to one set of fields.</span>
+        </li>
+        <li class="stat reveal">
+          <p class="stat__figure">
+            <span class="stat__value" data-stat-final="5,000">5,000</span>
+            <span class="stat__unit">simulated closes per range</span>
+          </p>
+          <span class="stat__label">Behind each next-day range for an index future, reported as a
+            range and never as a single price.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="case-body">
+    <div class="wrap case-body__grid">
+      <nav class="toc" aria-label="The Spine" data-spine-toc>
+        <p class="toc__title">The Spine</p>
+        <ol class="toc__list">
+          <li><a class="toc__link" href="#the-situation">The Situation</a></li>
+          <li><a class="toc__link" href="#what-i-did">What I Did</a></li>
+          <li><a class="toc__link" href="#what-changed">What Changed</a></li>
+          <li><a class="toc__link" href="#what-i-learned">What I Learned</a></li>
+          <li><a class="toc__link" href="#where-else-this-applies">Where Else This Applies</a></li>
+        </ol>
+      </nav>
+      <div class="case-body__prose">
+
+          <p class="case-body__tools">
+            <button class="expand-all" type="button" data-expand-all hidden>Expand all sections</button>
+          </p>
+
+          <section class="spine" id="the-situation">
+            <h2 class="spine__title">The Situation</h2>
+            <p>I built this toolkit to test how well I could bring data handling and financial
+              analysis together. The test case was a single futures account, my own, because it
+              produced exactly the kind of messy data real investors produce.</p>
+            <p>That data came from four places that never agreed with each other. Some brokers
+              export one row per completed position and others one row per fill, so a single
+              decision can arrive as three partial fills. The charting platform and the broker keep
+              different clocks, and some timestamps carry a timezone while others do not. Contract
+              names change every quarter, so the same index future shows up under a new code every
+              few months. And the reasoning behind each decision was scattered across hand-written
+              notes, a notes app and folders of chart screenshots.</p>
+            <p>None of those sources is wrong on its own. Put together without cleaning, they tell
+              the wrong story. A duplicate row doubles a loss, a timestamp read in the wrong zone
+              moves a decision onto the wrong day, and a plan graded from memory says the plan was
+              followed. The point of the project was to get the data into a shape where it tells the
+              correct story, including when that story is unflattering.</p>
+          </section>
+
+          <section class="spine" id="what-i-did">
+            <h2 class="spine__title">What I Did</h2>
+            <p>The work had four parts: cleaning the raw record, grading the plan against it,
+              building a place to state the thesis behind each position, and simulating where prices
+              could go next.</p>
+
+            <p><strong>1. Cleaning the raw record.</strong> Every import runs the same steps before
+              anything is graded:</p>
+            <ul class="spine__list">
+              <li>Match the columns. Each broker names its columns differently (&ldquo;B/S&rdquo;,
+                &ldquo;Buy/Sell&rdquo;, &ldquo;Side&rdquo;), so headers are matched to one fixed set
+                of fields instead of writing a parser per broker. That covers five export formats,
+                and a manual column map handles anything the matching misses.</li>
+              <li>Rebuild positions from fills. When an export lists single fills, opening and
+                closing fills are paired first in, first out, so partial fills become one position
+                with one entry, exit, size and fee.</li>
+              <li>Put every timestamp on one clock. A timestamp with no timezone is read as the
+                investor&rsquo;s local time, the clock they actually saw, and one with a timezone is
+                read as an exact instant. The day a decision lands on decides which version of the
+                Rules grades it, so this matters more than it looks.</li>
+              <li>Normalize symbols and money. Contract codes reduce to one root, so MNQH5 and the
+                platform&rsquo;s long contract IDs both become MNQ. Money cells lose their dollar
+                signs and commas, and accounting parentheses read as negatives. Fees stay a separate
+                field, because a fee the record hides is a cost the investor is told they never
+                paid.</li>
+              <li>Remove duplicates without deleting real data. The broker&rsquo;s own ID decides
+                what is a repeat. Where an export has no ID, the fallback key adds a counter, because
+                my real history held eight pairs of separate executions that were identical in every
+                field, and a simple de-duplication would have deleted them without a word.</li>
+              <li>Attach old notes to the right row. Notes written before the importer existed are
+                matched to broker rows on date, symbol, direction and entry price within one tick.
+                Time is left out, because a remembered time is unreliable. A missed match leaves two
+                rows I can see and fix, while a wrong match quietly moves my reasoning onto a
+                different decision, so the bar is set high on purpose.</li>
+              <li>Skip bad rows, never the file. A malformed row is counted and set aside, so one
+                broken line does not sink an otherwise good import.</li>
+            </ul>
+            <p>The result was 231 executions across 37 market sessions, each one a clean row the
+              rest of the toolkit could rely on.</p>
+
+            <p><strong>2. Grading the plan against the record.</strong> The investor writes their
+              Rules down before a market session, each as a condition a computer can check.
+              Afterwards, the Investment Decision Record checks every execution against them and
+              marks each Rule kept or broken for the day. That is <strong>Verified
+              Adherence</strong>, and nothing the investor types reaches it.</p>
+            <p>I kept the investor&rsquo;s own grade instead of deleting it. <strong>Claimed
+              Adherence</strong>, the investor&rsquo;s account of the same day, sits beside the
+              computed figure, and the difference is shown for review instead of reconciled away.
+              The record knows what happened but never why. The investor knows why, and has every
+              reason to be generous. The gap shows where belief has drifted from behavior, and
+              averaging the two into one score is the one step that hides it.</p>
+            <figure class="exhibit" id="exhibit-recorded-reported-adherence" data-exhibit="adherence-gap"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 1</span> Averaging what
+                  was done with what was reported erases the signal worth reviewing.</h3>
+                <p class="exhibit__instruction">Read each Rule across the week, the record beside the
+                  report, then press Report one combined score.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>A synthetic week of the Illustrative Investor, each Rule graded for each
+                      day from the broker&rsquo;s record and as reported in review</caption>
+                    <thead>
+                      <tr><th scope="col">Day</th><th scope="col">Rule</th><th scope="col">Verified
+                        Adherence</th><th scope="col">Claimed Adherence</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Monday</th><td>Rule A, position size</td><td>Kept</td><td>Broken</td></tr>
+                      <tr><th scope="row">Monday</th><td>Rule B, entries</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Monday</th><td>Rule C, exits</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Monday</th><td>Rule D, when to stop</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Tuesday</th><td>Rule A, position size</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Tuesday</th><td>Rule B, entries</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Tuesday</th><td>Rule C, exits</td><td>Broken</td><td>Kept</td></tr>
+                      <tr><th scope="row">Tuesday</th><td>Rule D, when to stop</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Wednesday</th><td>Rule A, position size</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Wednesday</th><td>Rule B, entries</td><td>Broken</td><td>Broken</td></tr>
+                      <tr><th scope="row">Wednesday</th><td>Rule C, exits</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Wednesday</th><td>Rule D, when to stop</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Thursday</th><td>Rule A, position size</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Thursday</th><td>Rule B, entries</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Thursday</th><td>Rule C, exits</td><td>Broken</td><td>Kept</td></tr>
+                      <tr><th scope="row">Thursday</th><td>Rule D, when to stop</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Friday</th><td>Rule A, position size</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Friday</th><td>Rule B, entries</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Friday</th><td>Rule C, exits</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Friday</th><td>Rule D, when to stop</td><td>Broken</td><td>Kept</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, a synthetic week of the
+                Illustrative Investor. Each Rule on each day is graded from the broker&rsquo;s record
+                (Verified Adherence) and by the investor in review (Claimed Adherence). Kept or broken
+                is a simplification for this Exhibit, and the combined score is the plain average of
+                both counts.</figcaption>
+            </figure>
+
+            <p><strong>3. The Thesis Builder.</strong> This started as a rule book and became a place
+              to state why a position is being taken, before it is taken. Each position carries the
+              investor&rsquo;s thesis: the strategy behind it, the criteria that had to be true, the
+              evidence that lined up, and the planned exit and stop. The broker cannot know any of
+              that, so an import never writes over it.</p>
+            <p>Next to the thesis sit six short courses on the philosophies a thesis can come from.
+              They run from the long-term value approach of Benjamin Graham, Warren Buffett and
+              Charlie Munger, with compounding, moats and margin of safety, to statistical methods
+              built on standard deviations, along with supply and demand, breakouts, Fibonacci levels
+              and a liquidity-based method. The idea is that an investor learns a philosophy by
+              writing theses in its terms, not by reading about it once.</p>
+            <p>The charting side supplies the evidence. Its indicators mark price levels on the
+              chart, such as unfilled gaps and clusters of equal highs and lows, so they do not have
+              to be redrawn by hand every session. They present evidence and never give a direction,
+              because the direction is the investor&rsquo;s call. What a chart showed at a point in
+              time can be exported as structured data and attached to the thesis it supported. I
+              rebuilt those indicators from an inherited script that did a fraction of what I needed,
+              and the first step was writing down exactly how it failed, which turned a vague plan to
+              rebuild into fifty numbered requirements.</p>
+
+            <p><strong>4. Monte Carlo simulations.</strong> The last part asks where prices could go
+              next, and answers with a range. I pulled 90 days of hourly prices and volume for
+              Nasdaq-100 index futures from a public source and cleaned them the same way: missing
+              rows dropped, every timestamp on one clock, hours rolled up into days. From the open,
+              high, low, close and volume I built a few features: the day&rsquo;s range, the opening
+              gap, whether volume spiked above its recent norm, and the last five daily returns.</p>
+            <p>Two simulations run on that data. The first draws 500 paths of the next 24 hours,
+              hour by hour, from the period&rsquo;s average move and volatility, which is the shape
+              Exhibit 2 draws. The second estimates the next day&rsquo;s close. It draws 5,000 returns
+              from the last 20 days, weighting recent days more heavily, scales them to current
+              volatility, and centers them on a random-forest model&rsquo;s estimate of the next
+              day&rsquo;s return. What comes out is a range: the middle half of the simulated closes,
+              from the 25th to the 75th percentile, with the median between them.</p>
+            <figure class="exhibit" id="exhibit-simulated-price-range" data-exhibit="fan-range"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 2</span> One simulated
+                  path looks like a forecast, and the full fan shows it is one draw from a range.</h3>
+                <p class="exhibit__instruction">Read the shaded ranges hour by hour, then press One
+                  path to see what a single simulation would suggest on its own.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>5,000 synthetic paths of an invented index over the next 24 hours,
+                      starting at 100: the simulated level at each percentile every three hours, and
+                      one path on its own</caption>
+                    <thead>
+                      <tr><th scope="col">Hour</th><th scope="col">One path</th><th scope="col">5th
+                        percentile</th><th scope="col">25th percentile</th><th
+                        scope="col">Median</th><th scope="col">75th percentile</th><th scope="col">95th
+                        percentile</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">0</th><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td><td>100.0</td></tr>
+                      <tr><th scope="row">3</th><td>99.6</td><td>99.3</td><td>99.7</td><td>100.0</td><td>100.3</td><td>100.7</td></tr>
+                      <tr><th scope="row">6</th><td>99.9</td><td>99.0</td><td>99.6</td><td>100.0</td><td>100.4</td><td>101.0</td></tr>
+                      <tr><th scope="row">9</th><td>100.2</td><td>98.8</td><td>99.5</td><td>100.0</td><td>100.5</td><td>101.2</td></tr>
+                      <tr><th scope="row">12</th><td>100.0</td><td>98.6</td><td>99.4</td><td>99.9</td><td>100.6</td><td>101.4</td></tr>
+                      <tr><th scope="row">15</th><td>99.7</td><td>98.4</td><td>99.3</td><td>99.9</td><td>100.6</td><td>101.5</td></tr>
+                      <tr><th scope="row">18</th><td>98.7</td><td>98.2</td><td>99.2</td><td>99.9</td><td>100.6</td><td>101.6</td></tr>
+                      <tr><th scope="row">21</th><td>98.8</td><td>98.1</td><td>99.2</td><td>99.9</td><td>100.7</td><td>101.9</td></tr>
+                      <tr><th scope="row">24</th><td>98.6</td><td>97.9</td><td>99.1</td><td>99.9</td><td>100.8</td><td>102.0</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative and synthetic. 5,000
+                paths drawn from hourly returns with no drift and a volatility of 0.25% an hour,
+                starting from an invented index level of 100. No real price, date or position is
+                drawn.</figcaption>
+            </figure>
+            <p>Those are ranges, not predictions. A single path looks like a forecast, which is
+              exactly why the Exhibit draws the whole fan. The same idea runs inside the Investment
+              Decision Record&rsquo;s practice mode, which generates new synthetic price bars fitted
+              to a real market&rsquo;s volatility patterns, so practice happens on price action
+              nobody has memorized. The next step is to point the range at individual stocks and ask
+              whether a stock&rsquo;s current price sits favorably inside it.</p>
+
+            <p>Three design decisions hold the record up.</p>
+            <p><strong>One calculation produces every number.</strong> The grading is a single
+              function. It takes the executions, the Rules, the account, the investor&rsquo;s notes
+              and the date as inputs, and returns every number on every screen. Because the date
+              is an input, re-running a session from March today gives the answer it gave in
+              March, and every screen shows the same answer.</p>
+            <p><strong>Rules are versioned.</strong> The investor has to be able to edit their
+              Rules, or they are the system&rsquo;s rules and not the investor&rsquo;s. But a
+              threshold edited in place rewrites its own history, and last month&rsquo;s grade
+              quietly becomes a claim about this month&rsquo;s rule. So every edit saves a new
+              version, and every day records the version it was graded under.</p>
+            <figure class="exhibit" id="exhibit-versioned-investment-rules" data-exhibit="versioned-rules"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 3</span> A revised rule
+                  governs the decisions after it, and earlier decisions keep the rule they were made
+                  under.</h3>
+                <p class="exhibit__instruction">Read the week as revised, then press Edit in place and
+                  watch what happens to the days already graded.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The synthetic week of Exhibit 1 for Rule B: the version each day was
+                      recorded under, and the day graded under each version of the Rule</caption>
+                    <thead>
+                      <tr><th scope="col">Day</th><th scope="col">Rule</th><th scope="col">Recorded
+                        under</th><th scope="col">Graded under version 1</th><th scope="col">Graded
+                        under version 2</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Monday</th><td>Rule B, entries</td><td>Version 1</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Tuesday</th><td>Rule B, entries</td><td>Version 1</td><td>Kept</td><td>Broken</td></tr>
+                      <tr><th scope="row">Wednesday</th><td>Rule B, entries</td><td>Version 1</td><td>Broken</td><td>Kept</td></tr>
+                      <tr><th scope="row">Thursday</th><td>Rule B, entries</td><td>Version 1</td><td>Kept</td><td>Kept</td></tr>
+                      <tr><th scope="row">Friday</th><td>Rule B, entries</td><td>Version 2</td><td>Broken</td><td>Kept</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, the synthetic week of
+                Exhibit 1, for Rule B only, of the Illustrative Investor. Rule B is revised on review
+                after Thursday and saved as version 2, and the system grades each day only under its
+                own version, matching Exhibit 1. Both versions are shown here so an edit in place can
+                be drawn. What either version of Rule B says is withheld.</figcaption>
+            </figure>
+            <p><strong>The broker connection reads and never writes.</strong> The system knows
+              when the day&rsquo;s budget is spent, so it could block the next order instead of
+              only objecting to it. I rejected order placement, because a block works only if it
+              cannot be bypassed, and the broker&rsquo;s own platform is one keystroke away. It
+              would buy no enforcement while adding two failure modes: a bug that moves money
+              and a failed request that leaves a position open. When the read-only connection
+              fails, the system says so loudly, because a stale count shown as a current one gets
+              believed.</p>
+            <figure class="exhibit" id="exhibit-read-only-broker-integration" data-exhibit="broker-integration"
+                    data-provenance="illustrative">
+              <div class="exhibit__head">
+                <h3 class="exhibit__title"><span class="exhibit__label">Exhibit 4</span> The system
+                  observes every execution and places none.</h3>
+                <p class="exhibit__instruction">Read the paths as built, then press Connection failed
+                  to see what the Illustrative Investor is shown when the record stops arriving.</p>
+              </div>
+              <div class="exhibit__stage" data-stage></div>
+              <details class="exhibit__data">
+                <summary class="exhibit__data-toggle">View the data</summary>
+                <div class="exhibit__table">
+                  <table>
+                    <caption>The paths between the broker and the Investment Decision Record for the
+                      Illustrative Investor&rsquo;s account, whether each was built, and how each
+                      fails</caption>
+                    <thead>
+                      <tr><th scope="col">Path</th><th scope="col">From</th><th scope="col">To</th><th
+                        scope="col">Built</th><th scope="col">Failure mode</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><th scope="row">Read the execution record</th><td>The broker</td><td>The record</td><td>Yes</td><td>The connection fails and the record goes stale</td></tr>
+                      <tr><th scope="row">Place an order</th><td>The record</td><td>The broker</td><td>No</td><td>A bug that moves money</td></tr>
+                      <tr><th scope="row">Place an order</th><td>The record</td><td>The broker</td><td>No</td><td>A failed request that leaves a position open</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+              <figcaption class="exhibit__source"><b>Source:</b> illustrative, the paths between the
+                broker and the Investment Decision Record for the Illustrative Investor. The order
+                path was not built, so its failure modes, named above, are drawn struck through. The
+                notice is worded for this Exhibit, not copied from the system. The broker&rsquo;s
+                name, how the system signs in to it, and every detail of the account are
+                withheld.</figcaption>
+            </figure>
+          </section>
+
+          <section class="spine" id="what-changed">
+            <h2 class="spine__title">What Changed</h2>
+            <p>My notes stopped being a place to type in what happened and became a record built
+              from data. Once executions arrived by import, writing meant adding the thesis to rows
+              that already existed, limited to what the broker cannot know. The headline figure
+              changed with it, from how completely a form was filled in to how much room the account
+              has left before it ends.</p>
+            <p>Reviews changed the same way. A week&rsquo;s review became reading clean records
+              instead of opening dated folders of screenshots.</p>
+            <p class="pending-result">
+              <span class="pending-result__flag">Pending Result</span>
+              Whether the simulated ranges hold up is the open question. A range is calibrated when
+              the real close lands inside the middle half about half the time, and inside the 5th to
+              95th percentile band about 90% of the time. I ran that check on the 65 days the saved
+              data allowed, from July 24 to October 10, 2025, rebuilding each day&rsquo;s range from
+              only the data before it. The middle half caught the real close on 28 of 65 days, 43%,
+              and the wider band on 48, 74%. So the ranges run too narrow, and the simulation is more
+              confident than the market. The median pointed the right direction on 34 of 65 days,
+              close to a coin flip. Sixty-five days is too few to settle it either way, so the next
+              step is the same test over years of data, widening the range until it earns its
+              confidence. Whether grading decisions against the record changes them is a separate
+              question, and answering it would take a long run of decisions this page does not
+              publish.
+            </p>
+            <p class="withheld-result">
+              <span class="withheld-result__flag">Withheld</span>
+              What the committed Rules would have done across the account&rsquo;s history has been
+              computed exactly, from executions that already happened. It is not on this page. That
+              figure is a personal profit-and-loss number. A number about my own account is not
+              evidence about my engineering, and it is what a reader would remember instead. A check
+              in the site&rsquo;s build now fails if a dollar figure of that kind appears in any page.
+              So this is enforced by the build, not left to my restraint.
+            </p>
+          </section>
+
+          <section class="spine" id="what-i-learned">
+            <h2 class="spine__title">What I Learned</h2>
+            <p>The hardest call in this project was choosing which story the data is allowed to
+              tell. A messy record will support almost any story if you let it. Drop the duplicates
+              you do not like, read the timestamps in whichever zone moves a bad decision onto
+              another day, or average the investor&rsquo;s grade with the computer&rsquo;s, and the
+              record says what you hoped. Every cleaning step above is a decision about what the data
+              may say, so each one is written down with its reason, in the code, where anyone
+              checking a number can find it.</p>
+            <p>I learned the second lesson by getting it wrong. I wrote the record&rsquo;s alerts
+              from a story about the user, not from the user&rsquo;s data. When I finally pointed the
+              same import that produces Verified Adherence at the alert list, one alert turned out to
+              be watching for a pattern the record did not contain, and I retired it. The charting
+              side taught the same thing from the other end: a readout dead from the day it was
+              written sat on the chart for months, unnoticed because nothing depended on it. Checking
+              the simulation for this page did it a third time. My original app read the price
+              columns in the wrong order, so its &ldquo;close&rdquo; was each hour&rsquo;s open.
+              &ldquo;I use it and it works&rdquo; is not evidence that it works.</p>
+            <details class="disclosure">
+              <summary class="disclosure__summary">What this page claims, and what it does
+                not</summary>
+              <div class="disclosure__body">
+                <p>Nothing here should be read as a claim that the toolkit made anyone a better
+                  investor. Returns are out of scope, and the Withheld note above says why.</p>
+                <p>What the page claims is narrower and checkable. The grade comes from a record the
+                  investor does not write. The calculation gives the same answer on old data. The
+                  simulated ranges were checked against what happened, on a sample too small to
+                  settle it. And the decisions behind the build were written down with their
+                  alternatives at the time, not reconstructed afterwards for a write-up.</p>
+              </div>
+            </details>
+          </section>
+
+          <section class="spine" id="where-else-this-applies">
+            <h2 class="spine__title">Where Else This Applies</h2>
+            <p><strong>Clean the record before analyzing it.</strong> Any analysis that joins data
+              from systems that were never designed to agree, like a loan system and a customer
+              database, or two platforms on different clocks, inherits every disagreement between
+              them. The cleaning rules are the analysis&rsquo;s first assumptions, and they deserve
+              the same scrutiny as the model.</p>
+            <p><strong>Give ranges, not point forecasts.</strong> A forecast given as one number
+              invites people to treat it as a promise. A range, together with how often the real
+              outcome landed inside it, says how much the forecast should be trusted, and that check
+              is cheap to run.</p>
+            <p><strong>Self-report measures intention, and it fails hardest where it matters
+              most.</strong> Control attestations, training completion, time recording and
+              safety checklists all ask the person who did the work to confirm they did it
+              properly. Each is least reliable in exactly the cases worth catching. Where a system
+              already holds a record of the behavior, compliance can be computed from it. The
+              distance between claim and record is then a second measurement, and most
+              organizations throw it away by reconciling it. The same reading works for an adviser,
+              whose recorded rationale can be read against the client&rsquo;s executions, and for an
+              investment committee, whose policy statement can be read against the
+              portfolio&rsquo;s transactions.</p>
+          </section>
+
+          <p class="case-foot">
+            <a class="btn btn--solid" href="/work/">All six Engagements</a>
+            <a class="btn btn--outline" href="mailto:jacobeickhoff01@gmail.com">Ask me about this one</a>
+          </p>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- chrome:footer -->
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <div class="site-footer__identity">
+        <p class="site-footer__name">Jacob Eickhoff</p>
+        <p class="site-footer__where">St. Cloud, Minnesota &middot; University of Wisconsin&ndash;Eau Claire, May 2027</p>
+      </div>
+      <div class="site-footer__group">
+        <h2 class="site-footer__heading">Work</h2>
+        <ul class="site-footer__list">
+          <li><a href="/work/customer-intelligence/">Customer Intelligence</a></li>
+          <li><a href="/work/credit-process-rebuild/">Credit Process Rebuild</a></li>
+          <li><a href="/work/the-competition/">Hedge Fund Case Competition</a></li>
+          <li><a href="/work/the-research/">Research</a></li>
+          <li><a href="/work/investment-analysis-toolkit/">Investment Analysis Toolkit</a></li>
+          <li><a href="/work/macrosense/">Regime &amp; Sentiment Allocator</a></li>
+        </ul>
+      </div>
+      <div class="site-footer__group">
+        <h2 class="site-footer__heading">Contact</h2>
+        <ul class="site-footer__list">
+          <li><a href="mailto:jacobeickhoff01@gmail.com">jacobeickhoff01@gmail.com</a></li>
+          <li><a href="https://www.linkedin.com/in/jacob-eickhoff" rel="me noopener">LinkedIn</a></li>
+        </ul>
+      </div>
+      <p class="site-footer__note">Figures here describe work product, meaning assertions written, tools shipped and decisions recorded. Figures describing a Sponsor&rsquo;s business are generalized or left out.</p>
+    </div>
+  </footer>
+<!-- /chrome:footer -->
+
+</body>
+</html>
